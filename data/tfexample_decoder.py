@@ -40,7 +40,6 @@ from __future__ import print_function
 
 import abc
 
-
 import six
 
 from tf_slim.data import data_decoder

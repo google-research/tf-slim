@@ -66,6 +66,7 @@ ResNet-101 for semantic segmentation into 21 classes:
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+
 from tf_slim.nets import resnet_utils
 from tensorflow.contrib import layers as layers_lib
 from tensorflow.contrib.framework.python.ops import add_arg_scope

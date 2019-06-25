@@ -33,7 +33,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-
 import numpy as np
 from tf_slim import model_analyzer
 from tf_slim.nets import inception_v3

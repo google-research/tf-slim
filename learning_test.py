@@ -37,7 +37,6 @@ import glob
 import os
 import tempfile
 
-
 import numpy as np
 from numpy import testing as np_testing
 from tf_slim import learning

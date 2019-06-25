@@ -33,7 +33,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-
 import numpy as np
 from tf_slim.nets import resnet_utils
 from tf_slim.nets import resnet_v1

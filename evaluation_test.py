@@ -38,7 +38,6 @@ import os
 import shutil
 import time
 
-
 import numpy as np
 from tf_slim import evaluation
 from tensorflow.contrib.framework.python.ops import variables as variables_lib
