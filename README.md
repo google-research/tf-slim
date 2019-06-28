@@ -4,9 +4,14 @@ TF-Slim is a lightweight library for defining, training and evaluating complex
 models in TensorFlow. Components of tf-slim can be freely mixed with native
 tensorflow, as well as other frameworks, such as tf.contrib.learn.
 
+## Install
+```bash
+pip install tf_slim
+```
+
 ## Usage
 ```python
-import tensorflow.contrib.slim as slim
+import tf_slim as slim
 ```
 
 ## Why TF-Slim?
