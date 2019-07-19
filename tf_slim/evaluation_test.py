@@ -26,8 +26,8 @@ import time
 
 import numpy as np
 from tf_slim import evaluation
-from tensorflow.contrib.framework.python.ops import variables as variables_lib
-from tensorflow.contrib.training.python.training import evaluation as evaluation_lib
+from tf_slim.ops import variables as variables_lib
+from tf_slim.training import evaluation as evaluation_lib
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import saver_pb2
 from tensorflow.python.debug.lib import debug_data

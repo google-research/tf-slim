@@ -35,8 +35,7 @@ units.
 
 Typical use:
 
-   from tensorflow.contrib.slim.python.slim.nets import
-   resnet_v1
+   from tf_slim.nets import resnet_v1
 
 ResNet-101 for image classification into 1000 classes:
 
@@ -60,11 +59,11 @@ from __future__ import division
 from __future__ import print_function
 
 from tf_slim.nets import resnet_utils
-from tensorflow.contrib import layers
-from tensorflow.contrib.framework.python.ops import add_arg_scope
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.layers.python.layers import layers as layers_lib
-from tensorflow.contrib.layers.python.layers import utils
+from tf_slim import layers
+from tf_slim.ops.arg_scope import add_arg_scope
+from tf_slim.ops.arg_scope import arg_scope
+from tf_slim.layers import layers as layers_lib
+from tf_slim.layers import utils
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn_ops

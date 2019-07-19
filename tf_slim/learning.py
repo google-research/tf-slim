@@ -254,7 +254,7 @@ import os
 import sys
 import time
 
-from tensorflow.contrib.training.python.training import training
+from tf_slim.training import training
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import timeline

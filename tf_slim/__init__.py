@@ -32,14 +32,19 @@ from tf_slim.data import dataset_data_provider
 from tf_slim.data import parallel_reader
 from tf_slim.data import prefetch_queue
 from tf_slim.data import tfexample_decoder
+
 # TODO(b/135606235): Delete non-slim imports
-from tensorflow.contrib import losses
-from tensorflow.contrib import metrics
-from tensorflow.contrib.framework.python.ops.arg_scope import *
-from tensorflow.contrib.framework.python.ops.variables import *
-from tensorflow.contrib.layers.python.layers import *
-from tensorflow.contrib.layers.python.layers.initializers import *
-from tensorflow.contrib.layers.python.layers.regularizers import *
+# -- from tensorflow.contrib import losses
+# from tensorflow import losses
+# -- from tensorflow.contrib import metrics
+# from tensorflow import metrics
+# -- from tensorflow.contrib.framework.python.ops.arg_scope import *
+# -- from tensorflow.contrib.framework.python.ops.variables import *
+from tf_slim.ops.arg_scope import *
+from tf_slim.ops.variables import *
+from tf_slim.layers.layers import *
+from tf_slim.layers.initializers import *
+from tf_slim.layers.regularizers import *
 from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
 # pylint: enable=unused-import,line-too-long,g-importing-member,wildcard-import
 

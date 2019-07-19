@@ -22,8 +22,8 @@ from __future__ import print_function
 import numpy as np
 from tf_slim import model_analyzer
 from tf_slim.nets import inception_v2
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.framework.python.ops import variables as variables_lib
+from tf_slim.ops.arg_scope import arg_scope
+from tf_slim.ops import variables as variables_lib
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops

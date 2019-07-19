@@ -22,9 +22,9 @@ from __future__ import print_function
 import numpy as np
 from tf_slim.nets import resnet_utils
 from tf_slim.nets import resnet_v2
-from tensorflow.contrib import layers
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.layers.python.layers import utils
+from tf_slim import layers
+from tf_slim.ops.arg_scope import arg_scope
+from tf_slim.layers import utils
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes

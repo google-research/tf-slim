@@ -26,9 +26,9 @@ import tempfile
 import numpy as np
 from numpy import testing as np_testing
 from tf_slim import learning
-from tensorflow.contrib.framework.python.ops import variables as variables_lib2
-from tensorflow.contrib.layers.python.layers import layers
-from tensorflow.contrib.losses.python.losses import loss_ops
+from tf_slim.ops import variables as variables_lib2
+from tf_slim.layers import layers
+from tensorflow import losses as loss_ops
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import session
@@ -248,7 +248,7 @@ class TrainBNClassifierTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -284,7 +284,7 @@ class CreateTrainOpTest(test.TestCase):
       expected_var = self._addBesselsCorrection(16, expected_var)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -318,7 +318,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -351,7 +351,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -376,7 +376,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -402,7 +402,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -435,7 +435,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -454,7 +454,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -473,7 +473,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -510,7 +510,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -535,7 +535,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       summary.scalar('total_loss', total_loss)
 
@@ -561,7 +561,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       summary.scalar('total_loss', total_loss)
 
@@ -581,7 +581,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -599,7 +599,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -620,7 +620,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -639,7 +639,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -662,7 +662,7 @@ class TrainTest(test.TestCase):
       local_multiplier = variables_lib2.local_variable(1.0)
 
       tf_predictions = LogisticClassifier(tf_inputs) * local_multiplier
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -686,7 +686,7 @@ class TrainTest(test.TestCase):
         tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
         tf_predictions = LogisticClassifier(tf_inputs)
-        loss_ops.log_loss(tf_predictions, tf_labels)
+        loss_ops.log_loss(tf_labels, tf_predictions)
         total_loss = loss_ops.get_total_loss()
 
         optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -706,7 +706,7 @@ class TrainTest(test.TestCase):
     tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
-    loss_ops.log_loss(tf_predictions, tf_labels)
+    loss_ops.log_loss(tf_labels, tf_predictions)
     total_loss = loss_ops.get_total_loss()
 
     optimizer = gradient_descent.GradientDescentOptimizer(
@@ -815,7 +815,7 @@ class TrainTest(test.TestCase):
     tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
-    loss_ops.log_loss(tf_predictions, tf_labels)
+    loss_ops.log_loss(tf_labels, tf_predictions)
     return loss_ops.get_total_loss()
 
   def testTrainAllVarsHasLowerLossThanTrainSubsetOfVars(self):
@@ -967,7 +967,7 @@ class TrainTest(test.TestCase):
       tf_labels_limited = input_lib.limit_epochs(tf_labels, num_epochs=300)
 
       tf_predictions = LogisticClassifier(tf_inputs_limited)
-      loss_ops.log_loss(tf_predictions, tf_labels_limited)
+      loss_ops.log_loss(tf_labels_limited, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)

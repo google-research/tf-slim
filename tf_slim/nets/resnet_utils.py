@@ -41,13 +41,13 @@ from __future__ import print_function
 
 import collections
 
-from tensorflow.contrib import layers as layers_lib
-from tensorflow.contrib.framework.python.ops import add_arg_scope
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.layers.python.layers import initializers
-from tensorflow.contrib.layers.python.layers import layers
-from tensorflow.contrib.layers.python.layers import regularizers
-from tensorflow.contrib.layers.python.layers import utils
+from tf_slim import layers as layers_lib
+from tf_slim.ops.arg_scope import add_arg_scope
+from tf_slim.ops.arg_scope import arg_scope
+from tf_slim.layers import initializers
+from tf_slim.layers import layers
+from tf_slim.layers import regularizers
+from tf_slim.layers import utils
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
@@ -99,13 +99,13 @@ def conv2d_same(inputs, num_outputs, kernel_size, stride, rate=1, scope=None):
 
   is equivalent to
 
-     net = tf.contrib.layers.conv2d(inputs, num_outputs, 3, stride=1,
+     net = tf_slim.layers.conv2d(inputs, num_outputs, 3, stride=1,
      padding='SAME')
      net = subsample(net, factor=stride)
 
   whereas
 
-     net = tf.contrib.layers.conv2d(inputs, num_outputs, 3, stride=stride,
+     net = tf_slim.layers.conv2d(inputs, num_outputs, 3, stride=stride,
      padding='SAME')
 
   is different when the input's height or width is even, which is why we add the
