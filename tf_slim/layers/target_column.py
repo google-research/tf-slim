@@ -28,8 +28,11 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
+from tensorflow.python.util.deprecation import deprecated
 
-
+@deprecated(
+  None,
+  "Please see tensorflow/estimator/contrib/head.py")
 def regression_target(label_name=None,
                       weight_column_name=None,
                       label_dimension=1):
@@ -57,7 +60,9 @@ def regression_target(label_name=None,
 
 # TODO(zakaria): Add logistic_regression_target
 
-
+@deprecated(
+  None,
+  "Please see tensorflow/estimator/contrib/head.py")
 def multi_class_target(n_classes, label_name=None, weight_column_name=None):
   """Creates a _TargetColumn for multi class single label classification.
 
@@ -91,7 +96,9 @@ def multi_class_target(n_classes, label_name=None, weight_column_name=None):
       label_name=label_name,
       weight_column_name=weight_column_name)
 
-
+@deprecated(
+  None,
+  "Please see tensorflow/estimator/contrib/head.py")
 def binary_svm_target(label_name=None, weight_column_name=None):
   """Creates a _TargetColumn for binary classification with SVMs.
 
@@ -113,7 +120,9 @@ def binary_svm_target(label_name=None, weight_column_name=None):
       label_name=label_name, weight_column_name=weight_column_name)
 
 
-# See:third_party/tensorflow/contrib/learn/python/learn/estimators/head.py
+@deprecated(
+  None,
+  "Please see tensorflow/estimator/contrib/head.py")
 class ProblemType(object):
   UNSPECIFIED = 0
   CLASSIFICATION = 1
@@ -429,7 +438,9 @@ def _run_metrics(predictions, labels, metrics, weights):
 
   return result
 
-
+@deprecated(
+  None,
+  "Please see tensorflow/estimator/contrib/head.py")
 def get_default_binary_metrics_for_eval(thresholds):
   """Returns a dictionary of basic metrics for logistic regression.
 
