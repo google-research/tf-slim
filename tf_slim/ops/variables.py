@@ -23,8 +23,6 @@ import re
 from tf_slim.ops.arg_scope import add_arg_scope as contrib_add_arg_scope
 
 # TODO (adrianc-a) having multiple ops I believe might cause naming conflicts
-from tf_slim.ops import gen_variable_ops
-from tensorflow import load_op_library
 from tensorflow.core.protobuf import saver_pb2
 from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.framework import device as tf_device
@@ -32,10 +30,8 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
-from tensorflow.python.ops import resource_variable_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
-from tensorflow.python.platform import resource_loader
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import saver as tf_saver
 from tensorflow.python.training import training_util
@@ -66,31 +62,7 @@ __all__ = ['add_model_variable',
            'local_variable',
            'model_variable',
            'variable',
-           'VariableDeviceChooser',
-           'zero_initializer']
-
-
-def zero_initializer(ref, use_locking=True, name="zero_initializer"):
-  """Initialize 'ref' with all zeros, ref tensor should be uninitialized.
-
-  If already initialized, you will get ValueError. This op is intended to
-  save memory during initialization.
-  Args:
-    ref: ref of the tensor need to be zero initialized.
-    name: optional name for this operation.
-
-  Returns:
-    ref that initialized.
-  Raises:
-    ValueError: If ref tensor is initialized.
-  """
-  load_op_library(
-      resource_loader.get_path_to_datafile('_variable_ops.so'))
-  if resource_variable_ops.is_resource_variable(ref):
-    return gen_variable_ops.zero_var_initializer(
-        ref.handle, shape=ref.shape, dtype=ref.dtype, name=name)
-  else:
-    return gen_variable_ops.zero_initializer(ref, name=name)
+           'VariableDeviceChooser']
 
 
 @deprecated(None, 'Please switch to tf.train.assert_global_step')
