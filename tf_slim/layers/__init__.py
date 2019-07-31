@@ -19,10 +19,6 @@ from __future__ import division
 from __future__ import print_function
 
 # pylint: disable=wildcard-import
-from tf_slim.layers.embedding_ops import *
-from tf_slim.layers.encoders import *
-from tf_slim.layers.feature_column import *
-from tf_slim.layers.feature_column_ops import *
 from tf_slim.layers.initializers import *
 from tf_slim.layers.layers import *
 from tf_slim.layers.normalization import *
@@ -32,5 +28,4 @@ from tf_slim.layers.rev_block_lib import *
 from tf_slim.layers.summaries import *
 from tf_slim.layers.target_column import *
 from tf_slim.ops.bucketization_op import *
-from tf_slim.ops.sparse_feature_cross_op import *
 # pylint: enable=wildcard-import
