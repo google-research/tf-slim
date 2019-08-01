@@ -28,7 +28,8 @@ from numpy import testing as np_testing
 from tf_slim import learning
 from tf_slim.ops import variables as variables_lib2
 from tf_slim.layers import layers
-from tensorflow import losses as loss_ops
+#from tensorflow import losses as loss_ops
+from tensorflow.compat.v1 import losses as loss_ops
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import session

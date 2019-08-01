@@ -29,7 +29,8 @@ from tf_slim.layers import layers
 from tf_slim.training import evaluation
 from tf_slim.training import training
 
-from tensorflow import losses as loss_ops
+#from tensorflow import losses as loss_ops
+from tensorflow.compat.v1 import losses as loss_ops
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import session as session_lib
 from tensorflow.python.framework import constant_op

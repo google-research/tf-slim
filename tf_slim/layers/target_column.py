@@ -20,7 +20,8 @@ from __future__ import print_function
 
 import six
 
-from tensorflow import losses as loss_ops
+#from tensorflow import losses as loss_ops
+from tensorflow.compat.v1 import losses as loss_ops
 from tensorflow.python.ops import metrics as metrics_lib
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
@@ -497,7 +498,7 @@ def _streaming_auc(predictions, labels, weights=None):
 def _streaming_accuracy(predictions, labels, weights=None,
                         metrics_collections=None, updates_collections=None,
                         name=None):
-    return _streaming_accuracy(
+    return metrics_lib.accuracy(
         predictions=predictions, labels=labels, weights=weights,
         metrics_collections=metrics_collections,
         updates_collections=updates_collections, name=name)

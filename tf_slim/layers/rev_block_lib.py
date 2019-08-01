@@ -33,7 +33,7 @@ import numpy as np
 import six
 from six.moves import xrange  # pylint: disable=redefined-builtin
 
-from tf_slim.ops import framework_ops as contrib_framework_ops
+import tf_slim.ops as arg_scope_ops
 from tensorflow.python.eager import backprop
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops as framework_ops
@@ -542,7 +542,7 @@ def _recomputing_grad_fn(compute_fn,
     if use_data_dep:
       inputs = _force_data_dependency(output_grads, inputs)
     # Re-enter scopes
-    with contrib_framework_ops.arg_scope(arg_scope):
+    with arg_scope_ops.arg_scope(arg_scope):
       with variable_scope.variable_scope(var_scope, reuse=True):
         # Re-call the function and ensure that the touched variables are the
         # same as in the first call.
@@ -592,7 +592,7 @@ def _recompute_grad(fn, args, use_data_dep=_USE_DEFAULT, tupleize_grads=False):
     # Capture the variable and arg scopes so we can re-enter them when
     # recomputing.
     vs = variable_scope.get_variable_scope()
-    arg_scope = contrib_framework_ops.current_arg_scope()
+    arg_scope = arg_scope_ops.current_arg_scope()
     # Track all variables touched in the function.
     with backprop.GradientTape() as tape:
       fn_kwargs = {}

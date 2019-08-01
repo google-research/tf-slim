@@ -22,7 +22,6 @@ import re
 
 from tf_slim.ops.arg_scope import add_arg_scope as contrib_add_arg_scope
 
-# TODO (adrianc-a) having multiple ops I believe might cause naming conflicts
 from tensorflow.core.protobuf import saver_pb2
 from tensorflow.python import pywrap_tensorflow
 from tensorflow.python.framework import device as tf_device
