@@ -551,7 +551,8 @@ class TrainTest(test.TestCase):
           log_every_n_steps=10,
           trace_every_n_steps=100)
     self.assertIsNotNone(loss)
-    for trace_step in [1, 101, 201]:
+    # TODO (adrianc-a) What changed r1.14-r2.0 that made this index shift?
+    for trace_step in [0, 100, 200]:
       trace_filename = 'tf_trace-%d.json' % trace_step
       self.assertTrue(os.path.isfile(os.path.join(logdir, trace_filename)))
 
