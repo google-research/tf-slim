@@ -446,8 +446,7 @@ def create_train_op(total_loss,
       total_loss,
       variables_to_train,
       gate_gradients=gate_gradients,
-      aggregation_method=aggregation_method,
-      colocate_gradients_with_ops=colocate_gradients_with_ops)
+      aggregation_method=aggregation_method)
 
   if transform_grads_fn:
     grads = transform_grads_fn(grads)
