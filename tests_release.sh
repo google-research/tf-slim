@@ -14,9 +14,6 @@
 
 #!/usr/bin/env bash
 
-# Test nightly release: ./test_release.sh nightly
-# Test stable release: ./test_release.sh stable
-
 # Exit if any process returns non-zero status.
 set -e
 # Display the commands being run in logs, which are replicated to sponge.
@@ -37,18 +34,18 @@ run_tests() {
 
   # TensorFlow isn't a regular dependency because there are many different pip
   # packages a user might have installed.
-  pip install tensorflow
+  pip install tensorflow==2.0.0-beta1
 
   # Run the tests
   python setup.py test
 
-  # Install tf_agents package.
+  # Install the tf_slim package
   WHEEL_PATH=${TMP}/wheel/$1
   ./pip_pkg.sh ${WHEEL_PATH}/
 
   pip install ${WHEEL_PATH}/tf_slim*.whl
 
-  # Move away from repo directory so "import tf_agents" refers to the
+  # Move away from repo directory so "import tf_slim" refers to the
   # installed wheel and not to the local fs.
   (cd $(mktemp -d) && python -c 'import tf_slim')
 
