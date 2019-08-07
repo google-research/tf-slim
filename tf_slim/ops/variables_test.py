@@ -41,6 +41,8 @@ from tensorflow.python.platform import test
 from tensorflow.python.training import device_setter
 from tensorflow.python.training import saver as saver_lib
 
+from tensorflow.errors import FailedPreconditionError
+
 
 class LocalVariableTest(test.TestCase):
 
@@ -122,8 +124,7 @@ class GlobalVariableTest(test.TestCase):
       variables_lib2.global_variable(value1)
       variables = variables_lib.global_variables()
       self.assertEquals(2, len(variables))
-      with self.assertRaisesOpError(
-          'Attempting to use uninitialized value Variable'):
+      with self.assertRaises(FailedPreconditionError):
         sess.run(variables)
       variables_lib.variables_initializer(variables).run()
       self.assertAllEqual(set([value0, value1]), set(sess.run(variables)))
