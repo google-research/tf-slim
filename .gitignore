@@ -7,3 +7,5 @@ node_modules
 __pycache__
 *.swp
 .vscode/
+build/
+tf_slim.egg-info/
