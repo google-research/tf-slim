@@ -46,6 +46,7 @@ from tensorflow.python.training import input  # pylint: disable=redefined-builti
 from tensorflow.python.training import saver as saver_lib
 from tensorflow.python.training import session_run_hook
 # pylint:enable=g-direct-tensorflow-import
+from nose.tools import nottest
 
 FLAGS = flags.FLAGS
 
@@ -59,6 +60,7 @@ def GenerateTestData(num_classes, batch_size):
   return inputs, labels
 
 
+@nottest
 def TestModel(inputs):
   scale = variables.Variable(1.0, trainable=False)
 

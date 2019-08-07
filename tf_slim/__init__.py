@@ -40,7 +40,8 @@ from tf_slim.data import tfexample_decoder
 # from tensorflow import metrics
 # -- from tensorflow.contrib.framework.python.ops.arg_scope import *
 # -- from tensorflow.contrib.framework.python.ops.variables import *
-from tf_slim.training import *
+from tf_slim.training import evaluation as train_eval
+from tf_slim.training import training as training
 from tf_slim.ops.arg_scope import *
 from tf_slim.ops.variables import *
 from tf_slim.layers.layers import *
