@@ -104,7 +104,7 @@ class LocalVariableTest(test.TestCase):
       self.assertAllEqual(a.eval(), [0] * 5)
 
   def testResourceVariable(self):
-    a = variables_lib2.local_variable(0)
+    a = variables_lib2.local_variable(0, use_resource=False)
     b = variables_lib2.local_variable(0, use_resource=True)
     self.assertTrue(isinstance(a, variables_lib.Variable))
     self.assertFalse(isinstance(a, resource_variable_ops.ResourceVariable))
@@ -175,7 +175,7 @@ class GlobalVariableTest(test.TestCase):
       self.assertAllEqual(a.eval(), [0] * 5)
 
   def testResourceVariable(self):
-    a = variables_lib2.global_variable(0)
+    a = variables_lib2.global_variable(0, use_resource=False)
     b = variables_lib2.global_variable(0, use_resource=True)
     self.assertTrue(isinstance(a, variables_lib.Variable))
     self.assertFalse(isinstance(a, resource_variable_ops.ResourceVariable))
