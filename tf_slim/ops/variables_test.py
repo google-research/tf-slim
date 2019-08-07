@@ -425,7 +425,8 @@ class VariablesTest(test.TestCase):
         self.counter = -1
 
       def __call__(self, op):
-        self.counter += 1
+        if op.type == 'VarHandleOp':
+          self.counter += 1
         return 'cpu:%d' % self.counter
 
     with self.cached_session():
@@ -638,7 +639,8 @@ class ModelVariablesTest(test.TestCase):
         self.counter = -1
 
       def __call__(self, op):
-        self.counter += 1
+        if op.type == 'VarHandleOp':
+          self.counter += 1
         return '/cpu:%d' % self.counter
 
     with ops.Graph().as_default():

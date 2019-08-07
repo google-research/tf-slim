@@ -785,7 +785,7 @@ class VariableDeviceChooser(object):
         replica=self._replica,
         device_type=self._device_type,
         device_index=self._device_index)
-    if self._num_tasks > 0:
+    if self._num_tasks > 0 and op.type == 'VarHandleOp':
       task_id = self._next_task_id
       self._next_task_id = (self._next_task_id + 1) % self._num_tasks
       device_spec.job = self._job_name
