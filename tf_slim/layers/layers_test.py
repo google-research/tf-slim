@@ -52,6 +52,8 @@ from tensorflow.python.ops import variables as variables_lib
 from tensorflow.python.ops.losses import losses
 from tensorflow.python.platform import test
 
+from tensorflow.compat.v1 import placeholder
+
 
 class AvgPool2DTest(test.TestCase):
 
@@ -2362,7 +2364,7 @@ class BatchNormTest(test.TestCase):
             batch_size * height * width, expected_var)
       images = constant_op.constant(
           image_values, shape=image_shape, dtype=dtypes.float32)
-      is_training = variables_lib.VariableV1(True)
+      is_training = placeholder(dtypes.bool)
       output = _layers.batch_norm(
           images,
           decay=0.1,
@@ -2387,7 +2389,7 @@ class BatchNormTest(test.TestCase):
         barrier = control_flow_ops.no_op(name='barrier')
       train_op = control_flow_ops.with_dependencies([barrier], output)
       for _ in range(10):
-        sess.run([train_op])
+        sess.run([train_op], {is_training: True})
       mean = moving_mean.eval()
       variance = moving_variance.eval()
       # After 10 updates with decay 0.1 moving_mean == expected_mean and
@@ -2509,7 +2511,7 @@ class BatchNormTest(test.TestCase):
             batch_size * height * width, expected_var)
       images = constant_op.constant(
           image_values, shape=image_shape, dtype=dtypes.float32)
-      is_training = variables_lib.VariableV1(True)
+      is_training = placeholder(dtypes.bool)
       output = _layers.batch_norm(
           images,
           decay=0.1,
