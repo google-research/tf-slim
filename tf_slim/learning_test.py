@@ -491,41 +491,6 @@ class TrainTest(test.TestCase):
     self.assertIsNotNone(loss)
     self.assertLess(loss, .015)
 
-  def testTrainWithSessionWrapper(self):
-    """Test that slim.learning.train can take `session_wrapper` args.
-
-    One of the applications of `session_wrapper` is the wrappers of TensorFlow
-    Debugger (tfdbg), which intercept methods calls to `tf.compat.v1.Session`
-    (e.g., run)
-    to achieve debugging. `DumpingDebugWrapperSession` is used here for testing
-    purpose.
-    """
-    dump_root = tempfile.mkdtemp()
-
-    def dumping_wrapper(sess):  # pylint: disable=invalid-name
-      return dumping_wrapper_lib.DumpingDebugWrapperSession(sess, dump_root)
-
-    with ops.Graph().as_default():
-      random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
-
-      tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_labels, tf_predictions)
-      total_loss = loss_ops.get_total_loss()
-
-      optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
-
-      train_op = learning.create_train_op(total_loss, optimizer)
-
-      loss = learning.train(
-          train_op, None, number_of_steps=1, session_wrapper=dumping_wrapper)
-    self.assertIsNotNone(loss)
-
-    run_root = glob.glob(os.path.join(dump_root, 'run_*'))[-1]
-    dump = debug_data.DebugDumpDir(run_root)
-    self.assertAllEqual(0,
-                        dump.get_tensors('global_step', 0, 'DebugIdentity')[0])
 
   def testTrainWithTrace(self):
     logdir = os.path.join(

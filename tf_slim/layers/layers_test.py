@@ -1953,9 +1953,10 @@ class BatchNormTest(test.TestCase):
       update_layers = ops.get_collection('my_update_ops')
       update_moving_mean = update_layers[0]
       update_moving_variance = update_layers[1]
-      self.assertEqual(update_moving_mean.op.name, 'BatchNorm/AssignMovingAvg')
+      self.assertEqual(update_moving_mean.op.name,
+                       'BatchNorm/AssignMovingAvg/AssignSubVariableOp')
       self.assertEqual(update_moving_variance.op.name,
-                       'BatchNorm/AssignMovingAvg_1')
+                       'BatchNorm/AssignMovingAvg_1/AssignSubVariableOp')
 
   def testVariablesCollections(self):
     variables_collections = {
@@ -2749,12 +2750,12 @@ class BatchNormTest(test.TestCase):
       _layers.batch_norm(images, scale=True)
       beta = variables.get_variables_by_name('beta')[0]
       gamma = variables.get_variables_by_name('gamma')[0]
-      self.assertEqual(beta.dtype, dtypes.float32_ref)
-      self.assertEqual(gamma.dtype, dtypes.float32_ref)
+      self.assertEqual(beta.dtype, dtypes.float32)
+      self.assertEqual(gamma.dtype, dtypes.float32)
       moving_mean = variables.get_variables_by_name('moving_mean')[0]
       moving_variance = variables.get_variables_by_name('moving_variance')[0]
-      self.assertEqual(moving_mean.dtype, dtypes.float32_ref)
-      self.assertEqual(moving_variance.dtype, dtypes.float32_ref)
+      self.assertEqual(moving_mean.dtype, dtypes.float32)
+      self.assertEqual(moving_variance.dtype, dtypes.float32)
 
   def _runFusedBatchNorm(self, shape, dtype):
     channels = shape[1]
