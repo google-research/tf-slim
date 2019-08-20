@@ -45,7 +45,10 @@ def _setup_model():
       trainable=False,
       dtype=dtypes.int64,
       initializer=init_ops.constant_initializer(
-          0, dtype=dtypes.int64))
+          0, dtype=dtypes.int64),
+      collections=[ops.GraphKeys.GLOBAL_VARIABLES,
+                   ops.GraphKeys.GLOBAL_STEP]
+  )
   return x, var, loss, global_step
 
 
