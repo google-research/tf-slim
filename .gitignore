@@ -9,3 +9,4 @@ __pycache__
 .vscode/
 build/
 tf_slim.egg-info/
+.eggs/
