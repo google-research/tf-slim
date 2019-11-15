@@ -34,7 +34,7 @@ run_tests() {
 
   # TensorFlow isn't a regular dependency because there are many different pip
   # packages a user might have installed.
-  pip install tensorflow==2.0.0-beta1
+  pip install tensorflow
 
   # Run the tests
   python setup.py test
