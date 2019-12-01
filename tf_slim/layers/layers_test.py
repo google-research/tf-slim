@@ -1384,7 +1384,7 @@ class DropoutTest(test.TestCase):
       is_training = array_ops.placeholder(dtype=dtypes.bool, shape=[])
       images = random_ops.random_uniform((5, height, width, 3), seed=1)
       output = _layers.dropout(images, is_training=is_training)
-      self.assertEqual(output.op.name, 'Dropout/cond/Merge')
+      self.assertEqual(output.op.name, 'Dropout/cond/Identity')
       output.get_shape().assert_is_compatible_with(images.get_shape())
 
   def testCollectOutputs(self):
