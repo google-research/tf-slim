@@ -40,7 +40,7 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import device_setter
 from tensorflow.python.training import saver as saver_lib
-from tensorflow.errors import FailedPreconditionError
+from tensorflow.compat.v2.errors import FailedPreconditionError
 from unittest import skip
 
 class LocalVariableTest(test.TestCase):
