@@ -30,7 +30,8 @@ install_requires = ['absl-py >= 0.2.2',]
 tests_require = ['nose']
 
 tf_slim_description = (
-    'TF-Slim: A framework for flexible Reinforcement Learning research')
+    'TensorFlow-Slim: A lightweight library for defining, training and '
+    'evaluating complex models in TensorFlow')
 
 
 setup(

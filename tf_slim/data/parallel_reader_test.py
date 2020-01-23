@@ -26,7 +26,6 @@ from tf_slim.data import test_utils
 from tensorflow.python.framework import dtypes as dtypes_lib
 from tensorflow.python.framework import errors_impl
 from tensorflow.python.framework import ops
-from tensorflow.python.framework import tensor_shape
 from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.ops import io_ops
 from tensorflow.python.ops import variables
@@ -147,14 +146,14 @@ class ParallelReaderTest(test.TestCase):
         capacity=55,
         min_after_dequeue=28,
         dtypes=[dtypes_lib.string, dtypes_lib.string],
-        shapes=[tensor_shape.scalar(), tensor_shape.scalar()])
+        shapes=[[], []])
     self._verify_read_up_to_out(shared_queue)
 
   def testReadUpToFromFIFOQueue(self):
     shared_queue = data_flow_ops.FIFOQueue(
         capacity=99,
         dtypes=[dtypes_lib.string, dtypes_lib.string],
-        shapes=[tensor_shape.scalar(), tensor_shape.scalar()])
+        shapes=[[], []])
     self._verify_read_up_to_out(shared_queue)
 
 

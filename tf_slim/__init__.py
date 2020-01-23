@@ -20,19 +20,6 @@ from __future__ import division
 from __future__ import print_function
 
 # pylint: disable=unused-import,line-too-long,g-importing-member,wildcard-import
-from tf_slim import evaluation
-from tf_slim import learning
-from tf_slim import model_analyzer
-from tf_slim import queues
-from tf_slim import summaries
-from tf_slim.data import data_decoder
-from tf_slim.data import data_provider
-from tf_slim.data import dataset
-from tf_slim.data import dataset_data_provider
-from tf_slim.data import parallel_reader
-from tf_slim.data import prefetch_queue
-from tf_slim.data import tfexample_decoder
-
 # TODO(b/135606235): Delete non-slim imports
 # -- from tensorflow.contrib import losses
 # from tensorflow import losses
@@ -47,9 +34,26 @@ from tf_slim.ops.variables import *
 from tf_slim.layers.layers import *
 from tf_slim.layers.initializers import *
 from tf_slim.layers.regularizers import *
-from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
 # pylint: enable=unused-import,line-too-long,g-importing-member,wildcard-import
 
+# pylint: disable=g-bad-import-order
+# Move explicit import after wild-card imports to prevent accidental
+# overwrites (such as summaries). Also use import x syntax, to directly
+# access file, rather than previously imported symbols.
+from tf_slim import evaluation
+from tf_slim import learning
+from tf_slim import model_analyzer
+from tf_slim import queues
+from tf_slim import summaries
+from tf_slim.data import data_decoder
+from tf_slim.data import data_provider
+from tf_slim.data import dataset
+from tf_slim.data import dataset_data_provider
+from tf_slim.data import parallel_reader
+from tf_slim.data import prefetch_queue
+from tf_slim.data import tfexample_decoder
+from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
+# pylint: enable=disable=g-bad-import-order
 
 from tensorflow.compat.v1 import disable_eager_execution
 disable_eager_execution()
