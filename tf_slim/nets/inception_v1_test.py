@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +23,8 @@ from __future__ import print_function
 import numpy as np
 from tf_slim import model_analyzer
 from tf_slim.nets import inception_v1
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.framework.python.ops import variables as variables_lib
+from tf_slim.ops import variables as variables_lib
+from tf_slim.ops.arg_scope import arg_scope
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops

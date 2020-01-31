@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,28 +20,27 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import glob
 import os
 import tempfile
 
 import numpy as np
 from numpy import testing as np_testing
 from tf_slim import learning
-from tensorflow.contrib.framework.python.ops import variables as variables_lib2
-from tensorflow.contrib.layers.python.layers import layers
-from tensorflow.contrib.losses.python.losses import loss_ops
+from tf_slim.layers import layers
+from tf_slim.ops import variables as variables_lib2
+
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import session
-from tensorflow.python.debug.lib import debug_data
-from tensorflow.python.debug.wrappers import dumping_wrapper as dumping_wrapper_lib
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import random_seed
 from tensorflow.python.ops import array_ops
+
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import variables as variables_lib
+from tensorflow.python.ops.losses import losses as loss_ops
 from tensorflow.python.platform import test
 from tensorflow.python.summary import summary
 from tensorflow.python.training import gradient_descent
@@ -58,8 +58,8 @@ class ClipGradientNormsTest(test.TestCase):
     return arr
 
   def setUp(self):
+    super(test.TestCase, self).setUp()
     np.random.seed(0)
-
     self._max_norm = 1.0
     self._grad_vec = np.array([1., 2., 3.])
     self._clipped_grad_vec = self.clip_values(self._grad_vec)
@@ -119,6 +119,7 @@ class ClipGradientNormsTest(test.TestCase):
 class MultiplyGradientsTest(test.TestCase):
 
   def setUp(self):
+    super(test.TestCase, self).setUp()
     np.random.seed(0)
     self._multiplier = 3.7
     self._grad_vec = np.array([1., 2., 3.])
@@ -228,6 +229,7 @@ def BatchNormClassifier(inputs):
 class TrainBNClassifierTest(test.TestCase):
 
   def setUp(self):
+    super(test.TestCase, self).setUp()
     # Create an easy training set:
     np.random.seed(0)
 
@@ -248,7 +250,7 @@ class TrainBNClassifierTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -263,6 +265,7 @@ class TrainBNClassifierTest(test.TestCase):
 class CreateTrainOpTest(test.TestCase):
 
   def setUp(self):
+    super(test.TestCase, self).setUp()
     # Create an easy training set:
     np.random.seed(0)
     self._inputs = np.random.rand(16, 4).astype(np.float32)
@@ -284,7 +287,7 @@ class CreateTrainOpTest(test.TestCase):
       expected_var = self._addBesselsCorrection(16, expected_var)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -318,7 +321,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -351,7 +354,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -376,7 +379,7 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
 
@@ -402,19 +405,20 @@ class CreateTrainOpTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
       train_op = learning.create_train_op(total_loss, optimizer)
 
       # Make sure the training op was recorded in the proper collection
-      self.assertTrue(train_op in ops.get_collection(ops.GraphKeys.TRAIN_OP))
+      self.assertIn(train_op, ops.get_collection(ops.GraphKeys.TRAIN_OP))
 
 
 class TrainTest(test.TestCase):
 
   def setUp(self):
+    super(test.TestCase, self).setUp()
     # Create an easy training set:
     np.random.seed(0)
 
@@ -435,7 +439,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -454,7 +458,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -473,7 +477,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -490,42 +494,6 @@ class TrainTest(test.TestCase):
     self.assertIsNotNone(loss)
     self.assertLess(loss, .015)
 
-  def testTrainWithSessionWrapper(self):
-    """Test that slim.learning.train can take `session_wrapper` args.
-
-    One of the applications of `session_wrapper` is the wrappers of TensorFlow
-    Debugger (tfdbg), which intercept methods calls to `tf.compat.v1.Session`
-    (e.g., run)
-    to achieve debugging. `DumpingDebugWrapperSession` is used here for testing
-    purpose.
-    """
-    dump_root = tempfile.mkdtemp()
-
-    def dumping_wrapper(sess):  # pylint: disable=invalid-name
-      return dumping_wrapper_lib.DumpingDebugWrapperSession(sess, dump_root)
-
-    with ops.Graph().as_default():
-      random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
-
-      tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
-      total_loss = loss_ops.get_total_loss()
-
-      optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
-
-      train_op = learning.create_train_op(total_loss, optimizer)
-
-      loss = learning.train(
-          train_op, None, number_of_steps=1, session_wrapper=dumping_wrapper)
-    self.assertIsNotNone(loss)
-
-    run_root = glob.glob(os.path.join(dump_root, 'run_*'))[-1]
-    dump = debug_data.DebugDumpDir(run_root)
-    self.assertAllEqual(0,
-                        dump.get_tensors('global_step', 0, 'DebugIdentity')[0])
-
   def testTrainWithTrace(self):
     logdir = os.path.join(
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
@@ -535,7 +503,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       summary.scalar('total_loss', total_loss)
 
@@ -552,7 +520,8 @@ class TrainTest(test.TestCase):
     self.assertIsNotNone(loss)
     for trace_step in [1, 101, 201]:
       trace_filename = 'tf_trace-%d.json' % trace_step
-      self.assertTrue(os.path.isfile(os.path.join(logdir, trace_filename)))
+      trace_path = os.path.join(logdir, trace_filename)
+      self.assertTrue(os.path.isfile(trace_path), trace_path)
 
   def testTrainWithNoneAsLogdirWhenUsingSummariesRaisesError(self):
     with ops.Graph().as_default():
@@ -561,7 +530,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
       summary.scalar('total_loss', total_loss)
 
@@ -581,7 +550,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -599,7 +568,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -620,7 +589,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -639,7 +608,7 @@ class TrainTest(test.TestCase):
       tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -662,7 +631,7 @@ class TrainTest(test.TestCase):
       local_multiplier = variables_lib2.local_variable(1.0)
 
       tf_predictions = LogisticClassifier(tf_inputs) * local_multiplier
-      loss_ops.log_loss(tf_predictions, tf_labels)
+      loss_ops.log_loss(tf_labels, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -686,7 +655,7 @@ class TrainTest(test.TestCase):
         tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
         tf_predictions = LogisticClassifier(tf_inputs)
-        loss_ops.log_loss(tf_predictions, tf_labels)
+        loss_ops.log_loss(tf_labels, tf_predictions)
         total_loss = loss_ops.get_total_loss()
 
         optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)
@@ -706,7 +675,7 @@ class TrainTest(test.TestCase):
     tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
-    loss_ops.log_loss(tf_predictions, tf_labels)
+    loss_ops.log_loss(tf_labels, tf_predictions)
     total_loss = loss_ops.get_total_loss()
 
     optimizer = gradient_descent.GradientDescentOptimizer(
@@ -815,7 +784,7 @@ class TrainTest(test.TestCase):
     tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
-    loss_ops.log_loss(tf_predictions, tf_labels)
+    loss_ops.log_loss(tf_labels, tf_predictions)
     return loss_ops.get_total_loss()
 
   def testTrainAllVarsHasLowerLossThanTrainSubsetOfVars(self):
@@ -967,7 +936,7 @@ class TrainTest(test.TestCase):
       tf_labels_limited = input_lib.limit_epochs(tf_labels, num_epochs=300)
 
       tf_predictions = LogisticClassifier(tf_inputs_limited)
-      loss_ops.log_loss(tf_predictions, tf_labels_limited)
+      loss_ops.log_loss(tf_labels_limited, tf_predictions)
       total_loss = loss_ops.get_total_loss()
 
       optimizer = gradient_descent.GradientDescentOptimizer(learning_rate=1.0)

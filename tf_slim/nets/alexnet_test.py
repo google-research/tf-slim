@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 from tf_slim.nets import alexnet
-from tensorflow.contrib.framework.python.ops import variables as variables_lib
+from tf_slim.ops import variables as variables_lib
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops

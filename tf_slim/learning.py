@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -254,7 +255,7 @@ import os
 import sys
 import time
 
-from tensorflow.contrib.training.python.training import training
+from tf_slim.training import training
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import timeline

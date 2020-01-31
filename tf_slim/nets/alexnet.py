@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,11 +38,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from tensorflow.contrib import layers
-from tensorflow.contrib.framework.python.ops import arg_scope
-from tensorflow.contrib.layers.python.layers import layers as layers_lib
-from tensorflow.contrib.layers.python.layers import regularizers
-from tensorflow.contrib.layers.python.layers import utils
+from tf_slim import layers
+from tf_slim.layers import layers as layers_lib
+from tf_slim.layers import regularizers
+from tf_slim.layers import utils
+from tf_slim.ops.arg_scope import arg_scope
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import init_ops

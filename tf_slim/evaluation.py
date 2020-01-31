@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -128,7 +129,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from tensorflow.contrib.training.python.training import evaluation
+from tf_slim.training import evaluation
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.summary import summary
 from tensorflow.python.training import monitored_session

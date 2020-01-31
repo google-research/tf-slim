@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TF-Slim Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,27 +20,18 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# pylint: disable=unused-import,line-too-long,g-importing-member,wildcard-import
-# TODO(b/135606235): Delete non-slim imports
-from tensorflow.contrib import losses
-from tensorflow.contrib import metrics
-from tensorflow.contrib.framework.python.ops.arg_scope import *
-from tensorflow.contrib.framework.python.ops.variables import *
-from tensorflow.contrib.layers.python.layers import *
-from tensorflow.contrib.layers.python.layers.initializers import *
-from tensorflow.contrib.layers.python.layers.regularizers import *
-from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
-# pylint: enable=unused-import,line-too-long,g-importing-member,wildcard-import
+# pylint:disable=g-bad-import-order,wildcard-import
 
-# pylint: disable=g-bad-import-order
+from tf_slim.layers import *
+from tf_slim.ops.variables import *
+
+
+from tf_slim.ops import arg_scope as arg_scope_lib
+
 # Move explicit import after wild-card imports to prevent accidental
 # overwrites (such as summaries). Also use import x syntax, to directly
 # access file, rather than previously imported symbols.
-import tf_slim.evaluation as evaluation
-import tf_slim.learning as learning
-import tf_slim.model_analyzer as model_analyzer
-import tf_slim.queues as queues
-import tf_slim.summaries as summaries
+
 from tf_slim.data import data_decoder
 from tf_slim.data import data_provider
 from tf_slim.data import dataset
@@ -47,5 +39,29 @@ from tf_slim.data import dataset_data_provider
 from tf_slim.data import parallel_reader
 from tf_slim.data import prefetch_queue
 from tf_slim.data import tfexample_decoder
+
+import tf_slim.evaluation as evaluation
+import tf_slim.learning as learning
+import tf_slim.losses as losses
+import tf_slim.metrics as metrics
+
+import tf_slim.model_analyzer as model_analyzer
+import tf_slim.queues as queues
+import tf_slim.summaries as summaries
+
+from tf_slim.training import evaluation as train_eval
+from tf_slim.training import training as training
+
+
+# pylint: disable=g-direct-tensorflow-import
+from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
+# pylint: enable=unused-import,line-too-long,g-importing-member,wildcard-import
+
+arg_scope = arg_scope_lib.arg_scope
+add_arg_scope = arg_scope_lib.add_arg_scope
+current_arg_scope = arg_scope_lib.current_arg_scope
+has_arg_scope = arg_scope_lib.has_arg_scope
+arg_scoped_arguments = arg_scope_lib.arg_scoped_arguments
+arg_scope_func_key = arg_scope_lib.arg_scope_func_key
 
 __all__ = make_all(__name__)

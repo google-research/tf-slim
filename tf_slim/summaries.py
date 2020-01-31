@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2017 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,9 +21,7 @@ tensorflow summaries. These allow users to print summary values
 automatically as they are computed and add prefixes to collections of summaries.
 
 Example usage:
-
-  import tensorflow as tf
-  slim = tf.contrib.slim
+  import tf_slim as slim
 
   slim.summaries.add_histogram_summaries(slim.variables.get_model_variables())
   slim.summaries.add_scalar_summary(total_loss, 'Total Loss')

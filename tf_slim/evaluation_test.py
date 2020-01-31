@@ -1,4 +1,5 @@
 # coding=utf-8
+# coding=utf-8
 # Copyright 2016 The TensorFlow Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,11 +24,12 @@ import glob
 import os
 import shutil
 import time
+from nose.tools import nottest
 
 import numpy as np
 from tf_slim import evaluation
-from tensorflow.contrib.framework.python.ops import variables as variables_lib
-from tensorflow.contrib.training.python.training import evaluation as evaluation_lib
+from tf_slim.ops import variables as variables_lib
+from tf_slim.training import evaluation as evaluation_lib
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import saver_pb2
 from tensorflow.python.debug.lib import debug_data
@@ -59,6 +61,7 @@ def GenerateTestData(num_classes, batch_size):
   return inputs, labels
 
 
+@nottest
 def TestModel(inputs):
   scale = variables.Variable(1.0, trainable=False)
 
