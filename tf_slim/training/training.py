@@ -412,7 +412,6 @@ def create_train_op(total_loss,
     A `Tensor` that when evaluated, computes the gradients and returns the total
       loss value.
   """
-  del colocate_gradients_with_ops
   if global_step is _USE_GLOBAL_STEP:  # pylint: disable=g-int-id-comparison
     global_step = training_util.get_or_create_global_step()
 
@@ -449,7 +448,8 @@ def create_train_op(total_loss,
       total_loss,
       variables_to_train,
       gate_gradients=gate_gradients,
-      aggregation_method=aggregation_method)
+      aggregation_method=aggregation_method,
+      colocate_gradients_with_ops=colocate_gradients_with_ops)
 
   if transform_grads_fn:
     grads = transform_grads_fn(grads)
