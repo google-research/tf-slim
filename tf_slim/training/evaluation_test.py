@@ -211,7 +211,7 @@ class EvaluateOnceTest(test.TestCase):
         hooks=[
             evaluation.StopAfterNEvalsHook(1),
         ])
-    self.asserGreater(final_ops_values['accuracy'], .99)
+    self.assertGreater(final_ops_values['accuracy'], .99)
 
   def testEvalOpAndFinalOp(self):
     checkpoint_dir = os.path.join(self.get_temp_dir(), 'eval_ops_and_final_ops')

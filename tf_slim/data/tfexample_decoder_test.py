@@ -21,12 +21,10 @@ from __future__ import print_function
 import sys
 
 import numpy as np
+import tensorflow.compat.v1 as tf
+
 from tf_slim.data import tfexample_decoder
 # pylint:disable=g-direct-tensorflow-import
-from tensorflow.core.example import example_pb2
-from tensorflow.core.example import feature_pb2
-from tensorflow.python.framework import constant_op
-from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import image_ops
@@ -40,46 +38,46 @@ from tensorflow.python.platform import test
 class TFExampleDecoderTest(test.TestCase):
 
   def _EncodedFloatFeature(self, ndarray):
-    return feature_pb2.Feature(
-        float_list=feature_pb2.FloatList(value=ndarray.flatten().tolist()))
+    return tf.train.Feature(
+        float_list=tf.train.FloatList(value=ndarray.flatten().tolist()))
 
   def _EncodedInt64Feature(self, ndarray):
-    return feature_pb2.Feature(
-        int64_list=feature_pb2.Int64List(value=ndarray.flatten().tolist()))
+    return tf.train.Feature(
+        int64_list=tf.train.Int64List(value=ndarray.flatten().tolist()))
 
   def _EncodedBytesFeature(self, tf_encoded):
     with self.cached_session():
       encoded = tf_encoded.eval()
 
     def BytesList(value):
-      return feature_pb2.BytesList(value=[value])
+      return tf.train.BytesList(value=[value])
 
-    return feature_pb2.Feature(bytes_list=BytesList(encoded))
+    return tf.train.Feature(bytes_list=BytesList(encoded))
 
   def _BytesFeature(self, ndarray):
     values = ndarray.flatten().tolist()
     for i in range(len(values)):
       values[i] = values[i].encode('utf-8')
-    return feature_pb2.Feature(bytes_list=feature_pb2.BytesList(value=values))
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=values))
 
   def _StringFeature(self, value):
     value = value.encode('utf-8')
-    return feature_pb2.Feature(bytes_list=feature_pb2.BytesList(value=[value]))
+    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
   def _Encoder(self, image, image_format):
     assert image_format in ['jpeg', 'JPEG', 'png', 'PNG', 'raw', 'RAW']
     if image_format in ['jpeg', 'JPEG']:
-      tf_image = constant_op.constant(image, dtype=dtypes.uint8)
+      tf_image = tf.constant(image, dtype=tf.uint8)
       return image_ops.encode_jpeg(tf_image)
     if image_format in ['png', 'PNG']:
-      tf_image = constant_op.constant(image, dtype=dtypes.uint8)
+      tf_image = tf.constant(image, dtype=tf.uint8)
       return image_ops.encode_png(tf_image)
     if image_format in ['raw', 'RAW']:
       # If machine is big endian, change the byte ordering in case of dtype
       # float32 so that it should be interpreted correctly.
       if image.dtype == np.float32 and sys.byteorder == 'big':
         image = image.astype('<f4')
-      return constant_op.constant(image.tostring(), dtype=dtypes.string)
+      return tf.constant(image.tostring(), dtype=tf.string)
 
   def GenerateImage(self, image_format, image_shape, image_dtype=np.uint8):
     """Generates an image and an example containing the encoded image.
@@ -102,8 +100,8 @@ class TFExampleDecoderTest(test.TestCase):
         0, num_pixels - 1,
         num=num_pixels).reshape(image_shape).astype(image_dtype)
     tf_encoded = self._Encoder(image, image_format)
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/encoded': self._EncodedBytesFeature(tf_encoded),
                 'image/format': self._StringFeature(image_format)
@@ -126,11 +124,11 @@ class TFExampleDecoderTest(test.TestCase):
     decoder = tfexample_decoder.TFExampleDecoder(
         keys_to_features={
             'image/encoded':
-                parsing_ops.FixedLenFeature(
-                    (), dtypes.string, default_value=''),
+                parsing_ops.FixedLenFeature((), tf.string, default_value=''),
             'image/format':
-                parsing_ops.FixedLenFeature(
-                    (), dtypes.string, default_value=image_format),
+                parsing_ops.FixedLenFeature((),
+                                            tf.string,
+                                            default_value=image_format),
         },
         items_to_handlers={'image': item_handler})
     [tf_image] = decoder.decode(serialized_example, ['image'])
@@ -244,7 +242,7 @@ class TFExampleDecoderTest(test.TestCase):
 
     decoded_image = self.RunDecodeExample(
         serialized_example,
-        tfexample_decoder.Image(shape=image_shape, dtype=dtypes.float32),
+        tfexample_decoder.Image(shape=image_shape, dtype=tf.float32),
         image_format='raw')
 
     self.assertAllClose(image, decoded_image, atol=0)
@@ -256,7 +254,7 @@ class TFExampleDecoderTest(test.TestCase):
         image_format='jpeg', image_shape=image_shape)
     decoded_image = self.RunDecodeExample(
         serialized_example,
-        tfexample_decoder.Image(dtype=dtypes.uint16),
+        tfexample_decoder.Image(dtype=tf.uint16),
         image_format='jpeg')
     self.assertAllClose(image, decoded_image, atol=1.001)
 
@@ -265,8 +263,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_array = np.array([[['ab'], ['cd'], ['ef']],
                          [['ghi'], ['jkl'], ['mnop']]])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'labels': self._BytesFeature(np_array),
         }))
 
@@ -278,9 +276,9 @@ class TFExampleDecoderTest(test.TestCase):
           'labels':
               parsing_ops.FixedLenFeature(
                   tensor_shape,
-                  dtypes.string,
-                  default_value=constant_op.constant(
-                      '', shape=tensor_shape, dtype=dtypes.string))
+                  tf.string,
+                  default_value=tf.constant(
+                      '', shape=tensor_shape, dtype=tf.string))
       }
       items_to_handlers = {
           'labels': tfexample_decoder.Tensor('labels'),
@@ -296,8 +294,8 @@ class TFExampleDecoderTest(test.TestCase):
   def testDecodeExampleWithFloatTensor(self):
     np_array = np.random.rand(2, 3, 1).astype('f')
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'array': self._EncodedFloatFeature(np_array),
         }))
 
@@ -306,7 +304,7 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'array': parsing_ops.FixedLenFeature(np_array.shape, dtypes.float32)
+          'array': parsing_ops.FixedLenFeature(np_array.shape, tf.float32)
       }
       items_to_handlers = {
           'array': tfexample_decoder.Tensor('array'),
@@ -319,8 +317,8 @@ class TFExampleDecoderTest(test.TestCase):
   def testDecodeExampleWithInt64Tensor(self):
     np_array = np.random.randint(1, 10, size=(2, 3, 1))
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'array': self._EncodedInt64Feature(np_array),
         }))
 
@@ -329,7 +327,7 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'array': parsing_ops.FixedLenFeature(np_array.shape, dtypes.int64)
+          'array': parsing_ops.FixedLenFeature(np_array.shape, tf.int64)
       }
       items_to_handlers = {
           'array': tfexample_decoder.Tensor('array'),
@@ -342,8 +340,8 @@ class TFExampleDecoderTest(test.TestCase):
   def testDecodeExampleWithVarLenTensor(self):
     np_array = np.array([[[1], [2], [3]], [[4], [5], [6]]])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'labels': self._EncodedInt64Feature(np_array),
         }))
 
@@ -352,7 +350,7 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'labels': parsing_ops.VarLenFeature(dtype=dtypes.int64),
+          'labels': parsing_ops.VarLenFeature(dtype=tf.int64),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.Tensor('labels'),
@@ -366,8 +364,8 @@ class TFExampleDecoderTest(test.TestCase):
   def testDecodeExampleWithFixLenTensorWithShape(self):
     np_array = np.array([[1, 2, 3], [4, 5, 6]])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'labels': self._EncodedInt64Feature(np_array),
         }))
 
@@ -376,8 +374,7 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'labels':
-              parsing_ops.FixedLenFeature(np_array.shape, dtype=dtypes.int64),
+          'labels': parsing_ops.FixedLenFeature(np_array.shape, dtype=tf.int64),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.Tensor('labels', shape=np_array.shape),
@@ -390,8 +387,8 @@ class TFExampleDecoderTest(test.TestCase):
 
   def testDecodeExampleWithVarLenTensorToDense(self):
     np_array = np.array([[1, 2, 3], [4, 5, 6]])
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'labels': self._EncodedInt64Feature(np_array),
         }))
 
@@ -400,7 +397,7 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'labels': parsing_ops.VarLenFeature(dtype=dtypes.int64),
+          'labels': parsing_ops.VarLenFeature(dtype=tf.int64),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.Tensor('labels', shape=np_array.shape),
@@ -415,8 +412,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_image = np.random.rand(2, 3, 1).astype('f')
     np_labels = np.array([[[1], [2], [3]], [[4], [5], [6]]])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image':
                     self._EncodedFloatFeature(np_image),
@@ -433,10 +430,10 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'image': parsing_ops.VarLenFeature(dtype=dtypes.float32),
-          'image/shape': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels/shape': parsing_ops.VarLenFeature(dtype=dtypes.int64),
+          'image': parsing_ops.VarLenFeature(dtype=tf.float32),
+          'image/shape': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels/shape': parsing_ops.VarLenFeature(dtype=tf.int64),
       }
       items_to_handlers = {
           'image':
@@ -456,8 +453,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_labels = np.array([[[1], [2], [3]], [[4], [5], [6]]])
     height, width, depth = np_labels.shape
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image':
                     self._EncodedFloatFeature(np_image),
@@ -478,12 +475,12 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'image': parsing_ops.VarLenFeature(dtype=dtypes.float32),
-          'image/shape': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels/height': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels/width': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'labels/depth': parsing_ops.VarLenFeature(dtype=dtypes.int64),
+          'image': parsing_ops.VarLenFeature(dtype=tf.float32),
+          'image/shape': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels/height': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels/width': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'labels/depth': parsing_ops.VarLenFeature(dtype=tf.int64),
       }
       items_to_handlers = {
           'image':
@@ -503,8 +500,8 @@ class TFExampleDecoderTest(test.TestCase):
   def testDecodeExampleWithSparseTensor(self):
     np_indices = np.array([[1], [2], [5]])
     np_values = np.array([0.1, 0.2, 0.6]).astype('f')
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'indices': self._EncodedInt64Feature(np_indices),
                 'values': self._EncodedFloatFeature(np_values),
@@ -515,8 +512,8 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'indices': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'values': parsing_ops.VarLenFeature(dtype=dtypes.float32),
+          'indices': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'values': parsing_ops.VarLenFeature(dtype=tf.float32),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.SparseTensor(),
@@ -533,8 +530,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_indices = np.array([[1], [2], [5]])
     np_values = np.array([0.1, 0.2, 0.6]).astype('f')
     np_shape = np.array([6])
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'indices': self._EncodedInt64Feature(np_indices),
                 'values': self._EncodedFloatFeature(np_values),
@@ -546,9 +543,9 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'indices': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'values': parsing_ops.VarLenFeature(dtype=dtypes.float32),
-          'shape': parsing_ops.VarLenFeature(dtype=dtypes.int64),
+          'indices': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'values': parsing_ops.VarLenFeature(dtype=tf.float32),
+          'shape': parsing_ops.VarLenFeature(dtype=tf.int64),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.SparseTensor(shape_key='shape'),
@@ -565,8 +562,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_indices = np.array([[1], [2], [5]])
     np_values = np.array([0.1, 0.2, 0.6]).astype('f')
     np_shape = np.array([6])
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'indices': self._EncodedInt64Feature(np_indices),
                 'values': self._EncodedFloatFeature(np_values),
@@ -577,8 +574,8 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'indices': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'values': parsing_ops.VarLenFeature(dtype=dtypes.float32),
+          'indices': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'values': parsing_ops.VarLenFeature(dtype=tf.float32),
       }
       items_to_handlers = {
           'labels': tfexample_decoder.SparseTensor(shape=np_shape),
@@ -596,8 +593,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_values = np.array([0.1, 0.2, 0.6]).astype('f')
     np_shape = np.array([6])
     np_dense = np.array([0.0, 0.1, 0.2, 0.0, 0.0, 0.6]).astype('f')
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'indices': self._EncodedInt64Feature(np_indices),
                 'values': self._EncodedFloatFeature(np_values),
@@ -608,8 +605,8 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       serialized_example = array_ops.reshape(serialized_example, shape=[])
       keys_to_features = {
-          'indices': parsing_ops.VarLenFeature(dtype=dtypes.int64),
-          'values': parsing_ops.VarLenFeature(dtype=dtypes.float32),
+          'indices': parsing_ops.VarLenFeature(dtype=tf.int64),
+          'values': parsing_ops.VarLenFeature(dtype=tf.float32),
       }
       items_to_handlers = {
           'labels':
@@ -625,8 +622,8 @@ class TFExampleDecoderTest(test.TestCase):
     tensor_shape = (2, 3, 1)
     np_array = np.random.rand(2, 3, 1)
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'image/depth_map': self._EncodedFloatFeature(np_array),
         }))
 
@@ -639,7 +636,7 @@ class TFExampleDecoderTest(test.TestCase):
           'image/depth_map':
               parsing_ops.FixedLenFeature(
                   tensor_shape,
-                  dtypes.float32,
+                  tf.float32,
                   default_value=array_ops.zeros(tensor_shape))
       }
 
@@ -657,8 +654,8 @@ class TFExampleDecoderTest(test.TestCase):
     tensor_shape = (2, 3, 1)
     np_array = np.random.rand(2, 3, 1)
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(feature={
+    example = tf.train.Example(
+        features=tf.train.Features(feature={
             'image/depth_map': self._EncodedFloatFeature(np_array),
         }))
 
@@ -671,7 +668,7 @@ class TFExampleDecoderTest(test.TestCase):
           'image/depth_map':
               parsing_ops.FixedLenFeature(
                   tensor_shape,
-                  dtypes.float32,
+                  tf.float32,
                   default_value=array_ops.zeros(tensor_shape))
       }
 
@@ -723,11 +720,9 @@ class TFExampleDecoderTest(test.TestCase):
 
         keys_to_features = {
             'image/encoded':
-                parsing_ops.FixedLenFeature(
-                    (), dtypes.string, default_value=''),
+                parsing_ops.FixedLenFeature((), tf.string, default_value=''),
             'image/format':
-                parsing_ops.FixedLenFeature(
-                    (), dtypes.string, default_value='jpeg')
+                parsing_ops.FixedLenFeature((), tf.string, default_value='jpeg')
         }
 
         items_to_handlers = {
@@ -756,8 +751,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_xmax = np.random.rand(num_bboxes, 1)
     np_bboxes = np.hstack([np_ymin, np_xmin, np_ymax, np_xmax])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/bbox/ymin': self._EncodedFloatFeature(np_ymin),
                 'image/object/bbox/xmin': self._EncodedFloatFeature(np_xmin),
@@ -770,10 +765,10 @@ class TFExampleDecoderTest(test.TestCase):
       serialized_example = array_ops.reshape(serialized_example, shape=[])
 
       keys_to_features = {
-          'image/object/bbox/ymin': parsing_ops.VarLenFeature(dtypes.float32),
-          'image/object/bbox/xmin': parsing_ops.VarLenFeature(dtypes.float32),
-          'image/object/bbox/ymax': parsing_ops.VarLenFeature(dtypes.float32),
-          'image/object/bbox/xmax': parsing_ops.VarLenFeature(dtypes.float32),
+          'image/object/bbox/ymin': parsing_ops.VarLenFeature(tf.float32),
+          'image/object/bbox/xmin': parsing_ops.VarLenFeature(tf.float32),
+          'image/object/bbox/ymax': parsing_ops.VarLenFeature(tf.float32),
+          'image/object/bbox/xmax': parsing_ops.VarLenFeature(tf.float32),
       }
 
       items_to_handlers = {
@@ -797,8 +792,8 @@ class TFExampleDecoderTest(test.TestCase):
     np_xmax = np.random.rand(num_bboxes, 1)
     np_bboxes = np.hstack([np_ymin, np_xmin, np_ymax, np_xmax])
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/bbox/ymin': self._EncodedFloatFeature(np_ymin),
                 'image/object/bbox/xmin': self._EncodedFloatFeature(np_xmin),
@@ -812,17 +807,21 @@ class TFExampleDecoderTest(test.TestCase):
 
       keys_to_features = {
           'image/object/bbox/ymin':
-              parsing_ops.FixedLenSequenceFeature(
-                  [], dtypes.float32, allow_missing=True),
+              parsing_ops.FixedLenSequenceFeature([],
+                                                  tf.float32,
+                                                  allow_missing=True),
           'image/object/bbox/xmin':
-              parsing_ops.FixedLenSequenceFeature(
-                  [], dtypes.float32, allow_missing=True),
+              parsing_ops.FixedLenSequenceFeature([],
+                                                  tf.float32,
+                                                  allow_missing=True),
           'image/object/bbox/ymax':
-              parsing_ops.FixedLenSequenceFeature(
-                  [], dtypes.float32, allow_missing=True),
+              parsing_ops.FixedLenSequenceFeature([],
+                                                  tf.float32,
+                                                  allow_missing=True),
           'image/object/bbox/xmax':
-              parsing_ops.FixedLenSequenceFeature(
-                  [], dtypes.float32, allow_missing=True),
+              parsing_ops.FixedLenSequenceFeature([],
+                                                  tf.float32,
+                                                  allow_missing=True),
       }
 
       items_to_handlers = {
@@ -847,12 +846,12 @@ class TFExampleDecoderTest(test.TestCase):
     with self.cached_session():
       tf_string = tf_encoded.eval()
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/encoded':
-                    feature_pb2.Feature(
-                        bytes_list=feature_pb2.BytesList(
+                    tf.train.Feature(
+                        bytes_list=tf.train.BytesList(
                             value=[tf_string, tf_string])),
                 'image/format':
                     self._StringFeature(image_format),
@@ -865,10 +864,11 @@ class TFExampleDecoderTest(test.TestCase):
       decoder = tfexample_decoder.TFExampleDecoder(
           keys_to_features={
               'image/encoded':
-                  parsing_ops.FixedLenFeature((2,), dtypes.string),
+                  parsing_ops.FixedLenFeature((2,), tf.string),
               'image/format':
-                  parsing_ops.FixedLenFeature(
-                      (), dtypes.string, default_value=image_format),
+                  parsing_ops.FixedLenFeature((),
+                                              tf.string,
+                                              default_value=image_format),
           },
           items_to_handlers={'image': tfexample_decoder.Image(repeated=True)})
       [tf_image] = decoder.decode(serialized_example, ['image'])
@@ -881,8 +881,8 @@ class TFExampleDecoderTest(test.TestCase):
 
   def testDecodeExampleWithLookup(self):
 
-    example = example_pb2.Example(
-        features=feature_pb2.Features(
+    example = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/class/text':
                     self._BytesFeature(np.array(['cat', 'dog', 'guinea pig'])),
@@ -890,7 +890,7 @@ class TFExampleDecoderTest(test.TestCase):
     serialized_example = example.SerializeToString()
     # 'dog' -> 0, 'guinea pig' -> 1, 'cat' -> 2
     table = lookup_ops.index_table_from_tensor(
-        constant_op.constant(['dog', 'guinea pig', 'cat']))
+        tf.constant(['dog', 'guinea pig', 'cat']))
 
     with self.cached_session() as sess:
       sess.run(lookup_ops.tables_initializer())
@@ -898,7 +898,7 @@ class TFExampleDecoderTest(test.TestCase):
       serialized_example = array_ops.reshape(serialized_example, shape=[])
 
       keys_to_features = {
-          'image/object/class/text': parsing_ops.VarLenFeature(dtypes.string),
+          'image/object/class/text': parsing_ops.VarLenFeature(tf.string),
       }
 
       items_to_handlers = {
@@ -914,32 +914,32 @@ class TFExampleDecoderTest(test.TestCase):
 
   def testDecodeExampleWithBackupHandlerLookup(self):
 
-    example1 = example_pb2.Example(
-        features=feature_pb2.Features(
+    example1 = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/class/text':
                     self._BytesFeature(np.array(['cat', 'dog', 'guinea pig'])),
                 'image/object/class/label':
                     self._EncodedInt64Feature(np.array([42, 10, 900]))
             }))
-    example2 = example_pb2.Example(
-        features=feature_pb2.Features(
+    example2 = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/class/text':
                     self._BytesFeature(np.array(['cat', 'dog', 'guinea pig'])),
             }))
-    example3 = example_pb2.Example(
-        features=feature_pb2.Features(
+    example3 = tf.train.Example(
+        features=tf.train.Features(
             feature={
                 'image/object/class/label':
                     self._EncodedInt64Feature(np.array([42, 10, 901]))
             }))
     # 'dog' -> 0, 'guinea pig' -> 1, 'cat' -> 2
     table = lookup_ops.index_table_from_tensor(
-        constant_op.constant(['dog', 'guinea pig', 'cat']))
+        tf.constant(['dog', 'guinea pig', 'cat']))
     keys_to_features = {
-        'image/object/class/text': parsing_ops.VarLenFeature(dtypes.string),
-        'image/object/class/label': parsing_ops.VarLenFeature(dtypes.int64),
+        'image/object/class/text': parsing_ops.VarLenFeature(tf.string),
+        'image/object/class/label': parsing_ops.VarLenFeature(tf.int64),
     }
     backup_handler = tfexample_decoder.BackupHandler(
         handler=tfexample_decoder.Tensor('image/object/class/label'),

@@ -25,28 +25,25 @@ import tempfile
 
 import numpy as np
 from numpy import testing as np_testing
+import tensorflow.compat.v1 as tf
 from tf_slim import learning
 from tf_slim.layers import layers
 from tf_slim.ops import variables as variables_lib2
 
 # pylint:disable=g-direct-tensorflow-import
-from tensorflow.core.protobuf import config_pb2
-from tensorflow.python.client import session
-from tensorflow.python.framework import constant_op
-from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import random_seed
-from tensorflow.python.ops import array_ops
-
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import variables as variables_lib
-from tensorflow.python.ops.losses import losses as loss_ops
+
 from tensorflow.python.platform import test
 from tensorflow.python.summary import summary
 from tensorflow.python.training import gradient_descent
 from tensorflow.python.training import input as input_lib
 from tensorflow.python.training import saver as saver_lib
 # pylint:enable=g-direct-tensorflow-import
+
+loss_ops = tf.losses
 
 
 class ClipGradientNormsTest(test.TestCase):
@@ -66,8 +63,8 @@ class ClipGradientNormsTest(test.TestCase):
     self._zero_vec = np.zeros(self._grad_vec.size)
 
   def testOrdinaryGradIsClippedCorrectly(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(self._zero_vec, dtype=dtypes.float32)
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(self._zero_vec, dtype=tf.float32)
     gradients_to_variables = (gradient, variable)
     [gradients_to_variables
     ] = learning.clip_gradient_norms([gradients_to_variables], self._max_norm)
@@ -81,7 +78,7 @@ class ClipGradientNormsTest(test.TestCase):
 
   def testNoneGradPassesThroughCorrectly(self):
     gradient = None
-    variable = variables_lib.Variable(self._zero_vec, dtype=dtypes.float32)
+    variable = variables_lib.Variable(self._zero_vec, dtype=tf.float32)
 
     gradients_to_variables = (gradient, variable)
     [gradients_to_variables
@@ -94,13 +91,12 @@ class ClipGradientNormsTest(test.TestCase):
     sparse_grad_indices = np.array([0, 1, 4])
     sparse_grad_dense_shape = [self._grad_vec.size]
 
-    values = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    indices = constant_op.constant(sparse_grad_indices, dtype=dtypes.int32)
-    dense_shape = constant_op.constant(
-        sparse_grad_dense_shape, dtype=dtypes.int32)
+    values = tf.constant(self._grad_vec, dtype=tf.float32)
+    indices = tf.constant(sparse_grad_indices, dtype=tf.int32)
+    dense_shape = tf.constant(sparse_grad_dense_shape, dtype=tf.int32)
 
     gradient = ops.IndexedSlices(values, indices, dense_shape)
-    variable = variables_lib.Variable(self._zero_vec, dtype=dtypes.float32)
+    variable = variables_lib.Variable(self._zero_vec, dtype=tf.float32)
 
     gradients_to_variables = (gradient, variable)
     gradients_to_variables = learning.clip_gradient_norms(
@@ -111,7 +107,7 @@ class ClipGradientNormsTest(test.TestCase):
     self.assertEqual(gradients_to_variables[0].indices, indices)
     self.assertEqual(gradients_to_variables[0].dense_shape, dense_shape)
 
-    with session.Session() as sess:
+    with tf.Session() as sess:
       actual_gradient = sess.run(gradients_to_variables[0].values)
     np_testing.assert_almost_equal(actual_gradient, self._clipped_grad_vec)
 
@@ -126,38 +122,38 @@ class MultiplyGradientsTest(test.TestCase):
     self._multiplied_grad_vec = np.multiply(self._grad_vec, self._multiplier)
 
   def testNonListGradsRaisesError(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     grad_to_var = (gradient, variable)
     gradient_multipliers = {variable: self._multiplier}
     with self.assertRaises(ValueError):
       learning.multiply_gradients(grad_to_var, gradient_multipliers)
 
   def testEmptyMultiplesRaisesError(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     grad_to_var = (gradient, variable)
     with self.assertRaises(ValueError):
       learning.multiply_gradients([grad_to_var], {})
 
   def testNonDictMultiplierRaisesError(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     grad_to_var = (gradient, variable)
     with self.assertRaises(ValueError):
       learning.multiply_gradients([grad_to_var], 3)
 
   def testMultipleOfNoneGradRaisesError(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     grad_to_var = (None, variable)
     gradient_multipliers = {variable: self._multiplier}
     with self.assertRaises(ValueError):
       learning.multiply_gradients(grad_to_var, gradient_multipliers)
 
   def testMultipleGradientsWithVariables(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     grad_to_var = (gradient, variable)
     gradient_multipliers = {variable: self._multiplier}
 
@@ -173,13 +169,12 @@ class MultiplyGradientsTest(test.TestCase):
                                    5)
 
   def testIndexedSlicesGradIsMultiplied(self):
-    values = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    indices = constant_op.constant([0, 1, 2], dtype=dtypes.int32)
-    dense_shape = constant_op.constant([self._grad_vec.size],
-                                       dtype=dtypes.int32)
+    values = tf.constant(self._grad_vec, dtype=tf.float32)
+    indices = tf.constant([0, 1, 2], dtype=tf.int32)
+    dense_shape = tf.constant([self._grad_vec.size], dtype=tf.int32)
 
     gradient = ops.IndexedSlices(values, indices, dense_shape)
-    variable = variables_lib.Variable(array_ops.zeros((1, 3)))
+    variable = variables_lib.Variable(tf.zeros((1, 3)))
     grad_to_var = (gradient, variable)
     gradient_multipliers = {variable: self._multiplier}
 
@@ -197,10 +192,10 @@ class MultiplyGradientsTest(test.TestCase):
                                    5)
 
   def testTensorMultiplierOfGradient(self):
-    gradient = constant_op.constant(self._grad_vec, dtype=dtypes.float32)
-    variable = variables_lib.Variable(array_ops.zeros_like(gradient))
+    gradient = tf.constant(self._grad_vec, dtype=tf.float32)
+    variable = variables_lib.Variable(tf.zeros_like(gradient))
     multiplier_flag = variables_lib.Variable(True)
-    tensor_multiplier = array_ops.where(multiplier_flag, self._multiplier, 1.0)
+    tensor_multiplier = tf.where(multiplier_flag, self._multiplier, 1.0)
     grad_to_var = (gradient, variable)
     gradient_multipliers = {variable: tensor_multiplier}
 
@@ -246,8 +241,8 @@ class TrainBNClassifierTest(test.TestCase):
     g = ops.Graph()
     with g.as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -279,8 +274,8 @@ class CreateTrainOpTest(test.TestCase):
   def testUseUpdateOps(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       expected_mean = np.mean(self._inputs, axis=(0))
       expected_var = np.var(self._inputs, axis=(0))
@@ -297,7 +292,7 @@ class CreateTrainOpTest(test.TestCase):
       moving_variance = variables_lib2.get_variables_by_name(
           'moving_variance')[0]
 
-      with session.Session() as sess:
+      with tf.Session() as sess:
         # Initialize all variables
         sess.run(variables_lib.global_variables_initializer())
         mean, variance = sess.run([moving_mean, moving_variance])
@@ -317,8 +312,8 @@ class CreateTrainOpTest(test.TestCase):
   def testEmptyUpdateOps(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -331,7 +326,7 @@ class CreateTrainOpTest(test.TestCase):
       moving_variance = variables_lib2.get_variables_by_name(
           'moving_variance')[0]
 
-      with session.Session() as sess:
+      with tf.Session() as sess:
         # Initialize all variables
         sess.run(variables_lib.global_variables_initializer())
         mean, variance = sess.run([moving_mean, moving_variance])
@@ -350,8 +345,8 @@ class CreateTrainOpTest(test.TestCase):
   def testUseGlobalStep(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -362,7 +357,7 @@ class CreateTrainOpTest(test.TestCase):
 
       global_step = variables_lib2.get_or_create_global_step()
 
-      with session.Session() as sess:
+      with tf.Session() as sess:
         # Initialize all variables
         sess.run(variables_lib.global_variables_initializer())
 
@@ -375,8 +370,8 @@ class CreateTrainOpTest(test.TestCase):
   def testNoneGlobalStep(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = BatchNormClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -388,7 +383,7 @@ class CreateTrainOpTest(test.TestCase):
 
       global_step = variables_lib2.get_or_create_global_step()
 
-      with session.Session() as sess:
+      with tf.Session() as sess:
         # Initialize all variables
         sess.run(variables_lib.global_variables_initializer())
 
@@ -401,8 +396,8 @@ class CreateTrainOpTest(test.TestCase):
   def testRecordTrainOpInCollection(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -435,8 +430,8 @@ class TrainTest(test.TestCase):
     g = ops.Graph()
     with g.as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -454,8 +449,8 @@ class TrainTest(test.TestCase):
   def testTrainWithNoneAsLogdir(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -473,8 +468,8 @@ class TrainTest(test.TestCase):
   def testTrainWithSessionConfig(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -484,7 +479,7 @@ class TrainTest(test.TestCase):
 
       train_op = learning.create_train_op(total_loss, optimizer)
 
-      session_config = config_pb2.ConfigProto(allow_soft_placement=True)
+      session_config = tf.ConfigProto(allow_soft_placement=True)
       loss = learning.train(
           train_op,
           None,
@@ -499,8 +494,8 @@ class TrainTest(test.TestCase):
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -526,8 +521,8 @@ class TrainTest(test.TestCase):
   def testTrainWithNoneAsLogdirWhenUsingSummariesRaisesError(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -546,8 +541,8 @@ class TrainTest(test.TestCase):
   def testTrainWithNoneAsLogdirWhenUsingTraceRaisesError(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -564,8 +559,8 @@ class TrainTest(test.TestCase):
   def testTrainWithNoneAsLogdirWhenUsingSaverRaisesError(self):
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -585,8 +580,8 @@ class TrainTest(test.TestCase):
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -604,8 +599,8 @@ class TrainTest(test.TestCase):
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       tf_predictions = LogisticClassifier(tf_inputs)
       loss_ops.log_loss(tf_labels, tf_predictions)
@@ -625,8 +620,8 @@ class TrainTest(test.TestCase):
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
       local_multiplier = variables_lib2.local_variable(1.0)
 
@@ -651,8 +646,8 @@ class TrainTest(test.TestCase):
     for i in range(len(number_of_steps)):
       with ops.Graph().as_default():
         random_seed.set_random_seed(i)
-        tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-        tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+        tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+        tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
         tf_predictions = LogisticClassifier(tf_inputs)
         loss_ops.log_loss(tf_labels, tf_predictions)
@@ -671,8 +666,8 @@ class TrainTest(test.TestCase):
         self.assertLess(loss, .015)
 
   def create_train_op(self, learning_rate=1.0, gradient_multiplier=1.0):
-    tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-    tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+    tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+    tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
     loss_ops.log_loss(tf_labels, tf_predictions)
@@ -780,8 +775,8 @@ class TrainTest(test.TestCase):
       self.assertLess(loss, .015)
 
   def ModelLoss(self):
-    tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-    tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+    tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+    tf_labels = tf.constant(self._labels, dtype=tf.float32)
 
     tf_predictions = LogisticClassifier(tf_inputs)
     loss_ops.log_loss(tf_labels, tf_predictions)
@@ -848,7 +843,7 @@ class TrainTest(test.TestCase):
       train_biases = learning.create_train_op(
           total_loss, optimizer, variables_to_train=[biases])
 
-      with session.Session() as sess:
+      with tf.Session() as sess:
         # Initialize the variables.
         sess.run(variables_lib.global_variables_initializer())
 
@@ -930,8 +925,8 @@ class TrainTest(test.TestCase):
         tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
-      tf_inputs = constant_op.constant(self._inputs, dtype=dtypes.float32)
-      tf_labels = constant_op.constant(self._labels, dtype=dtypes.float32)
+      tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
+      tf_labels = tf.constant(self._labels, dtype=tf.float32)
       tf_inputs_limited = input_lib.limit_epochs(tf_inputs, num_epochs=300)
       tf_labels_limited = input_lib.limit_epochs(tf_labels, num_epochs=300)
 
