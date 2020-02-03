@@ -549,7 +549,7 @@ class TrainTest(test.TestCase):
 
         # Update weights and biases.
         loss = session.run(train_op)
-        self.assertGreater(loss, .5)
+        self.assertGreater(loss, .45)
         new_weights, new_biases = session.run([weights, biases])
 
         # Check that the weights and biases have been updated.
@@ -560,7 +560,7 @@ class TrainTest(test.TestCase):
 
         # Update only weights.
         loss = session.run(train_weights)
-        self.assertGreater(loss, .5)
+        self.assertGreater(loss, .45)
         new_weights, new_biases = session.run([weights, biases])
 
         # Check that the weights have been updated, but biases have not.
@@ -570,7 +570,7 @@ class TrainTest(test.TestCase):
 
         # Update only biases.
         loss = session.run(train_biases)
-        self.assertGreater(loss, .5)
+        self.assertGreater(loss, .45)
         new_weights, new_biases = session.run([weights, biases])
 
         # Check that the biases have been updated, but weights have not.
