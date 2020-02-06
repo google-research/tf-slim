@@ -19,12 +19,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import contextlib
 import os
 import tempfile
 import unittest
 import numpy as np
+import tensorflow.compat.v1 as tf
 from tf_slim.ops import variables as variables_lib2
-
 from tf_slim.ops.arg_scope import arg_scope
 
 # pylint: disable=g-direct-tensorflow-import
@@ -45,6 +46,21 @@ from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import device_setter
 from tensorflow.python.training import saver as saver_lib
+
+
+def setUpModule():
+  tf.disable_eager_execution()
+
+
+@contextlib.contextmanager
+def temporary_disable_resource_variables():
+  enabled = variable_scope.resource_variables_enabled()
+  try:
+    variable_scope.disable_resource_variables()
+    yield
+  finally:
+    if enabled:
+      variable_scope.enable_resource_variables()
 
 
 class LocalVariableTest(test.TestCase):
@@ -74,15 +90,15 @@ class LocalVariableTest(test.TestCase):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         a = variables_lib2.local_variable(0)
-        self.assertFalse(a in variables_lib.global_variables())
-        self.assertTrue(a in variables_lib.local_variables())
+        self.assertNotIn(a, variables_lib.global_variables())
+        self.assertIn(a, variables_lib.local_variables())
 
   def testLocalVariableNotInVariablesToRestore(self):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         a = variables_lib2.local_variable(0)
-        self.assertFalse(a in variables_lib2.get_variables_to_restore())
-        self.assertTrue(a in variables_lib.local_variables())
+        self.assertNotIn(a, variables_lib2.get_variables_to_restore())
+        self.assertIn(a, variables_lib.local_variables())
 
   def testGetVariablesDontReturnsTransients(self):
     with self.cached_session():
@@ -111,9 +127,9 @@ class LocalVariableTest(test.TestCase):
   def testResourceVariable(self):
     a = variables_lib2.local_variable(0, use_resource=False)
     b = variables_lib2.local_variable(0, use_resource=True)
-    self.assertTrue(isinstance(a, variables_lib.Variable))
-    self.assertFalse(isinstance(a, resource_variable_ops.ResourceVariable))
-    self.assertTrue(isinstance(b, resource_variable_ops.ResourceVariable))
+    self.assertIsInstance(a, variables_lib.Variable)
+    self.assertNotIsInstance(a, resource_variable_ops.ResourceVariable)
+    self.assertIsInstance(b, resource_variable_ops.ResourceVariable)
 
 
 class GlobalVariableTest(test.TestCase):
@@ -144,15 +160,15 @@ class GlobalVariableTest(test.TestCase):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         a = variables_lib2.global_variable(0)
-        self.assertFalse(a in variables_lib.local_variables())
-        self.assertTrue(a in variables_lib.global_variables())
+        self.assertNotIn(a, variables_lib.local_variables())
+        self.assertIn(a, variables_lib.global_variables())
 
   def testGlobalVariableInVariablesToRestore(self):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         a = variables_lib2.global_variable(0)
-        self.assertFalse(a in variables_lib.local_variables())
-        self.assertTrue(a in variables_lib2.get_variables_to_restore())
+        self.assertNotIn(a, variables_lib.local_variables())
+        self.assertIn(a, variables_lib2.get_variables_to_restore())
 
   def testGetVariablesReturnsThem(self):
     with self.cached_session():
@@ -181,9 +197,9 @@ class GlobalVariableTest(test.TestCase):
   def testResourceVariable(self):
     a = variables_lib2.global_variable(0, use_resource=False)
     b = variables_lib2.global_variable(0, use_resource=True)
-    self.assertTrue(isinstance(a, variables_lib.Variable))
-    self.assertFalse(isinstance(a, resource_variable_ops.ResourceVariable))
-    self.assertTrue(isinstance(b, resource_variable_ops.ResourceVariable))
+    self.assertIsInstance(a, variables_lib.Variable)
+    self.assertNotIsInstance(a, resource_variable_ops.ResourceVariable)
+    self.assertIsInstance(b, resource_variable_ops.ResourceVariable)
 
 
 class GlobalStepTest(test.TestCase):
@@ -264,9 +280,9 @@ class VariablesTest(test.TestCase):
         a = variables_lib2.variable('a', [5])
         self.assertEqual(a.op.name, 'A/a')
         self.assertListEqual(a.get_shape().as_list(), [5])
-        self.assertTrue(a in ops.get_collection(ops.GraphKeys.GLOBAL_VARIABLES))
-        self.assertFalse(a in ops.get_collection(ops.GraphKeys.MODEL_VARIABLES))
-        self.assertFalse(a in variables_lib.local_variables())
+        self.assertIn(a, ops.get_collection(ops.GraphKeys.GLOBAL_VARIABLES))
+        self.assertNotIn(a, ops.get_collection(ops.GraphKeys.MODEL_VARIABLES))
+        self.assertNotIn(a, variables_lib.local_variables())
 
   def testGetVariables(self):
     with self.cached_session():
@@ -438,8 +454,8 @@ class VariablesTest(test.TestCase):
         # if op.type == 'VarHandleOp':  FIXME?
         self.counter += 1
         return 'cpu:%d' % self.counter
-
-    with self.cached_session():
+    # TODO(b/148892830): investigate if resource variables can be enabled
+    with temporary_disable_resource_variables(), self.cached_session():
       with arg_scope([variables_lib2.variable], device=DevFn()):
         a = variables_lib2.variable('a', [])
         b = variables_lib2.variable('b', [])
@@ -491,8 +507,8 @@ class VariablesTest(test.TestCase):
       self.assertDeviceEqual(e.initial_value.device, '/job:worker/cpu:99')
 
   def testVariableWithVariableDeviceChooser(self):
-
-    with ops.Graph().as_default():
+    # TODO(b/148892830): investigate if resource variables can be enabled
+    with temporary_disable_resource_variables(), ops.Graph().as_default():
       device_fn = variables_lib2.VariableDeviceChooser(num_tasks=2)
       with arg_scope([variables_lib2.variable], device=device_fn):
         a = variables_lib2.variable('a', [])
@@ -520,8 +536,8 @@ class VariablesTest(test.TestCase):
       self.assertDeviceEqual(e.initial_value.device, '/cpu:99')
 
   def testVariableWithVariableDeviceChooserWithReplica(self):
-
-    with ops.Graph().as_default():
+    # TODO(b/148892830): investigate if resource variables can be enabled
+    with temporary_disable_resource_variables(), ops.Graph().as_default():
       device_fn = variables_lib2.VariableDeviceChooser(replica=3, num_tasks=2)
       with arg_scope([variables_lib2.variable], device=device_fn):
         a = variables_lib2.variable('a', [])
@@ -592,9 +608,9 @@ class ModelVariablesTest(test.TestCase):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         a = variables_lib2.model_variable('a', [5])
-        self.assertTrue(a in variables_lib.global_variables())
-        self.assertTrue(a in ops.get_collection(ops.GraphKeys.MODEL_VARIABLES))
-        self.assertFalse(a in variables_lib.local_variables())
+        self.assertIn(a, variables_lib.global_variables())
+        self.assertIn(a, ops.get_collection(ops.GraphKeys.MODEL_VARIABLES))
+        self.assertNotIn(a, variables_lib.local_variables())
 
   def testGetVariablesReturns(self):
     with self.cached_session():
@@ -652,8 +668,8 @@ class ModelVariablesTest(test.TestCase):
         # if op.type == 'VarHandleOp': FIXME???
         self.counter += 1
         return '/cpu:%d' % self.counter
-
-    with ops.Graph().as_default():
+    # TODO(b/148892830): investigate if resource variables can be enabled
+    with temporary_disable_resource_variables(), ops.Graph().as_default():
       with arg_scope([variables_lib2.model_variable], device=DevFn()):
         a = variables_lib2.model_variable('a', [5])
         b = variables_lib2.model_variable('b', [20])
@@ -1310,6 +1326,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
 class FilterVariablesTest(test.TestCase):
 
   def setUp(self):
+    super(FilterVariablesTest, self).setUp()
+
     g = ops.Graph()
     with g.as_default():
       var_list = []

@@ -20,6 +20,9 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+
+import tensorflow.compat.v1 as tf
+
 # pylint: disable=g-direct-tensorflow-import
 from tf_slim.layers import normalization
 from tf_slim.ops import variables as contrib_variables
@@ -29,6 +32,10 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class InstanceNormTest(test.TestCase):

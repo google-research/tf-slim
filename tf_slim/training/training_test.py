@@ -22,6 +22,8 @@ from __future__ import print_function
 import os
 
 import numpy as np
+import tensorflow.compat.v1 as tf
+
 import tensorflow.compat.v1.losses as losses
 from tf_slim.layers import layers
 
@@ -44,6 +46,10 @@ from tensorflow.python.training import gradient_descent
 from tensorflow.python.training import monitored_session
 from tensorflow.python.training import saver as saver_lib
 # pylint: enable=g-import-not-at-top
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 def logistic_classifier(inputs):
@@ -87,6 +93,7 @@ class ClipGradsTest(test.TestCase):
 class CreateTrainOpTest(test.TestCase):
 
   def setUp(self):
+    super(CreateTrainOpTest, self).setUp()
     np.random.seed(0)
 
     # Create an easy training set:
@@ -104,7 +111,7 @@ class CreateTrainOpTest(test.TestCase):
       train_op = training.create_train_op(loss, optimizer)
 
       # Make sure the training op was recorded in the proper collection
-      self.assertTrue(train_op in ops.get_collection(ops.GraphKeys.TRAIN_OP))
+      self.assertIn(train_op, ops.get_collection(ops.GraphKeys.TRAIN_OP))
 
   def testUseUpdateOps(self):
     with ops.Graph().as_default():
@@ -226,6 +233,7 @@ class CreateTrainOpTest(test.TestCase):
 class TrainBatchNormClassifierTest(test.TestCase):
 
   def setUp(self):
+    super(TrainBatchNormClassifierTest, self).setUp()
     # Create an easy training set:
     np.random.seed(0)
 
@@ -262,6 +270,7 @@ class TrainBatchNormClassifierTest(test.TestCase):
 class TrainTest(test.TestCase):
 
   def setUp(self):
+    super(TrainTest, self).setUp()
     # Create an easy training set:
     np.random.seed(0)
 

@@ -13,11 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-"""Contains metric-computing operations on streamed tensors.
-
-Module documentation, including "@@" callouts, should be put in
-third_party/tensorflow/contrib/metrics/__init__.py
-"""
+"""Contains metric-computing operations on streamed tensors."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -25,8 +21,8 @@ from __future__ import print_function
 
 import collections as collections_lib
 
+import tensorflow.compat.v1 as tf
 # pylint: disable=g-direct-tensorflow-import
-from tensorflow.python.eager import context
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
@@ -40,7 +36,6 @@ from tensorflow.python.ops import nn
 from tensorflow.python.ops import state_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import weights_broadcast_ops
-from tensorflow.python.ops.distributions.normal import Normal
 from tensorflow.python.util.deprecation import deprecated
 
 # Epsilon constant used to represent extremely small quantity.
@@ -1357,7 +1352,7 @@ def _compute_placement_auc(labels, predictions, weights, alpha,
                               (var_1 / (total_1 + _EPSILON)))
 
   # Calculate asymptotic normal confidence intervals
-  std_norm_dist = Normal(loc=0., scale=1.)
+  std_norm_dist = tf.distributions.Normal(loc=0., scale=1.)
   z_value = std_norm_dist.quantile((1.0 - alpha) / 2.0)
   if logit_transformation:
     estimate = math_ops.log(auc / (1. - auc + _EPSILON))
@@ -2699,7 +2694,7 @@ def precision_at_recall(labels,
       or `updates_collections` are not a list or tuple.
     RuntimeError: If eager execution is enabled.
   """
-  if context.executing_eagerly():
+  if tf.executing_eagerly():
     raise RuntimeError('tf.metrics.precision_at_recall is not '
                        'supported when eager execution is enabled.')
 
@@ -3603,8 +3598,8 @@ def streaming_concat(values,
       axis += ndim
     if not 0 <= axis < ndim:
       raise ValueError('axis = %r not in [0, %r)' % (axis, ndim))
-
-    fixed_shape = [dim.value for n, dim in enumerate(values_shape) if n != axis]
+    fixed_shape = [tf.dimension_value(dim)
+                   for n, dim in enumerate(values_shape) if n != axis]
     if any(value is None for value in fixed_shape):
       raise ValueError('all dimensions of `values` other than the dimension to '
                        'concatenate along must have statically known size')
@@ -3751,7 +3746,7 @@ def count(values,
       or tuple.
     RuntimeError: If eager execution is enabled.
   """
-  if context.executing_eagerly():
+  if tf.executing_eagerly():
     raise RuntimeError('tf.contrib.metrics.count is not supported when eager '
                        'execution is enabled.')
 
@@ -3841,7 +3836,7 @@ def cohen_kappa(labels,
       `updates_collections` are not a list or tuple.
     RuntimeError: If eager execution is enabled.
   """
-  if context.executing_eagerly():
+  if tf.executing_eagerly():
     raise RuntimeError('tf.contrib.metrics.cohen_kappa is not supported '
                        'when eager execution is enabled.')
   if num_classes < 2:

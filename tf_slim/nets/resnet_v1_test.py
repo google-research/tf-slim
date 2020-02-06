@@ -21,6 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 
 from tf_slim import layers
 from tf_slim.layers import utils
@@ -38,6 +39,10 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 def create_input(batch_size, height, width, channels):

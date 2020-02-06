@@ -19,12 +19,17 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
+import tensorflow.compat.v1 as tf
 
 from tf_slim.ops import framework_ops as ops_lib
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import ops
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class OpsTest(test.TestCase):

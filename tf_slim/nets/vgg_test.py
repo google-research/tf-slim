@@ -20,6 +20,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow.compat.v1 as tf
+
 from tf_slim.nets import vgg
 from tf_slim.ops import variables as variables_lib
 # pylint:disable=g-direct-tensorflow-import
@@ -32,6 +34,10 @@ from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class VGGATest(test.TestCase):
 
   def testBuild(self):
@@ -41,7 +47,7 @@ class VGGATest(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_a(inputs, num_classes)
-      self.assertEquals(logits.op.name, 'vgg_a/fc8/squeezed')
+      self.assertEqual(logits.op.name, 'vgg_a/fc8/squeezed')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, num_classes])
 
@@ -52,7 +58,7 @@ class VGGATest(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_a(inputs, num_classes, spatial_squeeze=False)
-      self.assertEquals(logits.op.name, 'vgg_a/fc8/BiasAdd')
+      self.assertEqual(logits.op.name, 'vgg_a/fc8/BiasAdd')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, 2, 2, num_classes])
 
@@ -140,7 +146,7 @@ class VGGATest(test.TestCase):
                            [eval_batch_size, 2, 2, num_classes])
       logits = math_ops.reduce_mean(logits, [1, 2])
       predictions = math_ops.argmax(logits, 1)
-      self.assertEquals(predictions.get_shape().as_list(), [eval_batch_size])
+      self.assertEqual(predictions.get_shape().as_list(), [eval_batch_size])
 
   def testForward(self):
     batch_size = 1
@@ -162,7 +168,7 @@ class VGG16Test(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_16(inputs, num_classes)
-      self.assertEquals(logits.op.name, 'vgg_16/fc8/squeezed')
+      self.assertEqual(logits.op.name, 'vgg_16/fc8/squeezed')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, num_classes])
 
@@ -173,7 +179,7 @@ class VGG16Test(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_16(inputs, num_classes, spatial_squeeze=False)
-      self.assertEquals(logits.op.name, 'vgg_16/fc8/BiasAdd')
+      self.assertEqual(logits.op.name, 'vgg_16/fc8/BiasAdd')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, 2, 2, num_classes])
 
@@ -274,7 +280,7 @@ class VGG16Test(test.TestCase):
                            [eval_batch_size, 2, 2, num_classes])
       logits = math_ops.reduce_mean(logits, [1, 2])
       predictions = math_ops.argmax(logits, 1)
-      self.assertEquals(predictions.get_shape().as_list(), [eval_batch_size])
+      self.assertEqual(predictions.get_shape().as_list(), [eval_batch_size])
 
   def testForward(self):
     batch_size = 1
@@ -296,7 +302,7 @@ class VGG19Test(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_19(inputs, num_classes)
-      self.assertEquals(logits.op.name, 'vgg_19/fc8/squeezed')
+      self.assertEqual(logits.op.name, 'vgg_19/fc8/squeezed')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, num_classes])
 
@@ -307,7 +313,7 @@ class VGG19Test(test.TestCase):
     with self.cached_session():
       inputs = random_ops.random_uniform((batch_size, height, width, 3))
       logits, _ = vgg.vgg_19(inputs, num_classes, spatial_squeeze=False)
-      self.assertEquals(logits.op.name, 'vgg_19/fc8/BiasAdd')
+      self.assertEqual(logits.op.name, 'vgg_19/fc8/BiasAdd')
       self.assertListEqual(logits.get_shape().as_list(),
                            [batch_size, 2, 2, num_classes])
 
@@ -415,7 +421,7 @@ class VGG19Test(test.TestCase):
                            [eval_batch_size, 2, 2, num_classes])
       logits = math_ops.reduce_mean(logits, [1, 2])
       predictions = math_ops.argmax(logits, 1)
-      self.assertEquals(predictions.get_shape().as_list(), [eval_batch_size])
+      self.assertEqual(predictions.get_shape().as_list(), [eval_batch_size])
 
   def testForward(self):
     batch_size = 1

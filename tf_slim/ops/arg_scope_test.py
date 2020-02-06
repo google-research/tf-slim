@@ -17,12 +17,8 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import tensorflow.compat.v1 as tf
 from tf_slim.ops import arg_scope as arg_scope_lib
-
-
-# pylint: disable=g-direct-tensorflow-import
-from tensorflow.python.platform import test
 
 
 add_arg_scope = arg_scope_lib.add_arg_scope
@@ -58,7 +54,7 @@ def _key_op(op):
   return getattr(op, '_key_op', str(op))
 
 
-class ArgScopeTest(test.TestCase):
+class ArgScopeTest(tf.test.TestCase):
 
   def testEmptyArgScope(self):
     with self.cached_session():
@@ -101,7 +97,7 @@ class ArgScopeTest(test.TestCase):
 
   def testArgScopedArguments(self):
     func3_kwargs = ('a', 'b', 'c')
-    self.assertEquals(arg_scoped_arguments(func3), func3_kwargs)
+    self.assertEqual(arg_scoped_arguments(func3), func3_kwargs)
 
   def testCurrentArgScopeNested(self):
     func1_kwargs = {'a': 1, 'b': None, 'c': [1]}
@@ -260,4 +256,4 @@ class ArgScopeTest(test.TestCase):
 
 
 if __name__ == '__main__':
-  test.main()
+  tf.test.main()

@@ -21,21 +21,25 @@ from __future__ import print_function
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
+import tensorflow.compat.v1 as tf
 from tf_slim.metrics import metric_ops
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes as dtypes_lib
-from tensorflow.python.framework import ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class StreamingPrecisionRecallAtEqualThresholdsLargeTest(test.TestCase):
 
   def setUp(self):
+    super(StreamingPrecisionRecallAtEqualThresholdsLargeTest, self).setUp()
     np.random.seed(1)
-    ops.reset_default_graph()
 
   def testLargeCase(self):
     shape = [32, 512, 256, 1]

@@ -20,6 +20,8 @@ from __future__ import print_function
 
 import numpy as np
 
+import tensorflow.compat.v1 as tf
+
 from tf_slim.metrics import histogram_ops
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import constant_op
@@ -27,6 +29,10 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class Strict1dCumsumTest(test.TestCase):
@@ -57,6 +63,7 @@ class Strict1dCumsumTest(test.TestCase):
 class AUCUsingHistogramTest(test.TestCase):
 
   def setUp(self):
+    super(AUCUsingHistogramTest, self).setUp()
     self.rng = np.random.RandomState(0)
 
   def test_empty_labels_and_scores_gives_nan_auc(self):

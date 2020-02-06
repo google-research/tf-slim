@@ -23,7 +23,7 @@ from __future__ import print_function
 import glob
 import os
 
-
+import tensorflow.compat.v1 as tf
 from tf_slim import summaries
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
@@ -33,6 +33,10 @@ from tensorflow.python.platform import test
 from tensorflow.python.summary import summary
 from tensorflow.python.summary import summary_iterator
 # pylint:enable=g-direct-tensorflow-import
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class SummariesTest(test.TestCase):

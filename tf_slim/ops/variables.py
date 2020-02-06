@@ -20,9 +20,8 @@ from __future__ import print_function
 
 import functools
 import re
-
+import tensorflow.compat.v1 as tf
 import tf_slim.ops.arg_scope as arg_scope
-
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import saver_pb2
 from tensorflow.python.framework import device as tf_device
@@ -33,7 +32,6 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import tf_logging as logging
-from tensorflow.python.training import py_checkpoint_reader
 from tensorflow.python.training import saver as tf_saver
 from tensorflow.python.training import training_util
 from tensorflow.python.util.deprecation import deprecated
@@ -516,7 +514,8 @@ def assign_from_values(var_names_to_values):
     if not var:
       raise ValueError('Variable %s wasn\'t found' % var_name)
     elif len(var) > 1:
-      # tf.compat.v1.get_collection is just a filter on the prefix: find the exact match:
+      # tf.compat.v1.get_collection is just a filter on the prefix:
+      # find the exact match:
       found = False
       for v in var:
         if v.op.name == var_name:
@@ -634,7 +633,7 @@ def assign_from_checkpoint(model_path, var_list, ignore_missing_vars=False):
 
   # Read each checkpoint entry. Create a placeholder variable and
   # add the (possibly sliced) data from the checkpoint to the feed_dict.
-  reader = py_checkpoint_reader.NewCheckpointReader(model_path)
+  reader = tf.train.NewCheckpointReader(model_path)
   feed_dict = {}
   assign_ops = []
   for ckpt_name in grouped_vars:
@@ -711,7 +710,7 @@ def assign_from_checkpoint_fn(model_path,
   if not var_list:
     raise ValueError('var_list cannot be empty')
   if ignore_missing_vars:
-    reader = py_checkpoint_reader.NewCheckpointReader(model_path)
+    reader = tf.train.NewCheckpointReader(model_path)
     if isinstance(var_list, dict):
       var_dict = var_list
     else:
@@ -767,6 +766,7 @@ class VariableDeviceChooser(object):
       device_type: Optional device type string (e.g. "CPU" or "GPU")
       device_index: int.  Optional device index.  If left unspecified, device
         represents 'any' device_index.
+      replica: replica index.
     """
     self._job_name = job_name
     self._device_type = device_type

@@ -42,7 +42,7 @@ run_tests() {
   # Run the tests
   python setup.py test
 
-  # Install tf_agents package.
+  # Install tf_slim package.
   WHEEL_PATH=${TMP}/wheel/$1
   ./pip_pkg.sh ${WHEEL_PATH}/
 

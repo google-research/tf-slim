@@ -19,6 +19,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow.compat.v1 as tf
+
 from tf_slim.losses import metric_learning
 # pylint: disable=g-direct-tensorflow-import
 
@@ -34,6 +36,10 @@ try:
   HAS_SKLEARN = True
 except ImportError:
   HAS_SKLEARN = False
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 def pairwise_distance_np(feature, squared=False):

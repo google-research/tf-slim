@@ -138,9 +138,8 @@ from __future__ import division
 from __future__ import print_function
 
 import time
+import tensorflow.compat.v1 as tf
 # pylint: disable=g-direct-tensorflow-import
-
-from tensorflow.python.ops import state_ops
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import basic_session_run_hooks
@@ -416,7 +415,7 @@ def evaluate_repeatedly(checkpoint_dir,
   hooks = hooks or []
 
   if eval_ops is not None:
-    update_eval_step = state_ops.assign_add(eval_step, 1)
+    update_eval_step = tf.assign_add(eval_step, 1)
 
     for h in hooks:
       if isinstance(h, StopAfterNEvalsHook):

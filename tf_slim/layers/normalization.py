@@ -18,11 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# pylint: disable=g-direct-tensorflow-import
+import tensorflow.compat.v1 as tf
 from tf_slim.layers import utils
 from tf_slim.ops import variables
 from tf_slim.ops.arg_scope import add_arg_scope
-
+# pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import init_ops
@@ -109,7 +109,7 @@ def instance_norm(inputs,
       # explicitly reshape the params to params_shape_broadcast when computing
       # the moments and the batch normalization.
       params_shape_broadcast = list(
-          [1, inputs_shape[1].value] + [1 for _ in range(2, inputs_rank)])
+          [1, tf.dimension_value(inputs_shape[1])] + [1] * (inputs_rank - 2))
     else:
       reduction_axis = inputs_rank - 1
       params_shape_broadcast = None
@@ -260,7 +260,7 @@ def group_norm(inputs,
   dyanmic_shape = array_ops.shape(inputs)
   input_shape_list = []
   for i, dim in enumerate(inputs.shape):
-    if dim.value is None:
+    if tf.dimension_value(dim) is None:
       input_shape_list.append(dyanmic_shape[i])
     else:
       input_shape_list.append(dim)
@@ -268,7 +268,7 @@ def group_norm(inputs,
   # Standardize the channels_axis to be positive and identify # of channels.
   if channels_axis < 0:
     channels_axis = inputs.shape.ndims + channels_axis
-  channels = inputs.shape[channels_axis].value
+  channels = tf.dimension_value(inputs.shape[channels_axis])
 
   if channels is None:
     raise ValueError('Inputs %s has undefined channel dimension: %d.' % (
@@ -283,7 +283,7 @@ def group_norm(inputs,
   for a in reduction_axes:
     if a > inputs.shape.ndims:
       raise ValueError('Axis is out of bounds.')
-    if inputs.shape[a].value is None:
+    if tf.dimension_value(inputs.shape[a]) is None:
       raise ValueError('Inputs %s has undefined dimensions %d.' % (
           inputs.name, a))
     if channels_axis == a:

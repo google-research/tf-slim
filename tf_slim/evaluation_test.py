@@ -27,6 +27,7 @@ import time
 from nose.tools import nottest
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 from tf_slim import evaluation
 from tf_slim.ops import variables as variables_lib
 from tf_slim.training import evaluation as evaluation_lib
@@ -49,7 +50,12 @@ from tensorflow.python.training import saver as saver_lib
 from tensorflow.python.training import session_run_hook
 # pylint:enable=g-direct-tensorflow-import
 
+
 FLAGS = flags.FLAGS
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 def GenerateTestData(num_classes, batch_size):

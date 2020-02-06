@@ -14,11 +14,7 @@
 # limitations under the License.
 # ==============================================================================
 # pylint: disable=g-short-docstring-punctuation
-"""Metrics that use histograms.
-
-Module documentation, including "@@" callouts, should be put in
-third_party/tensorflow/contrib/metrics/__init__.py
-"""
+"""Metrics that use histograms."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -104,7 +100,7 @@ def _check_labels_and_scores(boolean_labels, scores, check_shape):
 
     if boolean_labels.dtype != dtypes.bool:
       raise ValueError(
-          'Argument boolean_labels should have dtype bool.  Found: %s',
+          'Argument boolean_labels should have dtype bool.  Found: %s' %
           boolean_labels.dtype)
 
     if check_shape:

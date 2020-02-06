@@ -23,6 +23,8 @@ import math
 
 import numpy as np
 from six.moves import xrange  # pylint: disable=redefined-builtin
+
+import tensorflow.compat.v1 as tf
 import tf_slim.metrics as metrics_lib
 from tf_slim.metrics.metric_ops import _next_array_size
 
@@ -38,10 +40,13 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
-from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
+
 
 NAN = float('nan')
-
 metrics = metrics_lib
 
 
@@ -153,17 +158,14 @@ def _assert_nan(test_case, actual):
 
 
 def _assert_metric_variables(test_case, expected):
-  test_case.assertEquals(
+  test_case.assertEqual(
       set(expected), set(v.name for v in variables.local_variables()))
-  test_case.assertEquals(
+  test_case.assertEqual(
       set(expected),
       set(v.name for v in ops.get_collection(ops.GraphKeys.METRIC_VARIABLES)))
 
 
-class StreamingMeanTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean(array_ops.ones([4, 3]))
@@ -265,7 +267,7 @@ class StreamingMeanTest(test.TestCase):
 
       variables.local_variables_initializer().run()
       for i in range(4):
-        update_op.eval(feed_dict={values: feed_values[i]})
+        sess.run(update_op, feed_dict={values: feed_values[i]})
       self.assertAlmostEqual((0 + 1 - 3.2 + 4.0) / 4.0, mean.eval(), 5)
 
   def test2dWeightedValues(self):
@@ -314,14 +316,11 @@ class StreamingMeanTest(test.TestCase):
 
       variables.local_variables_initializer().run()
       for i in range(4):
-        update_op.eval(feed_dict={values: feed_values[i]})
+        sess.run(update_op, feed_dict={values: feed_values[i]})
       self.assertAlmostEqual((0 + 1 - 4.2 + 0) / 4.0, mean.eval(), 5)
 
 
-class StreamingMeanTensorTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanTensorTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean_tensor(array_ops.ones([4, 3]))
@@ -481,10 +480,7 @@ class StreamingMeanTensorTest(test.TestCase):
       self.assertAllClose([[0, 0.5]], sess.run(mean), 5)
 
 
-class StreamingAccuracyTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingAccuracyTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_accuracy(
@@ -658,11 +654,11 @@ class StreamingAccuracyTest(test.TestCase):
       self.assertEqual(1.0, accuracy.eval())
 
 
-class StreamingTruePositivesTest(test.TestCase):
+class StreamingTruePositivesTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingTruePositivesTest, self).setUp()
     np.random.seed(1)
-    ops.reset_default_graph()
 
   def testVars(self):
     metrics.streaming_true_positives((0, 1, 0), (0, 1, 1))
@@ -709,9 +705,10 @@ class StreamingTruePositivesTest(test.TestCase):
         self.assertEqual(37.0, tp.eval())
 
 
-class StreamingFalseNegativesTest(test.TestCase):
+class StreamingFalseNegativesTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFalseNegativesTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -760,11 +757,11 @@ class StreamingFalseNegativesTest(test.TestCase):
         self.assertEqual(8.0, fn.eval())
 
 
-class StreamingFalsePositivesTest(test.TestCase):
+class StreamingFalsePositivesTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFalsePositivesTest, self).setUp()
     np.random.seed(1)
-    ops.reset_default_graph()
 
   def testVars(self):
     metrics.streaming_false_positives((0, 1, 0), (0, 1, 1))
@@ -814,9 +811,10 @@ class StreamingFalsePositivesTest(test.TestCase):
         self.assertEqual(42.0, fp.eval())
 
 
-class StreamingTrueNegativesTest(test.TestCase):
+class StreamingTrueNegativesTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingTrueNegativesTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -865,11 +863,11 @@ class StreamingTrueNegativesTest(test.TestCase):
         self.assertEqual(15.0, tn.eval())
 
 
-class StreamingTruePositivesAtThresholdsTest(test.TestCase):
+class StreamingTruePositivesAtThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingTruePositivesAtThresholdsTest, self).setUp()
     np.random.seed(1)
-    ops.reset_default_graph()
 
   def testVars(self):
     metrics.streaming_true_positives_at_thresholds(
@@ -903,9 +901,10 @@ class StreamingTruePositivesAtThresholdsTest(test.TestCase):
       self.assertAllEqual((111.0, 37.0, 0.0), tp.eval())
 
 
-class StreamingFalseNegativesAtThresholdsTest(test.TestCase):
+class StreamingFalseNegativesAtThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFalseNegativesAtThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -948,11 +947,11 @@ class StreamingFalseNegativesAtThresholdsTest(test.TestCase):
       self.assertAllEqual((0.0, 8.0, 11.0), fn.eval())
 
 
-class StreamingFalsePositivesAtThresholdsTest(test.TestCase):
+class StreamingFalsePositivesAtThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFalsePositivesAtThresholdsTest, self).setUp()
     np.random.seed(1)
-    ops.reset_default_graph()
 
   def testVars(self):
     metrics.streaming_false_positives_at_thresholds(
@@ -990,9 +989,10 @@ class StreamingFalsePositivesAtThresholdsTest(test.TestCase):
       self.assertAllEqual((125.0, 42.0, 12.0), fp.eval())
 
 
-class StreamingTrueNegativesAtThresholdsTest(test.TestCase):
+class StreamingTrueNegativesAtThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingTrueNegativesAtThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1031,9 +1031,10 @@ class StreamingTrueNegativesAtThresholdsTest(test.TestCase):
       self.assertAllEqual((5.0, 15.0, 23.0), tn.eval())
 
 
-class StreamingPrecisionTest(test.TestCase):
+class StreamingPrecisionTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingPrecisionTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1195,9 +1196,10 @@ class StreamingPrecisionTest(test.TestCase):
       self.assertEqual(0.0, precision.eval())
 
 
-class StreamingRecallTest(test.TestCase):
+class StreamingRecallTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingRecallTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1318,9 +1320,10 @@ class StreamingRecallTest(test.TestCase):
       self.assertEqual(0, recall.eval())
 
 
-class StreamingFPRTest(test.TestCase):
+class StreamingFPRTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFPRTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1441,9 +1444,10 @@ class StreamingFPRTest(test.TestCase):
       self.assertEqual(0, fpr.eval())
 
 
-class StreamingFNRTest(test.TestCase):
+class StreamingFNRTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFNRTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1564,9 +1568,10 @@ class StreamingFNRTest(test.TestCase):
       self.assertEqual(0, fnr.eval())
 
 
-class StreamingCurvePointsTest(test.TestCase):
+class StreamingCurvePointsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingCurvePointsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1685,9 +1690,10 @@ def _np_auc(predictions, labels, weights=None):
   return np.sum((sorted_weights * tp)[~is_positive]) / num_negatives
 
 
-class StreamingAUCTest(test.TestCase):
+class StreamingAUCTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingAUCTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -1740,8 +1746,12 @@ class StreamingAUCTest(test.TestCase):
       labels = constant_op.constant([0, 1, 1, 0], shape=(1, 4))
       with self.assertRaisesRegexp(errors_impl.InvalidArgumentError,
                                    r'predictions must be in \[0, 1\]'):
-        _, _ = metrics.streaming_auc(predictions, labels)
-        # Error detected statically; no need to run the op.
+        _, update_op = metrics.streaming_auc(predictions, labels)
+        # In later versions of tensorflow error are detected statically;
+        # no need to run the op. But in earlier release this should be run
+        # for backward compatibility.
+        sess.run(variables.local_variables_initializer())
+        update_op.eval()
 
   def testAllCorrect(self):
     self.allCorrectAsExpected('ROC')
@@ -1926,7 +1936,7 @@ class StreamingAUCTest(test.TestCase):
         self.assertAlmostEqual(expected_auc, auc.eval(), 2)
 
 
-class StreamingDynamicAUCTest(test.TestCase):
+class StreamingDynamicAUCTest(tf.test.TestCase):
 
   def setUp(self):
     super(StreamingDynamicAUCTest, self).setUp()
@@ -2171,9 +2181,10 @@ class StreamingDynamicAUCTest(test.TestCase):
         self.assertAlmostEqual(expected_auc, auc.eval())
 
 
-class AucWithConfidenceIntervalsTest(test.TestCase):
+class AucWithConfidenceIntervalsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(AucWithConfidenceIntervalsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -2371,9 +2382,10 @@ class AucWithConfidenceIntervalsTest(test.TestCase):
         sess.run(update_op)
 
 
-class StreamingPrecisionRecallAtEqualThresholdsTest(test.TestCase):
+class StreamingPrecisionRecallAtEqualThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingPrecisionRecallAtEqualThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -2584,9 +2596,10 @@ class StreamingPrecisionRecallAtEqualThresholdsTest(test.TestCase):
         eps=1e-3)
 
 
-class StreamingSpecificityAtSensitivityTest(test.TestCase):
+class StreamingSpecificityAtSensitivityTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingSpecificityAtSensitivityTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -2720,9 +2733,10 @@ class StreamingSpecificityAtSensitivityTest(test.TestCase):
       self.assertAlmostEqual(8.0 / 15.0, specificity.eval())
 
 
-class StreamingSensitivityAtSpecificityTest(test.TestCase):
+class StreamingSensitivityAtSpecificityTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingSensitivityAtSpecificityTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -2836,9 +2850,10 @@ class StreamingSensitivityAtSpecificityTest(test.TestCase):
       self.assertAlmostEqual(0.675, specificity.eval())
 
 
-class StreamingPrecisionRecallThresholdsTest(test.TestCase):
+class StreamingPrecisionRecallThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingPrecisionRecallThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -3123,9 +3138,10 @@ class StreamingPrecisionRecallThresholdsTest(test.TestCase):
       self.assertAlmostEqual(expected_rec, rec.eval(), 2)
 
 
-class StreamingFPRThresholdsTest(test.TestCase):
+class StreamingFPRThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFPRThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -3355,9 +3371,10 @@ class StreamingFPRThresholdsTest(test.TestCase):
       self.assertAlmostEqual(expected_fpr, fpr.eval(), 2)
 
 
-class RecallAtPrecisionTest(test.TestCase):
+class RecallAtPrecisionTest(tf.test.TestCase):
 
   def setUp(self):
+    super(RecallAtPrecisionTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -3526,9 +3543,10 @@ class RecallAtPrecisionTest(test.TestCase):
         strict_mode=True, target_precision=0.2, expected_recall=2.0 / 3)
 
 
-class PrecisionAtRecallTest(test.TestCase):
+class PrecisionAtRecallTest(tf.test.TestCase):
 
   def setUp(self):
+    super(PrecisionAtRecallTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -3658,9 +3676,10 @@ class PrecisionAtRecallTest(test.TestCase):
         self.assertAlmostEqual(34.0/43, precision.eval())
 
 
-class StreamingFNRThresholdsTest(test.TestCase):
+class StreamingFNRThresholdsTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingFNRThresholdsTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -3892,9 +3911,10 @@ class StreamingFNRThresholdsTest(test.TestCase):
 
 # This test can be removed if `streaming_recall_at_k` is removed.
 # Until then, this test validates that both ops yield the same results.
-class StreamingRecallAtKTest(test.TestCase):
+class StreamingRecallAtKTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingRecallAtKTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -4011,7 +4031,7 @@ class StreamingRecallAtKTest(test.TestCase):
       self.assertEqual(1.0, sp_recall.eval())
 
 
-class StreamingSparsePrecisionTest(test.TestCase):
+class StreamingSparsePrecisionTest(tf.test.TestCase):
 
   def _test_streaming_sparse_precision_at_k(self,
                                             predictions,
@@ -4683,7 +4703,7 @@ class StreamingSparsePrecisionTest(test.TestCase):
       self.assertEqual(expected_precision, precision.eval())
 
 
-class StreamingSparseRecallTest(test.TestCase):
+class StreamingSparseRecallTest(tf.test.TestCase):
 
   def _test_streaming_sparse_recall_at_k(self,
                                          predictions,
@@ -5388,10 +5408,7 @@ class StreamingSparseRecallTest(test.TestCase):
       self.assertEqual(expected_recall, recall.eval())
 
 
-class StreamingMeanAbsoluteErrorTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanAbsoluteErrorTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean_absolute_error(
@@ -5449,10 +5466,7 @@ class StreamingMeanAbsoluteErrorTest(test.TestCase):
       self.assertEqual(3, error.eval())
 
 
-class StreamingMeanRelativeErrorTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanRelativeErrorTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean_relative_error(
@@ -5534,10 +5548,7 @@ class StreamingMeanRelativeErrorTest(test.TestCase):
       self.assertEqual(0.0, error.eval())
 
 
-class StreamingMeanSquaredErrorTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanSquaredErrorTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean_squared_error(
@@ -5714,10 +5725,7 @@ class StreamingMeanSquaredErrorTest(test.TestCase):
       self.assertAlmostEqual(208.0 / 6, mse.eval(), 5)
 
 
-class StreamingRootMeanSquaredErrorTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingRootMeanSquaredErrorTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_root_mean_squared_error(
@@ -5805,10 +5813,7 @@ class StreamingRootMeanSquaredErrorTest(test.TestCase):
       self.assertAlmostEqual(math.sqrt(13), rmse.eval(), 5)
 
 
-class StreamingCovarianceTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingCovarianceTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_covariance(
@@ -5980,10 +5985,7 @@ class StreamingCovarianceTest(test.TestCase):
         prev_expected_cov = expected_cov
 
 
-class StreamingPearsonRTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingPearsonRTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_pearson_correlation(
@@ -6213,10 +6215,7 @@ class StreamingPearsonRTest(test.TestCase):
                                  sess.run(pearson_r, feed_dict=feed_dict), 5)
 
 
-class StreamingMeanCosineDistanceTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class StreamingMeanCosineDistanceTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_mean_cosine_distance(
@@ -6358,10 +6357,7 @@ class StreamingMeanCosineDistanceTest(test.TestCase):
       self.assertEqual(1.5, error.eval())
 
 
-class PcntBelowThreshTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class PcntBelowThreshTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.streaming_percentage_less(values=array_ops.ones((10,)), threshold=2)
@@ -6430,9 +6426,10 @@ class PcntBelowThreshTest(test.TestCase):
       self.assertAlmostEqual(0.0, pcnt2, 5)
 
 
-class StreamingMeanIOUTest(test.TestCase):
+class StreamingMeanIOUTest(tf.test.TestCase):
 
   def setUp(self):
+    super(StreamingMeanIOUTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -6716,10 +6713,10 @@ class StreamingMeanIOUTest(test.TestCase):
                              miou.eval())
 
 
-class StreamingConcatTest(test.TestCase):
+class StreamingConcatTest(tf.test.TestCase):
 
   def setUp(self):
-    ops.reset_default_graph()
+    super(StreamingConcatTest, self).setUp()
     variable_scope.enable_resource_variables()
 
   def testVars(self):
@@ -6843,7 +6840,7 @@ class StreamingConcatTest(test.TestCase):
       self.assertAllEqual([3, 4], concatenated.eval())
 
 
-class AggregateMetricsTest(test.TestCase):
+class AggregateMetricsTest(tf.test.TestCase):
 
   def testAggregateNoMetricsRaisesValueError(self):
     with self.assertRaises(ValueError):
@@ -6876,7 +6873,7 @@ class AggregateMetricsTest(test.TestCase):
       self.assertEqual(4, value_tensors[1].eval())
 
 
-class AggregateMetricMapTest(test.TestCase):
+class AggregateMetricMapTest(tf.test.TestCase):
 
   def testAggregateMultipleMetricsReturnsListsInOrder(self):
     predictions = array_ops.ones((10, 4))
@@ -6897,10 +6894,7 @@ class AggregateMetricMapTest(test.TestCase):
       self.assertEqual(4, names_to_values['m2'].eval())
 
 
-class CountTest(test.TestCase):
-
-  def setUp(self):
-    ops.reset_default_graph()
+class CountTest(tf.test.TestCase):
 
   def testVars(self):
     metrics.count(array_ops.ones([4, 3]))
@@ -6920,8 +6914,10 @@ class CountTest(test.TestCase):
 
   def testReturnType(self):
     c, op = metrics.count(array_ops.ones([4, 3]))
-    self.assertTrue(isinstance(c, ops.Tensor))
-    self.assertTrue(isinstance(op, ops.Operation) or isinstance(op, ops.Tensor))
+    self.assertIsInstance(c, ops.Tensor)
+    # Note: If resource variables are enabeld the result is a Variable
+    # (AssignAdd)
+    self.assertIsInstance(op, (ops.Operation, ops.Tensor, tf.Variable))
 
   def testBasic(self):
     with self.cached_session() as sess:
@@ -7007,7 +7003,7 @@ class CountTest(test.TestCase):
 
       variables.local_variables_initializer().run()
       for i in range(4):
-        update_op.eval(feed_dict={values: feed_values[i]})
+        sess.run(update_op, feed_dict={values: feed_values[i]})
       self.assertAlmostEqual(3.4, result.eval(), 5)
 
   def test2dWeightedValues(self):
@@ -7056,11 +7052,11 @@ class CountTest(test.TestCase):
 
       variables.local_variables_initializer().run()
       for i in range(4):
-        update_op.eval(feed_dict={values: feed_values[i]})
+        sess.run(update_op, feed_dict={values: feed_values[i]})
       self.assertAlmostEqual(4.1, result.eval(), 5)
 
 
-class CohenKappaTest(test.TestCase):
+class CohenKappaTest(tf.test.TestCase):
 
   def _confusion_matrix_to_samples(self, confusion_matrix):
     x, y = confusion_matrix.shape
@@ -7072,6 +7068,7 @@ class CohenKappaTest(test.TestCase):
     return pairs[:, 0], pairs[:, 1]
 
   def setUp(self):
+    super(CohenKappaTest, self).setUp()
     np.random.seed(1)
     ops.reset_default_graph()
 
@@ -7273,4 +7270,4 @@ class CohenKappaTest(test.TestCase):
         print(sess.run(values))
 
 if __name__ == '__main__':
-  test.main()
+  tf.test.main()

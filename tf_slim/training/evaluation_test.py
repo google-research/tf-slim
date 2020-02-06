@@ -24,6 +24,7 @@ import os
 import time
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 from tf_slim.layers import layers
 import tf_slim.losses as loss_ops
 from tf_slim.ops import variables
@@ -50,6 +51,10 @@ from tensorflow.python.summary import summary_iterator
 from tensorflow.python.training import basic_session_run_hooks
 from tensorflow.python.training import gradient_descent
 from tensorflow.python.training import saver as saver_lib
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class CheckpointIteratorTest(test.TestCase):

@@ -21,6 +21,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 from tf_slim import model_analyzer
 from tf_slim.nets import inception_v1
 from tf_slim.ops import variables as variables_lib
@@ -34,6 +35,10 @@ from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class InceptionV1Test(test.TestCase):
@@ -173,7 +178,7 @@ class InceptionV1Test(test.TestCase):
     with self.cached_session() as sess:
       sess.run(variables.global_variables_initializer())
       output = sess.run(logits, {inputs: images.eval()})
-      self.assertEquals(output.shape, (batch_size, num_classes))
+      self.assertEqual(output.shape, (batch_size, num_classes))
 
   def testEvaluation(self):
     batch_size = 2
@@ -188,7 +193,7 @@ class InceptionV1Test(test.TestCase):
     with self.cached_session() as sess:
       sess.run(variables.global_variables_initializer())
       output = sess.run(predictions)
-      self.assertEquals(output.shape, (batch_size,))
+      self.assertEqual(output.shape, (batch_size,))
 
   def testTrainEvalWithReuse(self):
     train_batch_size = 5
@@ -206,7 +211,7 @@ class InceptionV1Test(test.TestCase):
     with self.cached_session() as sess:
       sess.run(variables.global_variables_initializer())
       output = sess.run(predictions)
-      self.assertEquals(output.shape, (eval_batch_size,))
+      self.assertEqual(output.shape, (eval_batch_size,))
 
   def testLogitsNotSqueezed(self):
     num_classes = 25

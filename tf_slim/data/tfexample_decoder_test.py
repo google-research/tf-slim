@@ -35,6 +35,10 @@ from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class TFExampleDecoderTest(test.TestCase):
 
   def _EncodedFloatFeature(self, ndarray):

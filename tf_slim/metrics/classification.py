@@ -19,8 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow.compat.v1 as tf
 # pylint: disable=g-direct-tensorflow-import
-from tensorflow.python.distribute import distribution_strategy_context
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
@@ -174,7 +174,7 @@ def f1_score(labels, predictions, weights=None, num_thresholds=200,
         ops.add_to_collections(metrics_collections, best_f1)
       return best_f1
 
-    best_f1 = distribution_strategy_context.get_replica_context().merge_call(
+    best_f1 = tf.distribute.get_replica_context().merge_call(
         f1_across_replicas, args=(values,))
 
     update_op = compute_best_f1_score(tp=update_ops['tp'], fp=update_ops['fp'],

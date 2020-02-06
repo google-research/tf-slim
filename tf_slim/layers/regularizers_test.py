@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import numpy as np
 # pylint: disable=g-direct-tensorflow-import
+import tensorflow.compat.v1 as tf
 from tf_slim.layers import regularizers
 from tensorflow.python.client import session
 from tensorflow.python.framework import constant_op
@@ -28,6 +29,10 @@ from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class RegularizerTest(test.TestCase):
@@ -77,7 +82,7 @@ class RegularizerTest(test.TestCase):
       num_elem = 5 * 5 * 5
       tensor = constant_op.constant(1.0, shape=shape)
       loss = regularizers.l1_l2_regularizer(1.0, 1.0)(tensor)
-      self.assertEquals(loss.op.name, 'l1_l2_regularizer')
+      self.assertEqual(loss.op.name, 'l1_l2_regularizer')
       self.assertAlmostEqual(loss.eval(), num_elem + num_elem / 2, 5)
 
   def test_l1_l2_scale_l1Zero(self):
@@ -86,7 +91,7 @@ class RegularizerTest(test.TestCase):
     tensor = constant_op.constant(1.0, shape=shape)
     loss = regularizers.l1_l2_regularizer(0.0, 1.0)(tensor)
     with self.cached_session():
-      self.assertEquals(loss.op.name, 'l1_l2_regularizer')
+      self.assertEqual(loss.op.name, 'l1_l2_regularizer')
       self.assertAlmostEqual(loss.eval(), num_elem / 2, 5)
 
   def test_l1_l2_scale_l2Zero(self):
@@ -95,14 +100,14 @@ class RegularizerTest(test.TestCase):
     tensor = constant_op.constant(1.0, shape=shape)
     loss = regularizers.l1_l2_regularizer(1.0, 0.0)(tensor)
     with self.cached_session():
-      self.assertEquals(loss.op.name, 'l1_l2_regularizer')
+      self.assertEqual(loss.op.name, 'l1_l2_regularizer')
       self.assertAlmostEqual(loss.eval(), num_elem, 5)
 
   def test_l1_l2_scales_Zero(self):
     shape = [5, 5, 5]
     tensor = constant_op.constant(1.0, shape=shape)
     loss = regularizers.l1_l2_regularizer(0.0, 0.0)(tensor)
-    self.assertEquals(loss, None)
+    self.assertEqual(loss, None)
 
   def testL1L2RegularizerWithScope(self):
     with self.cached_session():
@@ -111,7 +116,7 @@ class RegularizerTest(test.TestCase):
       tensor = constant_op.constant(1.0, shape=shape)
       with ops.name_scope('foo'):
         loss = regularizers.l1_l2_regularizer(1.0, 1.0, scope='l1_l2')(tensor)
-      self.assertEquals(loss.op.name, 'foo/l1_l2')
+      self.assertEqual(loss.op.name, 'foo/l1_l2')
       self.assertAlmostEqual(loss.eval(), num_elem + num_elem / 2, 5)
 
   def test_sum_regularizer(self):

@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-
+import tensorflow.compat.v1 as tf
 from tf_slim.layers import utils
 
 # pylint: disable=g-direct-tensorflow-import
@@ -31,6 +31,10 @@ from tensorflow.python.framework import tensor_shape
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class ConstantValueTest(test.TestCase):

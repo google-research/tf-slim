@@ -20,10 +20,12 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-# pylint: disable=g-direct-tensorflow-import
-import tf_slim.layers as layers
+
+import tf_slim
 from tf_slim.layers import initializers
 from tf_slim.layers import regularizers
+
+# pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.client import session
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
@@ -65,11 +67,11 @@ class InitializerTest(test.TestCase):
     self._test_xavier(initializers.xavier_initializer, [], 0.0, True)
 
   def test_xavier_conv2d_uniform(self):
-    self._test_xavier(layers.xavier_initializer_conv2d, [100, 40, 5, 7],
+    self._test_xavier(tf_slim.xavier_initializer_conv2d, [100, 40, 5, 7],
                       2. / (100. * 40 * (5 + 7)), True)
 
   def test_xavier_conv2d_normal(self):
-    self._test_xavier(layers.xavier_initializer_conv2d, [100, 40, 5, 7],
+    self._test_xavier(tf_slim.xavier_initializer_conv2d, [100, 40, 5, 7],
                       2. / (100. * 40 * (5 + 7)), False)
 
 

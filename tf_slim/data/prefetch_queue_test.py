@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-
+import tensorflow.compat.v1 as tf
 from tf_slim.data import prefetch_queue
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import constant_op
@@ -35,6 +35,10 @@ from tensorflow.python.platform import test
 from tensorflow.python.training import input as input_lib
 from tensorflow.python.training import queue_runner_impl
 # pylint:enable=g-direct-tensorflow-import
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class PrefetchQueueTest(test.TestCase):
@@ -66,9 +70,9 @@ class PrefetchQueueTest(test.TestCase):
         results = sess.run(batches)
         self.assertAllEqual(results[0],
                             np.arange(i * batch_size, (i + 1) * batch_size))
-        self.assertEquals(results[1].shape,
-                          (batch_size, image_size, image_size, 3))
-        self.assertEquals(results[2].shape, (batch_size, 1))
+        self.assertEqual(results[1].shape,
+                         (batch_size, image_size, image_size, 3))
+        self.assertEqual(results[2].shape, (batch_size, 1))
 
       # Reached the limit.
       with self.assertRaises(errors_impl.OutOfRangeError):
@@ -145,9 +149,9 @@ class PrefetchQueueTest(test.TestCase):
         for batches in batches_list:
           results = sess.run(batches)
           value_counter.append(results[0])
-          self.assertEquals(results[1].shape,
-                            (batch_size, image_size, image_size, 3))
-          self.assertEquals(results[2].shape, (batch_size, 1))
+          self.assertEqual(results[1].shape,
+                           (batch_size, image_size, image_size, 3))
+          self.assertEqual(results[2].shape, (batch_size, 1))
 
       self.assertAllEqual(
           np.sort(np.concatenate(value_counter)),

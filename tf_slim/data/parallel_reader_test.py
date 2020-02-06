@@ -19,9 +19,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow.compat.v1 as tf
 from tf_slim import queues
 from tf_slim.data import parallel_reader
 from tf_slim.data import test_utils
+
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes as dtypes_lib
 from tensorflow.python.framework import errors_impl
@@ -35,9 +37,14 @@ from tensorflow.python.training import supervisor
 # pylint:enable=g-direct-tensorflow-import
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class ParallelReaderTest(test.TestCase):
 
   def setUp(self):
+    super(ParallelReaderTest, self).setUp()
     ops.reset_default_graph()
 
   def _verify_all_data_sources_read(self, shared_queue):
@@ -75,7 +82,7 @@ class ParallelReaderTest(test.TestCase):
     self.assertGreater(count0, 0)
     self.assertGreater(count1, 0)
     self.assertGreater(count2, 0)
-    self.assertEquals(count0 + count1 + count2, num_reads)
+    self.assertEqual(count0 + count1 + count2, num_reads)
 
   def _verify_read_up_to_out(self, shared_queue):
     with self.cached_session():
@@ -105,7 +112,7 @@ class ParallelReaderTest(test.TestCase):
       while True:
         try:
           current_keys, current_values = sess.run([key, value])
-          self.assertEquals(len(current_keys), len(current_values))
+          self.assertEqual(len(current_keys), len(current_values))
           all_keys_count += len(current_keys)
           all_values_count += len(current_values)
           for current_key in current_keys:
@@ -118,14 +125,14 @@ class ParallelReaderTest(test.TestCase):
         except errors_impl.OutOfRangeError:
           break
 
-    self.assertEquals(count0, num_records_per_file)
-    self.assertEquals(count1, num_records_per_file)
-    self.assertEquals(count2, num_records_per_file)
-    self.assertEquals(
+    self.assertEqual(count0, num_records_per_file)
+    self.assertEqual(count1, num_records_per_file)
+    self.assertEqual(count2, num_records_per_file)
+    self.assertEqual(
         all_keys_count,
         num_files * num_records_per_file)
-    self.assertEquals(all_values_count, all_keys_count)
-    self.assertEquals(
+    self.assertEqual(all_values_count, all_keys_count)
+    self.assertEqual(
         count0 + count1 + count2,
         all_keys_count)
 
@@ -160,6 +167,7 @@ class ParallelReaderTest(test.TestCase):
 class ParallelReadTest(test.TestCase):
 
   def setUp(self):
+    super(ParallelReadTest, self).setUp()
     ops.reset_default_graph()
 
   def testTFRecordReader(self):
@@ -181,12 +189,13 @@ class ParallelReadTest(test.TestCase):
         if 'flowers' in str(current_key):
           flowers += 1
       self.assertGreater(flowers, 0)
-      self.assertEquals(flowers, num_reads)
+      self.assertEqual(flowers, num_reads)
 
 
 class SinglePassReadTest(test.TestCase):
 
   def setUp(self):
+    super(SinglePassReadTest, self).setUp()
     ops.reset_default_graph()
 
   def testOutOfRangeError(self):
@@ -225,7 +234,7 @@ class SinglePassReadTest(test.TestCase):
           if 'flowers' in str(current_key):
             flowers += 1
         self.assertGreater(flowers, 0)
-        self.assertEquals(flowers, num_reads)
+        self.assertEqual(flowers, num_reads)
 
 
 if __name__ == '__main__':

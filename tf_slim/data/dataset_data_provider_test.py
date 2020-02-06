@@ -22,11 +22,16 @@ from __future__ import print_function
 import os
 import tempfile
 
+import tensorflow.compat.v1 as tf
+
+
 from tf_slim import queues
 from tf_slim.data import dataset
 from tf_slim.data import dataset_data_provider
 from tf_slim.data import test_utils
 from tf_slim.data import tfexample_decoder
+
+
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.client import session
 from tensorflow.python.framework import dtypes
@@ -37,6 +42,10 @@ from tensorflow.python.ops import parsing_ops
 from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 def _resize_image(image, height, width):

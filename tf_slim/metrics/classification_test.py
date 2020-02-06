@@ -32,6 +32,10 @@ from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class ClassificationTest(test.TestCase):
 
   def testAccuracy1D(self):

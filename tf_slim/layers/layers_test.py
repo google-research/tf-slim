@@ -22,13 +22,15 @@ from __future__ import print_function
 import math
 
 import numpy as np
+
+import tensorflow.compat.v1 as tf
+
 import tensorflow.compat.v1.losses as losses
 from tf_slim import layers as layers_lib
 from tf_slim.layers import layers as _layers
 from tf_slim.layers import regularizers
 from tf_slim.ops import arg_scope as arg_scope_lib
 from tf_slim.ops import variables
-
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.client import session
 from tensorflow.python.framework import constant_op
@@ -54,6 +56,9 @@ from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables as variables_lib
 from tensorflow.python.platform import test
 
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 arg_scope = arg_scope_lib.arg_scope
 
@@ -147,7 +152,7 @@ class AvgPool3DTest(test.TestCase):
     depth, height, width = 3, 6, 9
     images = np.random.uniform(size=(5, 2, depth, height, width))
     output = _layers.avg_pool3d(images, [3, 3, 3], data_format='NCDHW')
-    self.assertEquals(output.op.name, 'AvgPool3D/transpose_1')
+    self.assertEqual(output.op.name, 'AvgPool3D/transpose_1')
     self.assertListEqual(output.get_shape().as_list(), [5, 2, 1, 2, 4])
 
   def testCollectOutputs(self):
@@ -608,7 +613,7 @@ class ConvolutionTest(test.TestCase):
     self.assertListEqual(list(output.get_shape().as_list()), expected_size)
     with self.cached_session() as sess:
       sess.run(variables_lib.global_variables_initializer())
-      self.assertEquals(output.op.name, 'Conv/Relu')
+      self.assertEqual(output.op.name, 'Conv/Relu')
       self.assertListEqual(list(output.eval().shape), expected_size)
 
   def testDynamicOutputSizeWithRateOneValidPadding(self):
@@ -1361,7 +1366,7 @@ class DropoutTest(test.TestCase):
     with self.cached_session():
       images = np.random.uniform(size=(5, height, width, 3))
       output = _layers.dropout(images)
-      self.assertEqual(output.op.name, 'Dropout/dropout_1/Mul_1')
+      self.assertEqual(output.op.name.lower(), 'dropout/dropout_1/mul_1')
       output.get_shape().assert_is_compatible_with(
           ops.convert_to_tensor(images).get_shape())
 
@@ -1808,6 +1813,17 @@ class FCTest(test.TestCase):
 
 
 class BatchNormTest(test.TestCase):
+
+  def setUp(self):
+    super(BatchNormTest, self).setUp()
+    # TODO(b/148892830): Investigate if this should be re-enabled.
+    self.rv_enabled = variable_scope.resource_variables_enabled()
+    variable_scope.disable_resource_variables()
+
+  def tearDown(self):
+    super(BatchNormTest, self).tearDown()
+    if self.rv_enabled:
+      variable_scope.enable_resource_variables()
 
   def _addBesselsCorrection(self, sample_size, expected_var):
     correction_factor = sample_size / (sample_size - 1)
@@ -3122,7 +3138,7 @@ class MaxPool3DTest(test.TestCase):
     images = np.random.uniform(size=(5, 3, depth, height, width)).astype(
         np.float32)
     output = _layers.max_pool3d(images, [3, 3, 3], data_format='NCDHW')
-    self.assertEquals(output.op.name, 'MaxPool3D/transpose_1')
+    self.assertEqual(output.op.name, 'MaxPool3D/transpose_1')
     self.assertListEqual(output.get_shape().as_list(), [5, 3, 1, 2, 4])
 
   def testCollectOutputs(self):
@@ -3529,6 +3545,7 @@ class SequenceToImagesTest(test.TestCase):
 class SoftmaxTests(test.TestCase):
 
   def setUp(self):
+    super(SoftmaxTests, self).setUp()
     self.low = 1 / (1 + math.e)
     self.high = math.e / (1 + math.e)
 
@@ -3946,7 +3963,7 @@ class PoincareNormalizeTest(test.TestCase):
 class LegacyFullyConnectedTest(test.TestCase):
 
   def setUp(self):
-    test.TestCase.setUp(self)
+    super(LegacyFullyConnectedTest, self).setUp()
     random_seed.set_random_seed(1234)
     self.input = constant_op.constant([[1., 2., 3.], [-4., 15., -6.]])
     self.input_3_dim_arr = [[[1., 1.1, 1.2], [2., 2.1, 2.2], [3., 3.1, 3.2],

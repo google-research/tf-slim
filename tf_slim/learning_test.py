@@ -46,6 +46,10 @@ from tensorflow.python.training import saver as saver_lib
 loss_ops = tf.losses
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class ClipGradientNormsTest(test.TestCase):
 
   def clip_values(self, arr):
@@ -514,9 +518,15 @@ class TrainTest(test.TestCase):
           trace_every_n_steps=100)
     self.assertIsNotNone(loss)
     for trace_step in [1, 101, 201]:
-      trace_filename = 'tf_trace-%d.json' % trace_step
-      trace_path = os.path.join(logdir, trace_filename)
-      self.assertTrue(os.path.isfile(trace_path), trace_path)
+      trace_filename = 'tf_trace-%d.json' % (trace_step - 1)
+      trace_filename_legacy = 'tf_trace-%d.json' % trace_step
+
+      trace_paths = [os.path.join(logdir, f) for f in
+                     (trace_filename, trace_filename_legacy)]
+      # Note: with resource variables the traces are created at 0/100/200
+      # with legacy variables traces are created at 1/101/201
+      self.assertTrue(any(os.path.isfile(path) for path in trace_paths),
+                      trace_paths)
 
   def testTrainWithNoneAsLogdirWhenUsingSummariesRaisesError(self):
     with ops.Graph().as_default():

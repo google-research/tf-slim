@@ -21,19 +21,19 @@ networks simple:
 
 *   Allows the user to define models much more compactly by eliminating
     boilerplate code. This is accomplished through the use of
-    [argument scoping](https://github.com/google-research/tf-slim/tree/master/ops/arg_scope.py)
+    [argument scoping](https://github.com/google-research/tf-slim/tree/master/tf_slimops/arg_scope.py)
     and numerous high level
-    [layers](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
+    [layers](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
     and
-    [variables](https://github.com/google-research/tf-slim/tree/master/ops/variables.py).
+    [variables](https://github.com/google-research/tf-slim/tree/master/tf_slimops/variables.py).
     These tools increase readability and maintainability, reduce the likelihood
     of an error from copy-and-pasting hyperparameter values and simplifies
     hyperparameter tuning.
 *   Makes developing models simple by providing commonly used
-    [regularizers](https://github.com/google-research/tf-slim/tree/master/layers/regularizers.py).
+    [regularizers](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/regularizers.py).
 *   Several widely used computer vision models (e.g., VGG, AlexNet) have been
     developed in slim, and are
-    [available](https://github.com/google-research/tf-slim/tree/master/nets/)
+    [available](https://github.com/google-research/tf-slim/tree/master/tf_slimnets/)
     to users. These can either be used as black boxes, or can be extended in
     various ways, e.g., by adding "multiple heads" to different internal layers.
 *   Slim makes it easy to extend complex models, and to warm start training
@@ -43,40 +43,40 @@ networks simple:
 
 TF-Slim is composed of several parts which were design to exist independently.
 These include the following main pieces (explained in detail below).
-*   [arg_scope](https://github.com/google-research/tf-slim/tree/master/ops/arg_scope.py):
+*   [arg_scope](https://github.com/google-research/tf-slim/tree/master/tf_slimops/arg_scope.py):
     provides a new scope named `arg_scope` that allows a user to define default
     arguments for specific operations within that scope.
-*   [data](https://github.com/google-research/tf-slim/tree/master/data/):
+*   [data](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/):
     contains TF-slim's
-    [dataset](https://github.com/google-research/tf-slim/tree/master/data/dataset.py)
+    [dataset](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/dataset.py)
     definition,
-    [data providers](https://github.com/google-research/tf-slim/tree/master/data/data_provider.py),
-    [parallel_reader](https://github.com/google-research/tf-slim/tree/master/data/parallel_reader.py),
+    [data providers](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/data_provider.py),
+    [parallel_reader](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/parallel_reader.py),
     and
-    [decoding](https://github.com/google-research/tf-slim/tree/master/data/data_decoder.py)
+    [decoding](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/data_decoder.py)
     utilities.
-*   [evaluation](https://github.com/google-research/tf-slim/tree/master/evaluation.py):
+*   [evaluation](https://github.com/google-research/tf-slim/tree/master/tf_slimevaluation.py):
     contains routines for evaluating models.
-*   [layers](https://github.com/google-research/tf-slim/tree/master/layers/layers.py):
+*   [layers](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py):
     contains high level layers for building models using tensorflow.
-*   [learning](https://github.com/google-research/tf-slim/tree/master/learning.py):
+*   [learning](https://github.com/google-research/tf-slim/tree/master/tf_slimlearning.py):
     contains routines for training models.
-*   [losses](https://github.com/google-research/tf-slim/tree/master/losses/loss_ops.py):
+*   [losses](https://github.com/google-research/tf-slim/tree/master/tf_slimlosses/loss_ops.py):
     contains commonly used loss functions.
-*   [metrics](https://github.com/google-research/tf-slim/tree/master/metrics/metric_ops.py):
+*   [metrics](https://github.com/google-research/tf-slim/tree/master/tf_slimmetrics/metric_ops.py):
     contains popular evaluation metrics.
-*   [nets](https://github.com/google-research/tf-slim/tree/master/nets/):
+*   [nets](https://github.com/google-research/tf-slim/tree/master/tf_slimnets/):
     contains popular network definitions such as
-    [VGG](https://github.com/google-research/tf-slim/tree/master/nets/vgg.py)
+    [VGG](https://github.com/google-research/tf-slim/tree/master/tf_slimnets/vgg.py)
     and
-    [AlexNet](https://github.com/google-research/tf-slim/tree/master/nets/alexnet.py)
+    [AlexNet](https://github.com/google-research/tf-slim/tree/master/tf_slimnets/alexnet.py)
     models.
-*   [queues](https://github.com/google-research/tf-slim/tree/master/queues.py):
+*   [queues](https://github.com/google-research/tf-slim/tree/master/tf_slimqueues.py):
     provides a context manager for easily and safely starting and closing
     QueueRunners.
-*   [regularizers](https://github.com/google-research/tf-slim/tree/master/layers/regularizers.py):
+*   [regularizers](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/regularizers.py):
     contains weight regularizers.
-*   [variables](https://github.com/google-research/tf-slim/tree/master/ops/variables.py):
+*   [variables](https://github.com/google-research/tf-slim/tree/master/tf_slimops/variables.py):
     provides convenience wrappers for variable creation and manipulation.
 
 ## Defining Models
@@ -95,7 +95,7 @@ on a specific device, such as a GPU, the specification must be
 [made explicit](https://www.tensorflow.org/how_tos/using_gpu/index.html).
 To alleviate the code required for variable creation, TF-Slim provides a set
 of thin wrapper functions in
-[variables.py](https://github.com/google-research/tf-slim/tree/master/ops/variables.py)
+[variables.py](https://github.com/google-research/tf-slim/tree/master/tf_slimops/variables.py)
 which allow callers to easily define variables.
 
 For example, to create a `weights` variable, initialize it using a truncated
@@ -208,19 +208,19 @@ neural networks. These include:
 
 Layer | TF-Slim
 ------- | --------
-BiasAdd  | [slim.bias_add](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-BatchNorm  | [slim.batch_norm](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-Conv2d | [slim.conv2d](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-Conv2dInPlane | [slim.conv2d_in_plane](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-Conv2dTranspose (Deconv) | [slim.conv2d_transpose](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-FullyConnected | [slim.fully_connected](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-AvgPool2D | [slim.avg_pool2d](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-Dropout| [slim.dropout](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-Flatten | [slim.flatten](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-MaxPool2D | [slim.max_pool2d](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-OneHotEncoding | [slim.one_hot_encoding](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-SeparableConv2 | [slim.separable_conv2d](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
-UnitNorm | [slim.unit_norm](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
+BiasAdd  | [slim.bias_add](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+BatchNorm  | [slim.batch_norm](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+Conv2d | [slim.conv2d](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+Conv2dInPlane | [slim.conv2d_in_plane](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+Conv2dTranspose (Deconv) | [slim.conv2d_transpose](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+FullyConnected | [slim.fully_connected](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+AvgPool2D | [slim.avg_pool2d](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+Dropout| [slim.dropout](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+Flatten | [slim.flatten](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+MaxPool2D | [slim.max_pool2d](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+OneHotEncoding | [slim.one_hot_encoding](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+SeparableConv2 | [slim.separable_conv2d](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
+UnitNorm | [slim.unit_norm](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
 
 TF-Slim also provides two meta-operations called `repeat` and `stack` that
 allow users to repeatedly perform the same operation. For example, consider the
@@ -439,7 +439,7 @@ classification loss and depth prediction loss.
 
 TF-Slim provides an easy-to-use mechanism for defining and keeping track of
 loss functions via the
-[losses](https://github.com/google-research/tf-slim/tree/master/losses/loss_ops.py)
+[losses](https://github.com/google-research/tf-slim/tree/master/tf_slimlosses/loss_ops.py)
 module. Consider the simple case where we want to train the VGG network:
 
 
@@ -488,7 +488,7 @@ manage the total loss manually, or allow TF-Slim to manage them for you.
 
 What if you want to let TF-Slim manage the losses for you but have a custom loss
 function?
-[loss_ops.py](https://github.com/google-research/tf-slim/tree/master/losses/loss_ops.py)
+[loss_ops.py](https://github.com/google-research/tf-slim/tree/master/tf_slimlosses/loss_ops.py)
 also has a function that adds this loss to TF-Slims collection. For example:
 
 ```python
@@ -517,7 +517,7 @@ or let TF-Slim know about the additional loss and let TF-Slim handle the losses.
 ### Training Loop
 
 TF-Slim provides a simple but powerful set of tools for training models found in
-[learning.py](https://github.com/google-research/tf-slim/tree/master/learning.py).
+[learning.py](https://github.com/google-research/tf-slim/tree/master/tf_slimlearning.py).
 These include a Train function that repeatedly measures the loss, computes
 gradients and saves the model to disk, as well as several convenience functions
 for manipulating gradients. For example, once we've specified the model, the
@@ -846,20 +846,20 @@ with tf.Session() as sess:
 ```
 
 Note that
-[metric_ops.py](https://github.com/google-research/tf-slim/tree/master/metrics/metric_ops.py)
+[metric_ops.py](https://github.com/google-research/tf-slim/tree/master/tf_slimmetrics/metric_ops.py)
 can be used in isolation without using either
-[layers.py](https://github.com/google-research/tf-slim/tree/master/layers/layers.py)
+[layers.py](https://github.com/google-research/tf-slim/tree/master/tf_slimlayers/layers.py)
 or
-[loss_ops.py](https://github.com/google-research/tf-slim/tree/master/losses/loss_ops.py)
+[loss_ops.py](https://github.com/google-research/tf-slim/tree/master/tf_slimlosses/loss_ops.py)
 
 ### Evaluation Loop
 
 TF-Slim provides an evaluation module
-([evaluation.py](https://github.com/google-research/tf-slim/tree/master/evaluation.py)),
+([evaluation.py](https://github.com/google-research/tf-slim/tree/master/tf_slimevaluation.py)),
 which contains helper functions for writing model evaluation scripts using
 metrics from the
 [metric_ops.py]
-(https://github.com/google-research/tf-slim/tree/master/metrics/metric_ops.py)
+(https://github.com/google-research/tf-slim/tree/master/tf_slimmetrics/metric_ops.py)
 module. These include a function for periodically running evaluations,
 evaluating metrics over batches of data and printing and summarizing metric
 results. For example:

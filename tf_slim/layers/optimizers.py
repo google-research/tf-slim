@@ -174,7 +174,7 @@ def optimize_loss(loss,
         lr = learning_rate
       elif isinstance(learning_rate, float):
         if learning_rate < 0.0:
-          raise ValueError("Invalid learning_rate %s.", learning_rate)
+          raise ValueError("Invalid learning_rate %s." % learning_rate)
         lr = vs.get_variable(
             "learning_rate", [],
             trainable=False,

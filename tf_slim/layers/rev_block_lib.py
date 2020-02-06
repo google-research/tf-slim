@@ -559,7 +559,7 @@ def _recomputing_grad_fn(compute_fn,
             fn_kwargs["is_recomputing"] = True
           outputs = compute_fn(*inputs, **fn_kwargs)
         recompute_vars = set(
-            v.experimental_ref() for v in tape.watched_variables())
+            _as_ref(v) for v in tape.watched_variables())
         if original_vars != recompute_vars:
           raise ValueError(_WRONG_VARS_ERR)
 
@@ -580,6 +580,16 @@ def _recomputing_grad_fn(compute_fn,
   grad_inputs = grads[:len(inputs)]
   grad_vars = grads[len(inputs):]
   return grad_inputs, grad_vars
+
+
+def _as_ref(v):
+  # Tensorflow 2.1 no longer allows hashable variables
+  # However tensorflow 2.0 still doesn't have experimental_ref.
+  # this try to capture both cases.
+  try:
+    return v.experimental_ref()
+  except AttributeError:
+    return v
 
 
 def _recompute_grad(fn, args, use_data_dep=_USE_DEFAULT, tupleize_grads=False):
@@ -607,14 +617,14 @@ def _recompute_grad(fn, args, use_data_dep=_USE_DEFAULT, tupleize_grads=False):
       if has_is_recompute_kwarg:
         fn_kwargs["is_recomputing"] = False
       outputs = fn(*args, **fn_kwargs)
-    original_vars = set(v.experimental_ref() for v in tape.watched_variables())
+    original_vars = set(_as_ref(v) for v in tape.watched_variables())
 
     def _grad_fn(output_grads, variables=None):
       # Validate that custom_gradient passes the right variables into grad_fn.
       if original_vars:
         assert variables, ("Fn created variables but the variables were not "
                            "passed to the gradient fn.")
-        if set(v.experimental_ref() for v in variables) != original_vars:
+        if set(_as_ref(v) for v in variables) != original_vars:
           raise ValueError(_WRONG_VARS_ERR)
 
       return _recomputing_grad_fn(

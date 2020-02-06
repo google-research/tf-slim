@@ -20,6 +20,9 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
+
+import tensorflow.compat.v1 as tf
+
 # pylint: disable=g-direct-tensorflow-import
 from tf_slim.layers import optimizers as optimizers_lib
 from tensorflow.python.framework import constant_op
@@ -36,17 +39,26 @@ from tensorflow.python.platform import test
 from tensorflow.python.training import gradient_descent
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
+def disable_resource_variables(f):
+  def wrapper(*args, **kwargs):
+    variable_scope.disable_resource_variables()
+    try:
+      f(*args, **kwargs)
+    finally:
+      variable_scope.enable_resource_variables()
+  return wrapper
+
+
 def _setup_model():
   x = array_ops.placeholder(dtypes.float32, [])
   var = variable_scope.get_variable(
       "test", [], initializer=init_ops.constant_initializer(10))
   loss = math_ops.abs(var * x)
-  global_step = variable_scope.get_variable(
-      "global_step", [],
-      trainable=False,
-      dtype=dtypes.int64,
-      initializer=init_ops.constant_initializer(
-          0, dtype=dtypes.int64))
+  global_step = tf.train.create_global_step()
   return x, var, loss, global_step
 
 
@@ -164,6 +176,7 @@ class OptimizersTest(test.TestCase):
         optimizers_lib.optimize_loss(
             loss, global_step, learning_rate=-0.1, optimizer="SGD")
 
+  @disable_resource_variables
   def testGradientNoise(self):
     random_seed.set_random_seed(42)
     with self.cached_session() as session:
@@ -181,6 +194,7 @@ class OptimizersTest(test.TestCase):
       self.assertAlmostEqual(var_value, 9.86912, 4)
       self.assertEqual(global_step_value, 1)
 
+  @disable_resource_variables
   def testGradientNoiseWithClipping(self):
     random_seed.set_random_seed(42)
     with self.cached_session() as session:

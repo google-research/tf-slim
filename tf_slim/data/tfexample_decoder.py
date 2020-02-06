@@ -27,7 +27,6 @@ from __future__ import print_function
 import abc
 
 import six
-
 from tf_slim.data import data_decoder
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes
@@ -52,9 +51,7 @@ class ItemHandler(object):
   """
 
   def __init__(self, keys):
-    """Constructs the handler with the name of the tf.Feature keys to use.
-
-    See third_party/tensorflow/core/example/feature.proto
+    """Constructs the handler with the name of the tf.train.Feature keys to use.
 
     Args:
       keys: the name of the TensorFlow Example Feature.

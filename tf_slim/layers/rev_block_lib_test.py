@@ -19,6 +19,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 # pylint: disable=g-direct-tensorflow-import
+import tensorflow.compat.v1 as tf
+
 from tf_slim.layers import layers
 from tf_slim.layers import rev_block_lib
 from tensorflow.python.framework import dtypes
@@ -36,6 +38,10 @@ from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import test
+
+
+def setUpModule():
+  tf.disable_eager_execution()
 
 
 class RevBlockTest(test.TestCase):
@@ -343,7 +349,7 @@ class RecomputeTest(test.TestCase):
     assert len(tvars) == 4
     grads = gradients_impl.gradients(out, [inputs] + tvars)
     for grad in grads:
-      self.assertTrue(grad is not None)
+      self.assertIsNotNone(grad)
 
   def testWithIsRecomputeKwarg(self):
 

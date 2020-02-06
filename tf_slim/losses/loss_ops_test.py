@@ -21,6 +21,7 @@ from __future__ import print_function
 # pylint: enable=unused-import
 
 import numpy as np
+import tensorflow.compat.v1 as tf
 from tf_slim.ops.arg_scope import arg_scope
 import tf_slim.losses as loss_ops
 
@@ -39,9 +40,14 @@ from tensorflow.python.platform import test
 from tensorflow.python.training import momentum as momentum_lib
 
 
+def setUpModule():
+  tf.disable_eager_execution()
+
+
 class AbsoluteDifferenceLossTest(test.TestCase):
 
   def setUp(self):
+    super(AbsoluteDifferenceLossTest, self).setUp()
     self._predictions = constant_op.constant([4, 8, 12, 8, 1, 3], shape=(2, 3))
     self._labels = constant_op.constant([1, 9, 2, -5, -2, 6], shape=(2, 3))
 
@@ -133,7 +139,7 @@ class SoftmaxCrossEntropyLossTest(test.TestCase):
                                      [0, 1, 0],
                                      [0, 0, 1]])
       loss = loss_ops.softmax_cross_entropy(logits, labels)
-      self.assertEquals('softmax_cross_entropy_loss/value', loss.op.name)
+      self.assertEqual('softmax_cross_entropy_loss/value', loss.op.name)
       self.assertAlmostEqual(loss.eval(), 0.0, 3)
 
   def testAllWrong(self):
@@ -146,7 +152,7 @@ class SoftmaxCrossEntropyLossTest(test.TestCase):
 
     with self.cached_session():
       loss = loss_ops.softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 10.0, 3)
 
   def testNonZeroLossWithPythonScalarWeight(self):
@@ -242,7 +248,7 @@ class SoftmaxCrossEntropyLossTest(test.TestCase):
       label_smoothing = 0.1
       loss = loss_ops.softmax_cross_entropy(
           logits, labels, label_smoothing=label_smoothing)
-      self.assertEquals(loss.op.name, 'softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'softmax_cross_entropy_loss/value')
       expected_value = 400.0 * label_smoothing / 3.0
       self.assertAlmostEqual(loss.eval(), expected_value, 3)
 
@@ -294,7 +300,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
                                      [0.0, 0.0, 10.0]])
       labels = constant_op.constant([[0], [1], [2]], dtype=dtypes.int32)
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 0.0, 3)
 
   def testAllCorrectInt64Labels(self):
@@ -304,7 +310,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
                                      [0.0, 0.0, 10.0]])
       labels = constant_op.constant([[0], [1], [2]], dtype=dtypes.int64)
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 0.0, 3)
 
   def testAllCorrectNonColumnLabels(self):
@@ -314,7 +320,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
                                      [0.0, 0.0, 10.0]])
       labels = constant_op.constant([0, 1, 2])
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 0.0, 3)
 
   def testAllWrongInt32Labels(self):
@@ -325,7 +331,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
 
     with self.cached_session():
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 10.0, 3)
 
   def testAllWrongInt64Labels(self):
@@ -336,7 +342,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
 
     with self.cached_session():
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 10.0, 3)
 
   def testAllWrongNonColumnLabels(self):
@@ -347,7 +353,7 @@ class SparseSoftmaxCrossEntropyLossTest(test.TestCase):
 
     with self.cached_session():
       loss = loss_ops.sparse_softmax_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sparse_softmax_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 10.0, 3)
 
   def testNonZeroLossWithPythonScalarWeight(self):
@@ -515,7 +521,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
                                      [-100.0, -100.0, 100.0]])
       labels = constant_op.constant([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
       loss = loss_ops.sigmoid_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sigmoid_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sigmoid_cross_entropy_loss/value')
       self.assertAlmostEqual(0.0, loss.eval(), 3)
 
   def testLossWithSingleDimPlaceholderForLogitsAndWeights1(self):
@@ -557,7 +563,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
                                      [1, 0, 0],
                                      [0, 1, 0]])
       loss = loss_ops.sigmoid_cross_entropy(logits, labels)
-      self.assertEquals(loss.op.name, 'sigmoid_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sigmoid_cross_entropy_loss/value')
       self.assertAlmostEqual(loss.eval(), 600.0 / 9.0, 3)
 
   def testAllWrongSigmoidWithMeasurementSpecificWeights(self):
@@ -572,7 +578,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
                                       [2, 6, 0],
                                       [8, 0, 1]])
       loss = loss_ops.sigmoid_cross_entropy(logits, labels, weights)
-      self.assertEquals(loss.op.name, 'sigmoid_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sigmoid_cross_entropy_loss/value')
       self.assertAlmostEqual(1700.0 / 7.0, loss.eval(), 3)
 
   def testMultiCorrectSigmoid(self):
@@ -583,7 +589,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
                                    [1, 1, 0],
                                    [0, 1, 1]])
     loss = loss_ops.sigmoid_cross_entropy(logits, labels)
-    self.assertEquals(loss.op.name, 'sigmoid_cross_entropy_loss/value')
+    self.assertEqual(loss.op.name, 'sigmoid_cross_entropy_loss/value')
 
     with self.cached_session():
       self.assertAlmostEqual(loss.eval(), 0.0, 3)
@@ -606,7 +612,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
       label_smoothing = 0.1
       loss = loss_ops.sigmoid_cross_entropy(
           logits, labels, label_smoothing=label_smoothing)
-      self.assertEquals(loss.op.name, 'sigmoid_cross_entropy_loss/value')
+      self.assertEqual(loss.op.name, 'sigmoid_cross_entropy_loss/value')
       expected_value = (100.0 + 50.0 * label_smoothing) / 3.0
       self.assertAlmostEqual(loss.eval(), expected_value, 3)
 
@@ -629,6 +635,7 @@ class SigmoidCrossEntropyLossTest(test.TestCase):
 class LogLossTest(test.TestCase):
 
   def setUp(self):
+    super(LogLossTest, self).setUp()
     predictions = np.asarray([.9, .2, .2, .8, .4, .6]).reshape((2, 3))
     labels = np.asarray([1.0, 0.0, 1.0, 1.0, 0.0, 0.0]).reshape((2, 3))
 
@@ -833,6 +840,7 @@ class HingeLossTest(test.TestCase):
 class MeanSquaredErrorTest(test.TestCase):
 
   def setUp(self):
+    super(MeanSquaredErrorTest, self).setUp()
     self._predictions = constant_op.constant([4, 8, 12, 8, 1, 3], shape=(2, 3))
     self._labels = constant_op.constant([1, 9, 2, -5, -2, 6], shape=(2, 3))
 
@@ -899,6 +907,7 @@ class MeanSquaredErrorTest(test.TestCase):
 class MeanPairwiseSquaresErrorTest(test.TestCase):
 
   def setUp(self):
+    super(MeanPairwiseSquaresErrorTest, self).setUp()
     self._predictions = np.array([[4, 8, 12], [8, 1, 3]])
     self._labels = np.array([[1, 9, 2], [-5, -5, 7]])
 
@@ -1101,6 +1110,7 @@ class MeanPairwiseSquaresErrorTest(test.TestCase):
 class CosineDistanceLossTest(test.TestCase):
 
   def setUp(self):
+    super(CosineDistanceLossTest, self).setUp()
     self._predictions = np.asarray([
         [1, 0, 0],  # Batch 1
         [0, 0, -1],

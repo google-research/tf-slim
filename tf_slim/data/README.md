@@ -27,7 +27,7 @@ like an image, or several `items`, like an image, a class label and a scene
 label.
 
 More concretely, TF-Slim's
-[dataset](https://github.com/google-research/tf-slim/tree/master/data/dataset.py)
+[dataset](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/dataset.py)
 is a tuple that encapsulates the following elements of a dataset specification:
 
 *   `data_sources`: A list of file paths that together make up the dataset
@@ -35,7 +35,7 @@ is a tuple that encapsulates the following elements of a dataset specification:
     [Reader](https://www.tensorflow.org/api_docs/python/io_ops.html#ReaderBase)
     appropriate for the file type in `data_sources`.
 *   `decoder`: A TF-Slim
-    [data_decoder](https://github.com/google-research/tf-slim/tree/master/data/data_decoder.py)
+    [data_decoder](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/data_decoder.py)
     class which is used to decode the content of the read dataset files.
 *   `num_samples`: The number of samples in the dataset.
 *   `items_to_descriptions`: A map from the items provided by the dataset to
@@ -49,7 +49,7 @@ be returned as `Tensors`.
 ## Data Decoders
 
 A
-[data_decoder](https://github.com/google-research/tf-slim/tree/master/data/data_decoder.py)
+[data_decoder](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/data_decoder.py)
 is a class which is given some (possibly serialized/encoded) data and returns a
 list of `Tensors`. In particular, a given data decoder is able to decode a
 predefined list of `items` and can return a subset or all of them, when
@@ -74,7 +74,7 @@ for item in data_decoder.list_items():
 ## Example: TFExampleDecoder
 
 The
-[tfexample_decoder.py](https://github.com/google-research/tf-slim/tree/master/data/tfexample_decoder.py)
+[tfexample_decoder.py](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/tfexample_decoder.py)
 is a data decoder which decodes serialized `TFExample` protocol buffers. A
 `TFExample` protocol buffer is a map from keys (strings) to either a
 `tf.FixedLenFeature` or `tf.VarLenFeature`. Consequently, to decode a
@@ -125,7 +125,7 @@ provides two `items` named 'image' and 'label'.
 # Data Provision
 
 A
-[data_provider](https://github.com/google-research/tf-slim/tree/master/data/data_provider.py)
+[data_provider](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/data_provider.py)
 is a class which provides `Tensors` for each item requested:
 
 ```python
@@ -135,7 +135,7 @@ image, class_label, bounding_box = my_data_provider.get(
 ```
 
 The
-[dataset_data_provider](https://github.com/google-research/tf-slim/tree/master/data/dataset_data_provider.py)
+[dataset_data_provider](https://github.com/google-research/tf-slim/tree/master/tf_slimdata/dataset_data_provider.py)
 is a `data_provider` that provides data from a given `dataset` specification:
 
 ```python
