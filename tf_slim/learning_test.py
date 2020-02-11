@@ -885,7 +885,7 @@ class TrainTest(test.TestCase):
 
         # Update only biases.
         loss = sess.run(train_biases)
-        self.assertGreater(loss, .5)
+        self.assertGreater(loss, .45)
         new_weights, new_biases = sess.run([weights, biases])
 
         # Check that the biases have been updated, but weights have not.
