@@ -174,7 +174,7 @@ def constant_value(value_or_tensor_or_var, dtype=None):
 def static_cond(pred, fn1, fn2):
   """Return either fn1() or fn2() based on the boolean value of `pred`.
 
-  Same signature as `control_flow_ops.cond()` but requires pred to be a bool.
+  Same signature as `tf.cond()` but requires pred to be a bool.
 
   Args:
     pred: A value determining whether to return the result of `fn1` or `fn2`.

@@ -16,6 +16,7 @@
 """Implements various metric learning losses."""
 from __future__ import absolute_import
 from __future__ import division
+
 from __future__ import print_function
 
 import importlib
@@ -35,7 +36,7 @@ from tensorflow.python.ops import sparse_ops
 from tensorflow.python.summary import summary
 try:
   # pylint: disable=g-import-not-at-top
-  metrics = importlib.import_module('sklearn.metrics')  # pytype: ignore
+  metrics = importlib.import_module('sklearn.metrics')  # type: ignore
   HAS_SKLEARN = True
 except ImportError:
   HAS_SKLEARN = False

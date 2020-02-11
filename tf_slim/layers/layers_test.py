@@ -1388,11 +1388,15 @@ class DropoutTest(test.TestCase):
 
   def testCreateDropoutWithPlaceholder(self):
     height, width = 3, 3
+    tf.reset_default_graph()
     with self.cached_session():
       is_training = array_ops.placeholder(dtype=dtypes.bool, shape=[])
       images = random_ops.random_uniform((5, height, width, 3), seed=1)
       output = _layers.dropout(images, is_training=is_training)
-      self.assertEqual(output.op.name, 'Dropout/cond/Merge')
+      if tf.control_flow_v2_enabled():
+        self.assertEqual(output.op.inputs[0].op.type, 'If')
+      else:
+        self.assertEqual(output.op.name, 'Dropout/cond/Merge')
       output.get_shape().assert_is_compatible_with(images.get_shape())
 
   def testCollectOutputs(self):
@@ -1817,13 +1821,22 @@ class BatchNormTest(test.TestCase):
   def setUp(self):
     super(BatchNormTest, self).setUp()
     # TODO(b/148892830): Investigate if this should be re-enabled.
-    self.rv_enabled = variable_scope.resource_variables_enabled()
-    variable_scope.disable_resource_variables()
+    self.rv_enabled = tf.resource_variables_enabled()
+    self.cf_enabled = tf.control_flow_v2_enabled()
+    # Control flow  is automatically re-enabled on cond() mode
+    # (b/149312871) and this breaks disable_resource_variable below,
+    # remove once either of the bugs is fixed.
+    tf.disable_control_flow_v2()
+    # TODO(b/148892830): Investigate if this should be re-enabled.
+    # Also see TODO(b/149311854): for batchnorm specific shendagians.
+    tf.disable_resource_variables()
 
   def tearDown(self):
     super(BatchNormTest, self).tearDown()
     if self.rv_enabled:
-      variable_scope.enable_resource_variables()
+      tf.enable_resource_variables()
+    if self.cf_enabled:
+      tf.enable_control_flow_v2()
 
   def _addBesselsCorrection(self, sample_size, expected_var):
     correction_factor = sample_size / (sample_size - 1)
@@ -2583,8 +2596,9 @@ class BatchNormTest(test.TestCase):
 
   def testNoneUpdatesCollectionIsTrainingVariableFusedNCHW(self):
     if test.is_gpu_available(cuda_only=True):
-      self._testNoneUpdatesCollectionIsTrainingVariable(
-          True, data_format='NCHW')
+      with tf.Graph().as_default():
+        self._testNoneUpdatesCollectionIsTrainingVariable(
+            True, data_format='NCHW')
 
   def testNoneUpdatesCollectionIsTrainingVariableFusedNHWC(self):
     self._testNoneUpdatesCollectionIsTrainingVariable(True, data_format='NHWC')

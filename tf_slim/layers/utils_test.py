@@ -130,14 +130,16 @@ class SmartCondStaticTest(test.TestCase):
         self.assertEqual(o.eval(), expected(v))
 
   def test_variable(self):
-    fn1 = lambda: variables.Variable('fn1')
-    fn2 = lambda: variables.Variable('fn2')
-    expected = lambda v: b'fn1' if v else b'fn2'
-    for v in [True, False, 1, 0]:
-      o = utils.smart_cond(constant_op.constant(v), fn1, fn2)
-      with self.cached_session() as sess:
-        sess.run(variables.global_variables_initializer())
-        self.assertEqual(o.eval(), expected(v))
+    with tf.Graph().as_default():
+      fn1 = lambda: variables.Variable('fn1')
+      fn2 = lambda: variables.Variable('fn2')
+      expected = lambda v: b'fn1' if v else b'fn2'
+      for v in [True, False, 1, 0]:
+        o = utils.smart_cond(constant_op.constant(v), fn1, fn2)
+
+        with self.cached_session() as sess:
+          sess.run(variables.global_variables_initializer())
+          self.assertEqual(o.eval(), expected(v))
 
   def test_tensors(self):
     fn1 = lambda: constant_op.constant(0) - constant_op.constant(1)
@@ -172,15 +174,16 @@ class SmartCondDynamicTest(test.TestCase):
         self.assertEqual(o.eval(feed_dict={p: v}), expected(v))
 
   def test_variable(self):
-    fn1 = lambda: variables.Variable('fn1')
-    fn2 = lambda: variables.Variable('fn2')
-    expected = lambda v: b'fn1' if v else b'fn2'
-    p = array_ops.placeholder(dtypes.bool, [])
-    for v in [True, False, 1, 0]:
-      o = utils.smart_cond(p, fn1, fn2)
-      with self.cached_session() as sess:
-        sess.run(variables.global_variables_initializer())
-        self.assertEqual(o.eval(feed_dict={p: v}), expected(v))
+    with tf.Graph().as_default():
+      fn1 = lambda: variables.Variable('fn1')
+      fn2 = lambda: variables.Variable('fn2')
+      expected = lambda v: b'fn1' if v else b'fn2'
+      p = array_ops.placeholder(dtypes.bool, [])
+      for v in [True, False, 1, 0]:
+        o = utils.smart_cond(p, fn1, fn2)
+        with self.cached_session() as sess:
+          sess.run(variables.global_variables_initializer())
+          self.assertEqual(o.eval(feed_dict={p: v}), expected(v))
 
   def test_tensors(self):
     fn1 = lambda: constant_op.constant(0) - constant_op.constant(1)
