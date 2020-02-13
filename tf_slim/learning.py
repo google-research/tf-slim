@@ -263,6 +263,7 @@ from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import errors
 from tensorflow.python.framework import ops
 from tensorflow.python.lib.io import file_io
+from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import clip_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import lookup_ops
@@ -680,8 +681,8 @@ def train(train_op,
           else:
             local_init_op = control_flow_ops.group(
                 *[opt.local_step_init_op for opt in sync_optimizer])
-        ready_for_local_init_op = control_flow_ops.group(
-            *[opt.ready_for_local_init_op for opt in sync_optimizer])
+        ready_for_local_init_op = array_ops.concat(
+            [opt.ready_for_local_init_op for opt in sync_optimizer], axis=0)
       else:
         ready_for_local_init_op = None
 
