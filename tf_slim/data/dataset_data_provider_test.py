@@ -19,7 +19,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
 import tempfile
 
 import tensorflow.compat.v1 as tf
@@ -94,8 +93,7 @@ def _create_tfrecord_dataset(tmpdir):
 class DatasetDataProviderTest(test.TestCase):
 
   def testTFRecordDataset(self):
-    dataset_dir = tempfile.mkdtemp(prefix=os.path.join(self.get_temp_dir(),
-                                                       'tfrecord_dataset'))
+    dataset_dir = tempfile.mkdtemp('tfrecord_dataset')
 
     height = 300
     width = 280
@@ -117,8 +115,7 @@ class DatasetDataProviderTest(test.TestCase):
       self.assertListEqual([1], list(label.shape))
 
   def testTFRecordSeparateGetDataset(self):
-    dataset_dir = tempfile.mkdtemp(prefix=os.path.join(self.get_temp_dir(),
-                                                       'tfrecord_separate_get'))
+    dataset_dir = tempfile.mkdtemp('tfrecord_separate_get')
 
     height = 300
     width = 280
@@ -137,8 +134,7 @@ class DatasetDataProviderTest(test.TestCase):
       self.assertListEqual([1], list(label.shape))
 
   def testConflictingRecordKeyItem(self):
-    dataset_dir = tempfile.mkdtemp(prefix=os.path.join(self.get_temp_dir(),
-                                                       'tfrecord_dataset'))
+    dataset_dir = tempfile.mkdtemp('tfrecord_dataset')
 
     with self.cached_session():
       with self.assertRaises(ValueError):

@@ -1393,11 +1393,15 @@ class DropoutTest(test.TestCase):
     with self.cached_session():
       is_training = array_ops.placeholder(dtype=dtypes.bool, shape=[])
       images = random_ops.random_uniform((5, height, width, 3), seed=1)
+      # this verifies that that we've inserted cond properly.
       output = _layers.dropout(images, is_training=is_training)
-      if tf.control_flow_v2_enabled():
-        self.assertEqual(output.op.inputs[0].op.type, 'If')
-      else:
-        self.assertEqual(output.op.name, 'Dropout/cond/Merge')
+      # In control_flow_v2 the op is called "If" and it is behind
+      # identity op. In legacy mode cond we just go by name.
+      # Might need to do something more robust here eventually.
+      is_cond_op = (output.op.inputs[0].op.type == 'If' or
+                    output.op.name == 'Dropout/cond/Merge')
+      self.assertTrue(is_cond_op,
+                      'Expected cond_op got ' + repr(output))
       output.get_shape().assert_is_compatible_with(images.get_shape())
 
   def testCollectOutputs(self):
