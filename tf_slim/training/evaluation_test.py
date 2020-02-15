@@ -21,6 +21,7 @@ from __future__ import print_function
 
 import glob
 import os
+import tempfile
 import time
 
 import numpy as np
@@ -60,7 +61,7 @@ def setUpModule():
 class CheckpointIteratorTest(test.TestCase):
 
   def testReturnsEmptyIfNoCheckpointsFound(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(), 'no_checkpoints_found')
+    checkpoint_dir = tempfile.mkdtemp('no_checkpoints_found')
 
     num_found = 0
     for _ in evaluation.checkpoints_iterator(checkpoint_dir, timeout=0):
@@ -68,7 +69,7 @@ class CheckpointIteratorTest(test.TestCase):
     self.assertEqual(num_found, 0)
 
   def testReturnsSingleCheckpointIfOneCheckpointFound(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(), 'one_checkpoint_found')
+    checkpoint_dir = tempfile.mkdtemp('one_checkpoint_found')
     if not gfile.Exists(checkpoint_dir):
       gfile.MakeDirs(checkpoint_dir)
 
@@ -86,8 +87,7 @@ class CheckpointIteratorTest(test.TestCase):
     self.assertEqual(num_found, 1)
 
   def testReturnsSingleCheckpointIfOneShardedCheckpoint(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'one_checkpoint_found_sharded')
+    checkpoint_dir = tempfile.mkdtemp('one_checkpoint_found_sharded')
     if not gfile.Exists(checkpoint_dir):
       gfile.MakeDirs(checkpoint_dir)
 
@@ -192,8 +192,7 @@ class EvaluateOnceTest(test.TestCase):
         assert loss < .015
 
   def testEvaluatePerfectModel(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'evaluate_perfect_model_once')
+    checkpoint_dir = tempfile.mkdtemp('evaluate_perfect_model_once')
 
     # Train a Model to completion:
     self._train_model(checkpoint_dir, num_steps=300)
@@ -219,7 +218,7 @@ class EvaluateOnceTest(test.TestCase):
     self.assertGreater(final_ops_values['accuracy'], .99)
 
   def testEvalOpAndFinalOp(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(), 'eval_ops_and_final_ops')
+    checkpoint_dir = tempfile.mkdtemp('eval_ops_and_final_ops')
 
     # Train a model for a single step to get a checkpoint.
     self._train_model(checkpoint_dir, num_steps=1)
@@ -246,7 +245,7 @@ class EvaluateOnceTest(test.TestCase):
     self.assertEqual(final_ops_values['value'], num_evals + final_increment)
 
   def testOnlyFinalOp(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(), 'only_final_ops')
+    checkpoint_dir = tempfile.mkdtemp('only_final_ops')
 
     # Train a model for a single step to get a checkpoint.
     self._train_model(checkpoint_dir, num_steps=1)
@@ -308,8 +307,7 @@ class EvaluateRepeatedlyTest(test.TestCase):
           hooks=[basic_session_run_hooks.StopAtStepHook(num_steps)])
 
   def testEvaluatePerfectModel(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'evaluate_perfect_model_repeated')
+    checkpoint_dir = tempfile.mkdtemp('evaluate_perfect_model_repeated')
 
     # Train a Model to completion:
     self._train_model(checkpoint_dir, num_steps=300)
@@ -334,8 +332,7 @@ class EvaluateRepeatedlyTest(test.TestCase):
     self.assertGreater(final_values['accuracy'], .99)
 
   def testEvaluationLoopTimeout(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'evaluation_loop_timeout')
+    checkpoint_dir = tempfile.mkdtemp('evaluation_loop_timeout')
     if not gfile.Exists(checkpoint_dir):
       gfile.MakeDirs(checkpoint_dir)
 
@@ -363,8 +360,7 @@ class EvaluateRepeatedlyTest(test.TestCase):
     self.assertLess(end - start, 7)
 
   def testEvaluationLoopTimeoutWithTimeoutFn(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'evaluation_loop_timeout_with_timeout_fn')
+    checkpoint_dir = tempfile.mkdtemp('evaluation_loop_timeout_with_timeout_fn')
 
     # Train a Model to completion:
     self._train_model(checkpoint_dir, num_steps=300)
@@ -401,8 +397,7 @@ class EvaluateRepeatedlyTest(test.TestCase):
 
   def testEvaluateWithEvalFeedDict(self):
     # Create a checkpoint.
-    checkpoint_dir = os.path.join(self.get_temp_dir(),
-                                  'evaluate_with_eval_feed_dict')
+    checkpoint_dir = tempfile.mkdtemp('evaluate_with_eval_feed_dict')
     self._train_model(checkpoint_dir, num_steps=1)
 
     # We need a variable that the saver will try to restore.
@@ -467,8 +462,8 @@ class EvaluateRepeatedlyTest(test.TestCase):
     self.assertIsNotNone(graph_def)
 
   def testSummariesAreFlushedToDisk(self):
-    checkpoint_dir = os.path.join(self.get_temp_dir(), 'summaries_are_flushed')
-    logdir = os.path.join(self.get_temp_dir(), 'summaries_are_flushed_eval')
+    checkpoint_dir = tempfile.mkdtemp('summaries_are_flushed')
+    logdir = tempfile.mkdtemp('summaries_are_flushed_eval')
     if gfile.Exists(logdir):
       gfile.DeleteRecursively(logdir)
 
@@ -495,8 +490,7 @@ class EvaluateRepeatedlyTest(test.TestCase):
     self._verify_events(logdir, names_to_values)
 
   def testSummaryAtEndHookWithoutSummaries(self):
-    logdir = os.path.join(self.get_temp_dir(),
-                          'summary_at_end_hook_without_summaires')
+    logdir = tempfile.mkdtemp('summary_at_end_hook_without_summaires')
     if gfile.Exists(logdir):
       gfile.DeleteRecursively(logdir)
 

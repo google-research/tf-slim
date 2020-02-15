@@ -18,7 +18,7 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
+import tempfile
 import tensorflow.compat.v1 as tf
 from tf_slim import queues
 from tf_slim.data import parallel_reader
@@ -50,7 +50,7 @@ class ParallelReaderTest(test.TestCase):
   def _verify_all_data_sources_read(self, shared_queue):
     with self.cached_session():
       tfrecord_paths = test_utils.create_tfrecord_files(
-          self.get_temp_dir(), num_files=3)
+          tempfile.mkdtemp(), num_files=3)
 
     num_readers = len(tfrecord_paths)
     p_reader = parallel_reader.ParallelReader(
@@ -66,7 +66,7 @@ class ParallelReaderTest(test.TestCase):
 
     num_reads = 50
 
-    sv = supervisor.Supervisor(logdir=self.get_temp_dir())
+    sv = supervisor.Supervisor(logdir=tempfile.mkdtemp())
     with sv.prepare_or_wait_for_session() as sess:
       sv.start_queue_runners(sess)
 
@@ -89,7 +89,7 @@ class ParallelReaderTest(test.TestCase):
       num_files = 3
       num_records_per_file = 7
       tfrecord_paths = test_utils.create_tfrecord_files(
-          self.get_temp_dir(),
+          tempfile.mkdtemp(),
           num_files=num_files,
           num_records_per_file=num_records_per_file)
 
@@ -106,7 +106,7 @@ class ParallelReaderTest(test.TestCase):
     all_keys_count = 0
     all_values_count = 0
 
-    sv = supervisor.Supervisor(logdir=self.get_temp_dir())
+    sv = supervisor.Supervisor(logdir=tempfile.mkdtemp())
     with sv.prepare_or_wait_for_session() as sess:
       sv.start_queue_runners(sess)
       while True:
@@ -173,12 +173,12 @@ class ParallelReadTest(test.TestCase):
   def testTFRecordReader(self):
     with self.cached_session():
       self._tfrecord_paths = test_utils.create_tfrecord_files(
-          self.get_temp_dir(), num_files=3)
+          tempfile.mkdtemp(), num_files=3)
 
     key, value = parallel_reader.parallel_read(
         self._tfrecord_paths, reader_class=io_ops.TFRecordReader, num_readers=3)
 
-    sv = supervisor.Supervisor(logdir=self.get_temp_dir())
+    sv = supervisor.Supervisor(logdir=tempfile.mkdtemp())
     with sv.prepare_or_wait_for_session() as sess:
       sv.start_queue_runners(sess)
 
@@ -201,7 +201,7 @@ class SinglePassReadTest(test.TestCase):
   def testOutOfRangeError(self):
     with self.cached_session():
       [tfrecord_path] = test_utils.create_tfrecord_files(
-          self.get_temp_dir(), num_files=1)
+          tempfile.mkdtemp(), num_files=1)
 
     key, value = parallel_reader.single_pass_read(
         tfrecord_path, reader_class=io_ops.TFRecordReader)
@@ -218,7 +218,7 @@ class SinglePassReadTest(test.TestCase):
   def testTFRecordReader(self):
     with self.cached_session():
       [tfrecord_path] = test_utils.create_tfrecord_files(
-          self.get_temp_dir(), num_files=1)
+          tempfile.mkdtemp(), num_files=1)
 
     key, value = parallel_reader.single_pass_read(
         tfrecord_path, reader_class=io_ops.TFRecordReader)

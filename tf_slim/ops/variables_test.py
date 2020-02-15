@@ -20,7 +20,7 @@ from __future__ import division
 from __future__ import print_function
 
 import contextlib
-import os
+
 import tempfile
 import unittest
 import numpy as np
@@ -989,8 +989,7 @@ class AssignFromCheckpointTest(test.TestCase):
       return saver.save(sess, checkpoint_dir, global_step=global_step)
 
   def testLoadExistingVariables(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'load_existing_variables'))
+    model_dir = tempfile.mkdtemp('load_existing_variables')
 
     init_value0 = 10.0
     init_value1 = 20.0
@@ -1019,8 +1018,7 @@ class AssignFromCheckpointTest(test.TestCase):
   # Tests restoring PartitionedVariables and tests using a dictionary
   # of lists as the assign_from_checkpoint() var_list param.
   def testLoadPartitionedVariables(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'load_partitioned_variables'))
+    model_dir = tempfile.mkdtemp('load_partitioned_variables')
 
     init_value0 = np.array([[10.0, 11.0], [12.0, 13.0]])
     init_value1 = np.array([20.0])  # Partitioned into 1 part, edge case.
@@ -1059,9 +1057,7 @@ class AssignFromCheckpointTest(test.TestCase):
                          array_ops.identity(var1).eval()))
 
   def testRaisesValueErrorIfAVariableIsntFound(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(),
-                            'raises_value_error_if_var_isnt_found'))
+    model_dir = tempfile.mkdtemp('raises_value_error_if_var_isnt_found')
 
     init_value0 = 10.0
     init_value1 = 20.0
@@ -1079,9 +1075,7 @@ class AssignFromCheckpointTest(test.TestCase):
         variables_lib2.assign_from_checkpoint(model_path, vars_to_restore)
 
   def testInitFromCheckpointWithScopes(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(),
-                            'init_from_checkpoint_with_scopes'))
+    model_dir = tempfile.mkdtemp('init_from_checkpoint_with_scopes')
 
     init_value0 = np.asarray(
         [1.0, 3.0, 9.0], dtype=np.float32).reshape((1, 3, 1))
@@ -1142,8 +1136,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
       return saver.save(sess, checkpoint_dir, global_step=global_step)
 
   def testLoadExistingVariables(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'load_existing_variables'))
+    model_dir = tempfile.mkdtemp('load_existing_variables')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 
@@ -1173,9 +1166,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   @unittest.skip('sess.run functionality difference in v2.0')
   def testLoadExistingVariablesDifferentShapeDefaultDoesNotAllowReshape(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(),
-                            'load_existing_vars_no_reshape'))
+    model_dir = tempfile.mkdtemp('load_existing_vars_no_reshape')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 
@@ -1202,9 +1193,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   def testLoadExistingVariablesDifferentShapeAllowReshape(self):
     model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(
-            self.get_temp_dir(),
-            'load_existing_variables_different_shape_allow_reshape'))
+        'load_existing_variables_different_shape_allow_reshape')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 
@@ -1233,8 +1222,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
       self.assertEqual(init_value1, var1.eval())
 
   def testNotFoundError(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'not_found_error'))
+    model_dir = tempfile.mkdtemp('not_found_error')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 
@@ -1261,8 +1249,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
         init_fn(sess)
 
   def testMissingVariablesList(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'missing_variables_list'))
+    model_dir = tempfile.mkdtemp('missing_variables_list')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 
@@ -1292,8 +1279,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
       self.assertEqual(init_value1, var1.eval())
 
   def testMissingVariablesDict(self):
-    model_dir = tempfile.mkdtemp(
-        prefix=os.path.join(self.get_temp_dir(), 'missing_variables_dict'))
+    model_dir = tempfile.mkdtemp('missing_variables_dict')
     if gfile.Exists(model_dir):
       gfile.DeleteRecursively(model_dir)
 

@@ -19,8 +19,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import os
-
+import tempfile
 import numpy as np
 import tensorflow.compat.v1 as tf
 
@@ -327,7 +326,7 @@ class TrainTest(test.TestCase):
 
   def testResumeTrainAchievesRoughlyTheSameLoss(self):
     number_of_steps = [300, 1, 5]
-    logdir = os.path.join(self.get_temp_dir(), 'resume_train_same_loss')
+    logdir = tempfile.mkdtemp('resume_train_same_loss')
 
     for i in range(len(number_of_steps)):
       with ops.Graph().as_default():
@@ -384,8 +383,8 @@ class TrainTest(test.TestCase):
         total_loss, optimizer, transform_grads_fn=transform_grads_fn)
 
   def testTrainWithInitFromCheckpoint(self):
-    logdir1 = os.path.join(self.get_temp_dir(), 'tmp_logs1/')
-    logdir2 = os.path.join(self.get_temp_dir(), 'tmp_logs2/')
+    logdir1 = tempfile.mkdtemp('tmp_logs1/')
+    logdir2 = tempfile.mkdtemp('tmp_logs2/')
 
     if gfile.Exists(logdir1):  # For running on jenkins.
       gfile.DeleteRecursively(logdir1)
@@ -462,7 +461,7 @@ class TrainTest(test.TestCase):
     return losses.get_total_loss()
 
   def testTrainAllVarsHasLowerLossThanTrainSubsetOfVars(self):
-    logdir = os.path.join(self.get_temp_dir(), 'tmp_logs3/')
+    logdir = tempfile.mkdtemp('tmp_logs3/')
     if gfile.Exists(logdir):  # For running on jenkins.
       gfile.DeleteRecursively(logdir)
 

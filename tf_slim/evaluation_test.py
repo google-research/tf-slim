@@ -23,6 +23,7 @@ from __future__ import print_function
 import glob
 import os
 import shutil
+import tempfile
 import time
 from nose.tools import nottest
 
@@ -103,10 +104,8 @@ class EvaluationTest(test.TestCase):
     init_op = control_flow_ops.group(variables.global_variables_initializer(),
                                      variables.local_variables_initializer())
     # Create checkpoint and log directories:
-    chkpt_dir = os.path.join(self.get_temp_dir(), 'tmp_logs/')
-    gfile.MakeDirs(chkpt_dir)
-    logdir = os.path.join(self.get_temp_dir(), 'tmp_logs2/')
-    gfile.MakeDirs(logdir)
+    chkpt_dir = tempfile.mkdtemp('tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs2')
 
     # Save initialized variables to a checkpoint directory:
     saver = saver_lib.Saver()
@@ -214,9 +213,9 @@ class EvaluationTest(test.TestCase):
     init_op = control_flow_ops.group(variables.global_variables_initializer(),
                                      variables.local_variables_initializer())
     # Create checkpoint and log directories:
-    chkpt_dir = os.path.join(self.get_temp_dir(), 'tmp_logs/')
+    chkpt_dir = tempfile.mkdtemp('tmp_logs')
     gfile.MakeDirs(chkpt_dir)
-    logdir = os.path.join(self.get_temp_dir(), 'tmp_logs2/')
+    logdir = tempfile.mkdtemp('tmp_logs2')
     gfile.MakeDirs(logdir)
 
     # Save initialized variables to a checkpoint directory:
@@ -248,9 +247,9 @@ class SingleEvaluationTest(test.TestCase):
     self._predictions, self._scale = TestModel(self._inputs)
 
   def testErrorRaisedIfCheckpointDoesntExist(self):
-    checkpoint_path = os.path.join(self.get_temp_dir(),
-                                   'this_file_doesnt_exist')
-    log_dir = os.path.join(self.get_temp_dir(), 'error_raised')
+    tmp_dir = tempfile.mkdtemp()
+    checkpoint_path = os.path.join(tmp_dir, 'this_file_doesnt_exist')
+    log_dir = os.path.join(tempfile.mkdtemp(), 'error_raised')
     with self.assertRaises(ValueError):
       evaluation.evaluate_once('', checkpoint_path, log_dir)
 
@@ -263,8 +262,8 @@ class SingleEvaluationTest(test.TestCase):
       saver.save(sess, checkpoint_path)
 
   def testRestoredModelPerformance(self):
-    checkpoint_path = os.path.join(self.get_temp_dir(), 'model.ckpt')
-    log_dir = os.path.join(self.get_temp_dir(), 'log_dir1/')
+    checkpoint_path = os.path.join(tempfile.mkdtemp(), 'model.ckpt')
+    log_dir = tempfile.mkdtemp('log_dir1')
 
     # First, save out the current model to a checkpoint:
     self._prepareCheckpoint(checkpoint_path)
@@ -279,8 +278,8 @@ class SingleEvaluationTest(test.TestCase):
     self.assertAlmostEqual(accuracy_value, self._expected_accuracy)
 
   def testAdditionalHooks(self):
-    checkpoint_path = os.path.join(self.get_temp_dir(), 'model.ckpt')
-    log_dir = os.path.join(self.get_temp_dir(), 'log_dir1/')
+    checkpoint_path = os.path.join(tempfile.mkdtemp(), 'model.ckpt')
+    log_dir = tempfile.mkdtemp('log_dir1')
 
     # First, save out the current model to a checkpoint:
     self._prepareCheckpoint(checkpoint_path)
@@ -289,7 +288,7 @@ class SingleEvaluationTest(test.TestCase):
     value_op, update_op = metrics.accuracy(
         labels=self._labels, predictions=self._predictions)
 
-    dumping_root = os.path.join(self.get_temp_dir(), 'tfdbg_dump_dir')
+    dumping_root = tempfile.mkdtemp('tfdbg_dump_dir')
     dumping_hook = hooks.DumpingDebugHook(dumping_root, log_usage=False)
     try:
       # Run the evaluation and verify the results:

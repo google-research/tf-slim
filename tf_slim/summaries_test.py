@@ -22,13 +22,12 @@ from __future__ import print_function
 
 import glob
 import os
-
+import tempfile
 import tensorflow.compat.v1 as tf
 from tf_slim import summaries
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.summary import summary
 from tensorflow.python.summary import summary_iterator
@@ -40,11 +39,6 @@ def setUpModule():
 
 
 class SummariesTest(test.TestCase):
-
-  def safe_create(self, output_dir):
-    if gfile.Exists(output_dir):
-      gfile.DeleteRecursively(output_dir)
-    gfile.MakeDirs(output_dir)
 
   def assert_scalar_summary(self, output_dir, names_to_values):
     """Asserts that the given output directory contains written summaries.
@@ -89,10 +83,7 @@ class SummariesTest(test.TestCase):
     prefix = 'eval'
     summaries.add_scalar_summary(tensor, name, prefix, print_summary)
 
-    output_dir = os.path.join(self.get_temp_dir(),
-                              'scalar_summary_no_print_test')
-    self.safe_create(output_dir)
-
+    output_dir = tempfile.mkdtemp('scalar_summary_no_print_test')
     summary_op = summary.merge_all()
 
     summary_writer = summary.FileWriter(output_dir)

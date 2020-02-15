@@ -240,8 +240,7 @@ class TrainBNClassifierTest(test.TestCase):
       self._inputs[i, j] = 1
 
   def testTrainWithNoInitAssignCanAchieveZeroLoss(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     g = ops.Graph()
     with g.as_default():
       random_seed.set_random_seed(0)
@@ -429,8 +428,7 @@ class TrainTest(test.TestCase):
       self._inputs[i, j] = 1
 
   def testTrainWithNonDefaultGraph(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     g = ops.Graph()
     with g.as_default():
       random_seed.set_random_seed(0)
@@ -494,8 +492,7 @@ class TrainTest(test.TestCase):
     self.assertLess(loss, .015)
 
   def testTrainWithTrace(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
       tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
@@ -586,8 +583,7 @@ class TrainTest(test.TestCase):
             train_op, None, init_op=None, number_of_steps=300, saver=saver)
 
   def testTrainWithNoneAsInitWhenUsingVarsRaisesError(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
       tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
@@ -605,8 +601,7 @@ class TrainTest(test.TestCase):
         learning.train(train_op, logdir, init_op=None, number_of_steps=300)
 
   def testTrainWithNoInitAssignCanAchieveZeroLoss(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
       tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
@@ -626,8 +621,7 @@ class TrainTest(test.TestCase):
       self.assertLess(loss, .015)
 
   def testTrainWithLocalVariable(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
       tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
@@ -649,8 +643,7 @@ class TrainTest(test.TestCase):
       self.assertLess(loss, .015)
 
   def testResumeTrainAchievesRoughlyTheSameLoss(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     number_of_steps = [300, 301, 305]
 
     for i in range(len(number_of_steps)):
@@ -696,10 +689,8 @@ class TrainTest(test.TestCase):
         total_loss, optimizer, gradient_multipliers=gradient_multipliers)
 
   def testTrainWithInitFromCheckpoint(self):
-    logdir1 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs1')
-    logdir2 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs2')
+    logdir1 = tempfile.mkdtemp('tmp_logs1')
+    logdir2 = tempfile.mkdtemp('tmp_logs2')
 
     # First, train the model one step (make sure the error is high).
     with ops.Graph().as_default():
@@ -744,10 +735,8 @@ class TrainTest(test.TestCase):
       self.assertLess(loss, .02)
 
   def testTrainWithInitFromFn(self):
-    logdir1 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs1')
-    logdir2 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs2')
+    logdir1 = tempfile.mkdtemp('tmp_logs1')
+    logdir2 = tempfile.mkdtemp('tmp_logs2')
 
     # First, train the model one step (make sure the error is high).
     with ops.Graph().as_default():
@@ -793,8 +782,7 @@ class TrainTest(test.TestCase):
     return loss_ops.get_total_loss()
 
   def testTrainAllVarsHasLowerLossThanTrainSubsetOfVars(self):
-    logdir1 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs1')
+    logdir1 = tempfile.mkdtemp('tmp_logs1')
 
     # First, train only the weights of the model.
     with ops.Graph().as_default():
@@ -897,10 +885,8 @@ class TrainTest(test.TestCase):
     # to train two models. Model with equivalently larger learning
     # rate (i.e., learning_rate * gradient_multiplier) has smaller
     # training loss.
-    logdir1 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs1')
-    logdir2 = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs2')
+    logdir1 = tempfile.mkdtemp('tmp_logs1')
+    logdir2 = tempfile.mkdtemp('tmp_logs2')
 
     multipliers = [1., 1000.]
     number_of_steps = 10
@@ -931,8 +917,7 @@ class TrainTest(test.TestCase):
     self.assertGreater(losses[0], losses[1])
 
   def testTrainWithEpochLimit(self):
-    logdir = os.path.join(
-        tempfile.mkdtemp(prefix=self.get_temp_dir()), 'tmp_logs')
+    logdir = tempfile.mkdtemp('tmp_logs')
     with ops.Graph().as_default():
       random_seed.set_random_seed(0)
       tf_inputs = tf.constant(self._inputs, dtype=tf.float32)
