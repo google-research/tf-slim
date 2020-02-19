@@ -3747,7 +3747,7 @@ def count(values,
     RuntimeError: If eager execution is enabled.
   """
   if tf.executing_eagerly():
-    raise RuntimeError('tf.contrib.metrics.count is not supported when eager '
+    raise RuntimeError('tf_slim.metrics.count is not supported when eager '
                        'execution is enabled.')
 
   with variable_scope.variable_scope(name, 'count', (values, weights)):
@@ -3837,7 +3837,7 @@ def cohen_kappa(labels,
     RuntimeError: If eager execution is enabled.
   """
   if tf.executing_eagerly():
-    raise RuntimeError('tf.contrib.metrics.cohen_kappa is not supported '
+    raise RuntimeError('tf_slim.metrics.cohen_kappa is not supported '
                        'when eager execution is enabled.')
   if num_classes < 2:
     raise ValueError('`num_classes` must be >= 2.'

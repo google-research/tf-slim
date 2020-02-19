@@ -801,8 +801,8 @@ def filter_variables(var_list,
   convolutional layers (depending on the network definition) by:
 
   ```python
-  variables = tf.contrib.framework.get_model_variables()
-  conv_weight_variables = tf.contrib.framework.filter_variables(
+  variables = tf_slim.get_model_variables()
+  conv_weight_variables = tf_slim.filter_variables(
       variables,
       include_patterns=['Conv'],
       exclude_patterns=['biases', 'Logits'])

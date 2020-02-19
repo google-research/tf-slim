@@ -18,12 +18,12 @@
   Allows one to define models much more compactly by eliminating boilerplate
   code. This is accomplished through the use of argument scoping (arg_scope).
 
-  Example of how to use tf.contrib.framework.arg_scope:
+  Example of how to use tf_slim.arg_scope:
 
   ```
   from tf_slim import layers
 
-  arg_scope = tf.contrib.framework.arg_scope
+  arg_scope = tf_slim.arg_scope
 
   with arg_scope([layers.conv2d], padding='SAME',
                  initializer=layers.variance_scaling_initializer(),
@@ -54,10 +54,10 @@
     net = layers.conv2d(net, 256, [5, 5], scope='conv2')
   ```
 
-  Example of how to use tf.contrib.framework.add_arg_scope to enable your
+  Example of how to use tf_slim.add_arg_scope to enable your
   function to be called within an arg_scope later:
 
-  @tf.contrib.framework.add_arg_scope
+  @tf_slim.add_arg_scope
   def conv2d(*args, **kwargs)
 """
 from __future__ import absolute_import

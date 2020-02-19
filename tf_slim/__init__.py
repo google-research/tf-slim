@@ -52,16 +52,9 @@ import tf_slim.summaries as summaries
 from tf_slim.training import evaluation as train_eval
 from tf_slim.training import training as training
 
-
-# pylint: disable=g-direct-tensorflow-import
-from tensorflow.python.util.all_util import make_all  # pylint:disable=g-direct-tensorflow-import
-# pylint: enable=unused-import,line-too-long,g-importing-member,wildcard-import
-
 arg_scope = arg_scope_lib.arg_scope
 add_arg_scope = arg_scope_lib.add_arg_scope
 current_arg_scope = arg_scope_lib.current_arg_scope
 has_arg_scope = arg_scope_lib.has_arg_scope
 arg_scoped_arguments = arg_scope_lib.arg_scoped_arguments
 arg_scope_func_key = arg_scope_lib.arg_scope_func_key
-
-__all__ = make_all(__name__)

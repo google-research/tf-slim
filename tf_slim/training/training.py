@@ -38,10 +38,10 @@ to user-specified arguments.
   FLAGS.momentum)
 
   # Create the train_op
-  train_op = tf.contrib.training.create_train_op(total_loss, optimizer)
+  train_op = tf_slim.training.create_train_op(total_loss, optimizer)
 
   # Run training.
-  tf.contrib.training.train(train_op, my_log_dir)
+  tf_slim.training.train(train_op, my_log_dir)
 
 *************************
 * Creating the train_op *
@@ -49,12 +49,12 @@ to user-specified arguments.
 
 In order to use the `train` function, one needs a train_op: an `Operation` that
 (a) computes the loss, (b) applies the gradients to update the weights and
-(c) returns the value of the loss. tf.contrib.training.create_train_op creates
+(c) returns the value of the loss. tf_slim.training.create_train_op creates
 such an `Operation`. This function also provides the ability to manipulate
 the gradients using a few arguments:
 
   # Create the train_op and clip the gradient norms:
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
       total_loss,
       optimizer,
       transform_grads_fn=clip_gradient_norms_fn(3))
@@ -66,10 +66,10 @@ the gradients using a few arguments:
       'conv0/weights': 1.2,
       'fc8/weights': 3.4,
     }
-    return tf.contrib.training.multiply_gradients(
+    return tf_slim.training.multiply_gradients(
             grads, gradient_multipliers)
 
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
       total_loss,
       optimizer,
       transform_grads_fn=transform_grads_fn)
@@ -79,18 +79,18 @@ the gradients using a few arguments:
 ****************************************************************
 
 Many networks utilize modules, like BatchNorm, that require performing a series
-of non-gradient updates during training. tf.contrib.training.create_train_op
+of non-gradient updates during training  tf_slim.training.create_train_op
 allows a user to pass in a list of update_ops to call along with the gradient
 updates.
 
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
       total_loss, optimizer, update_ops)
 
-By default, tf.contrib.training.create_train_op includes all update ops that are
+By default, tf_slim.training.create_train_op includes all update ops that are
 part of the `tf.GraphKeys.UPDATE_OPS` collection. Additionally, the
-tf.contrib.layers.batch_norm function adds the moving mean and moving variance
+tf_slim.batch_norm function adds the moving mean and moving variance
 updates to this collection. Consequently, users who want to use
-tf.contrib.layers.batch_norm will not need to take any additional steps in order
+tf_slim.batch_norm will not need to take any additional steps in order
 to have the moving mean and moving variance updates be computed.
 
 However, users with additional, specialized updates can either override the
@@ -98,13 +98,13 @@ default update ops or simply add additional update ops to the
 `tf.GraphKeys.UPDATE_OPS` collection:
 
   # Force `create_train_op` to NOT use ANY update_ops:
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
      total_loss,
      optimizer,
      update_ops=[])
 
   # Use an alternative set of update ops:
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
      total_loss,
      optimizer,
      update_ops=my_other_update_ops)
@@ -113,12 +113,12 @@ default update ops or simply add additional update ops to the
   tf.compat.v1.add_to_collection(tf.GraphKeys.UPDATE_OPS, my_update0)
   tf.compat.v1.add_to_collection(tf.GraphKeys.UPDATE_OPS, my_update1)
 
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
      total_loss,
      optimizer)
 
   # Which is the same as:
-  train_op = tf.contrib.training.create_train_op(
+  train_op = tf_slim.training.create_train_op(
      total_loss,
      optimizer,
      update_ops=tf.compat.v1.get_collection(tf.GraphKeys.UPDATE_OPS))
@@ -133,17 +133,17 @@ One can use a tf.Scaffold and an initializing function to do so.
   ...
 
   # Create the train_op
-  train_op = tf.contrib.training.create_train_op(total_loss, optimizer)
+  train_op = tf_slim.training.create_train_op(total_loss, optimizer)
 
   # Create the initial assignment op
   checkpoint_path = '/path/to/old_model_checkpoint'
-  variables_to_restore = tf.contrib.framework.get_model_variables()
-  init_fn = tf.contrib.framework.assign_from_checkpoint_fn(
+  variables_to_restore = tf_slim.get_model_variables()
+  init_fn = tf.assign_from_checkpoint_fn(
       checkpoint_path, variables_to_restore)
 
   # Run training.
   scaffold = tf.Scaffold(init_fn=init_fn)
-  tf.contrib.training.train(train_op, my_log_dir, scaffold=scaffold)
+  tf_slim.training.train(train_op, my_log_dir, scaffold=scaffold)
 
 ***************************************************************************
 * Initializing a model from a checkpoint whose variable names don't match *
@@ -160,23 +160,23 @@ above:
   ...
 
   # Create the train_op
-  train_op = tf.contrib.training.create_train_op(total_loss, optimizer)
+  train_op = tf_slim.training.create_train_op(total_loss, optimizer)
 
   checkpoint_path = '/path/to/old_model_checkpoint'
 
   # Create the mapping:
   variables_to_restore = {
       'name_var_0_in_checkpoint':
-          tf.contrib.framework.get_unique_variable('var0'),
+          tf_slim.get_unique_variable('var0'),
       'name_var_1_in_checkpoint':
-          tf.contrib.framework.get_unique_variable('var1')
+          tf_slim.get_unique_variable('var1')
   }
-  init_fn = tf.contrib.framework.assign_from_checkpoint_fn(
+  init_fn = tf_slim.framework.assign_from_checkpoint_fn(
         checkpoint_path, variables_to_restore)
   scaffold = tf.Scaffold(init_fn=init_fn)
 
   # Run training.
-  tf.contrib.training.train(train_op, my_log_dir, scaffold=scaffold)
+  tf_slim.training.train(train_op, my_log_dir, scaffold=scaffold)
 
 
 *************************************************
@@ -190,24 +190,24 @@ need only filter those variables to initialize as follows:
   ...
 
   # Create the train_op
-  train_op = tf.contrib.training.create_train_op(total_loss, optimizer)
+  train_op = tf_slim.training.create_train_op(total_loss, optimizer)
 
   checkpoint_path = '/path/to/old_model_checkpoint'
 
   # Specify the variables to restore via a list of inclusion or exclusion
   # patterns:
-  variables_to_restore = tf.contrib.framework.get_variables_to_restore(
+  variables_to_restore = tf_slim.get_variables_to_restore(
       include=["conv"], exclude=["fc8", "fc9])
   # or
-  variables_to_restore = tf.contrib.framework.get_variables_to_restore(
+  variables_to_restore = tf_slim.get_variables_to_restore(
       exclude=["conv"])
 
-  init_fn = tf.contrib.framework.assign_from_checkpoint_fn(
+  init_fn = tf_slim.assign_from_checkpoint_fn(
       checkpoint_path, variables_to_restore)
   scaffold = tf.Scaffold(init_fn=init_fn)
 
   # Run training.
-  tf.contrib.training.train(train_op, my_log_dir, scaffold=scaffold)
+  tf_slim.training.train(train_op, my_log_dir, scaffold=scaffold)
 
 ******************************************************
 * Initializing model variables from values in memory *
@@ -224,7 +224,7 @@ placeholders and a feed dictionary:
   ...
 
   # Create the train_op
-  train_op = tf.contrib.training.create_train_op(total_loss, optimizer)
+  train_op = tf_slim.training.create_train_op(total_loss, optimizer)
 
   # Create the mapping from variable names to values:
   var0_initial_value = ReadFromDisk(...)
@@ -235,11 +235,11 @@ placeholders and a feed dictionary:
     'var1': var1_initial_value,
   }
 
-  init_fn = tf.contrib.framework.assign_from_values_fn(var_names_to_values)
+  init_fn = tf_slim.assign_from_values_fn(var_names_to_values)
   scaffold = tf.Scaffold(init_fn=init_fn)
 
   # Run training.
-  tf.contrib.training.train(train_op, my_log_dir, scaffold=scaffold)
+  tf_slim.training.train(train_op, my_log_dir, scaffold=scaffold)
 """
 
 from __future__ import absolute_import

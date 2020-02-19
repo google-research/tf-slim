@@ -2,7 +2,7 @@
 
 TF-Slim is a lightweight library for defining, training and evaluating complex
 models in TensorFlow. Components of tf-slim can be freely mixed with native
-tensorflow, as well as other frameworks, such as tf.contrib.learn.
+tensorflow, as well as other frameworks..
 
 ## Install
 ```bash
@@ -296,7 +296,7 @@ In addition to the types of scope mechanisms in TensorFlow
 ([name_scope](https://www.tensorflow.org/api_docs/python/tf/name_scope),
 [variable_scope](https://www.tensorflow.org/api_docs/python/tf/variable_scope)),
 TF-Slim adds a new scoping mechanism called
-[arg_scope](https://www.tensorflow.org/api_docs/python/tf/contrib/framework/arg_scope).
+[arg_scope](https://github.com/google-research/tf-slim/tree/master/tf_slim/ops/arg_scope.py).
 This new scope allows a user to specify one or more operations and a set of
 arguments which will be passed to each of the operations defined in the
 `arg_scope`. This functionality is best illustrated by example. Consider the

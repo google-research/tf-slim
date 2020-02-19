@@ -93,7 +93,7 @@ more summaries and call the evaluation_loop method:
       logdir,
       num_evals=num_evals,
       eval_op=names_to_updates.values(),
-      summary_op=tf.contrib.deprecated.merge_summary(summary_ops),
+      summary_op=tf.compat.v1.summary.merge(summary_ops),
       eval_interval_secs=600)
 
 **************************************************
@@ -120,7 +120,7 @@ with only summaries. The user need only leave out the 'eval_op' argument:
       checkpoint_dir,
       logdir,
       num_evals=1,
-      summary_op=tf.contrib.deprecated.merge_summary(summary_ops),
+      summary_op=tf.compat.v1.summary.merge(summary_ops),
       eval_interval_secs=600)
 
 """
@@ -137,12 +137,20 @@ from tensorflow.python.training import saver as tf_saver
 # pylint:enable=g-direct-tensorflow-import
 
 __all__ = [
+    'StopAfterNEvalsHook',
+    'SummaryAtEndHook',
+    'checkpoints_iterator',
     'evaluate_once',
     'evaluation_loop',
+    'get_or_create_eval_step',
     'wait_for_new_checkpoint',
-    'checkpoints_iterator',
 ]
 
+StopAfterNEvalsHook = evaluation.StopAfterNEvalsHook
+SummaryAtEndHook = evaluation.SummaryAtEndHook
+evaluate_repeatedly = evaluation.evaluate_repeatedly
+
+get_or_create_eval_step = evaluation.get_or_create_eval_step
 wait_for_new_checkpoint = evaluation.wait_for_new_checkpoint
 checkpoints_iterator = evaluation.checkpoints_iterator
 

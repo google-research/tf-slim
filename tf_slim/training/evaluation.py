@@ -36,7 +36,7 @@ out the metrics values to stdout:
   predictions = MyModel(images)
 
   # Choose the metrics to compute:
-  names_to_values, names_to_updates = tf.contrib.metrics.aggregate_metric_map({
+  names_to_values, names_to_updates = tf_slim.metrics.aggregate_metric_map({
       "accuracy": tf.compat.v1.metrics.accuracy(labels, predictions),
       "mse": tf.compat.v1.metrics.mean_squared_error(labels, predictions),
   })
@@ -56,8 +56,8 @@ out the metrics values to stdout:
       eval_ops=names_to_updates.values(),
       final_ops=names_to_values,
       hooks=[
-            tf.contrib.training.StopAfterNEvalsHook(num_evals),
-            tf.contrib.training.SummaryAtEndHook(logdir),
+            tf_slim.evaluation.StopAfterNEvalsHook(num_evals),
+            tf_slim.evaluation.SummaryAtEndHook(logdir),
       ],
       config=None)
 
@@ -80,7 +80,7 @@ more summaries and call the evaluate_repeatedly method:
   predictions = MyModel(images)
 
   # Choose the metrics to compute:
-  names_to_values, names_to_updates = tf.contrib.metrics.aggregate_metric_map({
+  names_to_values, names_to_updates = tf_slim.metrics.aggregate_metric_map({
       "accuracy": tf.compat.v1.metrics.accuracy(labels, predictions),
       "mse": tf.compat.v1.metrics.mean_squared_error(labels, predictions),
   })
@@ -96,12 +96,12 @@ more summaries and call the evaluate_repeatedly method:
   num_evals = 1000
 
   # Evaluate every 10 minutes:
-  tf.contrib.training.evaluate_repeatedly(
+  tf_slim.evaluation.evaluate_repeatedly(
       checkpoint_dir,
       eval_ops=names_to_updates.values(),
       hooks=[
-            tf.contrib.training.StopAfterNEvalsHook(num_evals),
-            tf.contrib.training.SummaryAtEndHook(logdir),
+            tf_slim.evaluation.StopAfterNEvalsHook(num_evals),
+            tf_slim.evaluation.SummaryAtEndHook(logdir),
       ],
       eval_interval_secs=600)
 
@@ -124,10 +124,10 @@ with only summaries. The user need only leave out the 'eval_ops' argument:
   log_dir = '/tmp/my_model_eval/'
 
   # Evaluate once every 10 minutes.
-  tf.contrib.training.evaluate_repeatedly(
+  tf_slim.evaluation.evaluate_repeatedly(
       checkpoint_dir,
       hooks=[
-          tf.contrib.training.SummaryAtEndHook(logdir),
+          tf_slim.evaluation.SummaryAtEndHook(logdir),
       ],
       eval_interval_secs=600)
 
@@ -361,7 +361,7 @@ def evaluate_repeatedly(checkpoint_dir,
 
   During a single evaluation, the `eval_ops` is run until the session is
   interrupted or requested to finish. This is typically requested via a
-  `tf.contrib.training.StopAfterNEvalsHook` which results in `eval_ops` running
+  `tf_slim.train_eval.StopAfterNEvalsHook` which results in `eval_ops` running
   the requested number of times.
 
   Optionally, a user can pass in `final_ops`, a single `Tensor`, a list of
@@ -370,12 +370,12 @@ def evaluate_repeatedly(checkpoint_dir,
   values of `final_ops` are returned. If `final_ops` is left as `None`, then
   `None` is returned.
 
-  One may also consider using a `tf.contrib.training.SummaryAtEndHook` to record
+  One may also consider using a `tf.train_eval.SummaryAtEndHook` to record
   summaries after the `eval_ops` have run. If `eval_ops` is `None`, the
   summaries run immediately after the model checkpoint has been restored.
 
   Note that `evaluate_once` creates a local variable used to track the number of
-  evaluations run via `tf.contrib.training.get_or_create_eval_step`.
+  evaluations run via `tf_slim.evaluation.get_or_create_eval_step`.
   Consequently, if a custom local init op is provided via a `scaffold`, the
   caller should ensure that the local init op also initializes the eval step.
 
@@ -388,7 +388,7 @@ def evaluate_repeatedly(checkpoint_dir,
       it must also take care of restoring the model from its checkpoint.
     eval_ops: A single `Tensor`, a list of `Tensors` or a dictionary of names to
       `Tensors`, which is run until the session is requested to stop, commonly
-      done by a `tf.contrib.training.StopAfterNEvalsHook`.
+      done by a `tf_slim.evaluation.StopAfterNEvalsHook`.
     feed_dict: The feed dictionary to use when executing the `eval_ops`.
     final_ops: A single `Tensor`, a list of `Tensors` or a dictionary of names
       to `Tensors`.
