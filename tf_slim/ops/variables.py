@@ -24,7 +24,7 @@ import tensorflow.compat.v1 as tf
 import tf_slim.ops.arg_scope as arg_scope
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import saver_pb2
-from tensorflow.python.framework import device as tf_device
+from tensorflow.python.framework import device_spec as tf_device
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
@@ -776,7 +776,7 @@ class VariableDeviceChooser(object):
     self._next_task_id = 0
 
   def __call__(self, op):
-    device_spec = tf_device.DeviceSpec(
+    device_spec = tf_device.DeviceSpecV1(
         replica=self._replica,
         device_type=self._device_type,
         device_index=self._device_index)
