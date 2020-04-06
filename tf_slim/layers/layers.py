@@ -2145,9 +2145,6 @@ class GDN(base.Layer):
     return input_shape
 
 
-ops.RegisterGradient('GDNLowerBound')(GDN._lower_bound_grad)  # pylint:disable=protected-access
-
-
 def gdn(inputs,
         inverse=False,
         beta_min=1e-6,
