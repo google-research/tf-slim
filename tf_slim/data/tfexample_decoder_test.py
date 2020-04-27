@@ -24,6 +24,7 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 
 from tf_slim.data import tfexample_decoder
+from google.protobuf import text_format
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
@@ -67,6 +68,15 @@ class TFExampleDecoderTest(test.TestCase):
   def _StringFeature(self, value):
     value = value.encode('utf-8')
     return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
+
+  def _SequenceFloatFeature(self, ndarray, guard_value=None):
+    feature_list = tf.train.FeatureList()
+    for row in ndarray:
+      feature = feature_list.feature.add()
+      for column in row:
+        if column != guard_value:  # don't append guard value, can set to None.
+          feature.float_list.value.append(column)
+    return feature_list
 
   def _Encoder(self, image, image_format):
     assert image_format in ['jpeg', 'JPEG', 'png', 'PNG', 'raw', 'RAW']
@@ -965,6 +975,331 @@ class TFExampleDecoderTest(test.TestCase):
     self.assertAllClose([42, 10, 900], obtained_class_ids_each_example[0])
     self.assertAllClose([2, 0, 1], obtained_class_ids_each_example[1])
     self.assertAllClose([42, 10, 901], obtained_class_ids_each_example[2])
+
+  def testDecodeSequenceExampleNumBoxesSequenceNoCheck(self):
+    tensor_0 = np.array([[32.0, 21.0], [55.5, -2.0]])
+    tensor_1 = np.array([[32.0, -2.0], [55.5, -2.0]])
+    expected_num_boxes = np.array([2, 1])
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'tensor_0':
+                    self._SequenceFloatFeature(tensor_0, guard_value=-2.0),
+                'tensor_1':
+                    self._SequenceFloatFeature(tensor_1, guard_value=-2.0),
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'tensor_0': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'tensor_1': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'num_boxes':
+                tfexample_decoder.NumBoxesSequence(
+                    keys=('tensor_0', 'tensor_1'), check_consistency=False)
+        },
+    )
+    num_boxes, = decoder.decode(serialized_sequence)
+    with self.test_session() as sess:
+      actual_num_boxes = sess.run(num_boxes)
+      self.assertAllEqual(actual_num_boxes, expected_num_boxes)
+
+  def testDecodeSequenceExampleNumBoxesSequenceWithCheck(self):
+    tensor_0 = np.array([[32.0, 21.0], [55.5, -2.0]])
+    tensor_1 = np.array([[32.0, -2.0], [55.5, -2.0]])
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'tensor_0':
+                    self._SequenceFloatFeature(tensor_0, guard_value=-2.0),
+                'tensor_1':
+                    self._SequenceFloatFeature(tensor_1, guard_value=-2.0),
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'tensor_0': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'tensor_1': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'num_boxes':
+                tfexample_decoder.NumBoxesSequence(
+                    keys=('tensor_0', 'tensor_1'), check_consistency=True)
+        },
+    )
+    num_boxes, = decoder.decode(serialized_sequence)
+    with self.test_session() as sess:
+      with self.assertRaisesRegex(tf.errors.InvalidArgumentError,
+                                  'assertion failed:*'):
+        sess.run(num_boxes)
+
+  def testDecodeSequenceExampleNumBoxesSequenceNotSparse(self):
+    tensor_0 = np.array([[32.0, 21.0], [55.5, 22.0]])
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(feature_list={
+            'tensor_0': self._SequenceFloatFeature(tensor_0, guard_value=-2.0),
+        }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'tensor_0':
+                parsing_ops.FixedLenSequenceFeature([2], dtype=tf.float32),
+        },
+        items_to_handlers={
+            'num_boxes':
+                tfexample_decoder.NumBoxesSequence(
+                    keys=('tensor_0'), check_consistency=False)
+        },
+    )
+
+    with self.assertRaisesRegex(ValueError,
+                                'tensor must be of type tf.SparseTensor.'):
+      decoder.decode(serialized_sequence)
+
+  def testDecodeSequenceExampleBoundingBoxSequence(self):
+    xmin = np.array([[32.0, 21.0], [55.5, -2.0]])
+    xmax = np.array([[21.0, 21.0], [32.5, -2.0]])
+    ymin = np.array([[7.0, 21.0], [55.5, -2.0]])
+    ymax = np.array([[32.0, 21.0], [55.5, -2.0]])
+    # Note: expected_bbox matches the default order in the item handler.
+    expected_bbox = np.stack([ymin, xmin, ymax, xmax], axis=2)
+    # The guard value should be left out and the sparse tensor should be filled
+    # with -1.0's
+    expected_bbox[expected_bbox == -2.0] = -1.0
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'bbox/xmin':
+                    self._SequenceFloatFeature(xmin, guard_value=-2.0),
+                'bbox/xmax':
+                    self._SequenceFloatFeature(xmax, guard_value=-2.0),
+                'bbox/ymin':
+                    self._SequenceFloatFeature(ymin, guard_value=-2.0),
+                'bbox/ymax':
+                    self._SequenceFloatFeature(ymax, guard_value=-2.0)
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'bbox/xmin': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/xmax': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/ymin': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/ymax': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'bbox': tfexample_decoder.BoundingBoxSequence(prefix='bbox/'),
+        },
+    )
+    decoded_bbox, = decoder.decode(serialized_sequence)
+    with self.test_session():
+      self.assertAllClose(decoded_bbox.eval(), expected_bbox)
+
+  def testDecodeSequenceExampleBoundingBoxSequenceWithDefaultValue(self):
+    xmin = np.array([[32.0, 21.0], [55.5, -2.0]])
+    xmax = np.array([[21.0, 21.0], [32.5, -2.0]])
+    ymin = np.array([[7.0, 21.0], [55.5, -2.0]])
+    ymax = np.array([[32.0, 21.0], [55.5, -2.0]])
+    # Note: expected_bbox matches the default order in the item handler.
+    expected_bbox = np.stack([ymin, xmin, ymax, xmax], axis=2)
+    # The guard value should be left out and the sparse tensor should be filled
+    # with -1.0's
+    expected_bbox[expected_bbox == -2.0] = float('nan')
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'bbox/xmin':
+                    self._SequenceFloatFeature(xmin, guard_value=-2.0),
+                'bbox/xmax':
+                    self._SequenceFloatFeature(xmax, guard_value=-2.0),
+                'bbox/ymin':
+                    self._SequenceFloatFeature(ymin, guard_value=-2.0),
+                'bbox/ymax':
+                    self._SequenceFloatFeature(ymax, guard_value=-2.0)
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'bbox/xmin': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/xmax': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/ymin': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'bbox/ymax': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'bbox': tfexample_decoder.BoundingBoxSequence(
+                prefix='bbox/', default_value=float('nan')),
+        },
+    )
+    decoded_bbox, = decoder.decode(serialized_sequence)
+    with self.test_session():
+      self.assertAllClose(decoded_bbox.eval(), expected_bbox)
+
+  def testDecodeSequenceExampleKeypointsSequence(self):
+    x = np.array([[32.0, 21.0], [55.5, -2.0]])
+    y = np.array([[7.0, 21.0], [55.5, -2.0]])
+    # Note: expected_keypoints matches the default order in the item handler.
+    expected_keypoints = np.stack([y, x], axis=2)
+    # The guard value should be left out and the sparse tensor should be filled
+    # with -1.0's
+    expected_keypoints[expected_keypoints == -2.0] = -1.0
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'keypoints/x':
+                    self._SequenceFloatFeature(x, guard_value=-2.0),
+                'keypoints/y':
+                    self._SequenceFloatFeature(y, guard_value=-2.0)
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'keypoints/x': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'keypoints/y': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'keypoints': tfexample_decoder.KeypointsSequence(
+                prefix='keypoints/'),
+        },
+    )
+    decoded_keypoints, = decoder.decode(serialized_sequence)
+    with self.test_session():
+      self.assertAllClose(decoded_keypoints.eval(), expected_keypoints)
+
+  def testDecodeSequenceExampleKeypointsSequenceWithDefaultValue(self):
+    x = np.array([[32.0, 21.0], [55.5, -2.0]])
+    y = np.array([[7.0, 21.0], [55.5, -2.0]])
+    # Note: expected_keypoints matches the default order in the item handler.
+    expected_keypoints = np.stack([y, x], axis=2)
+    # The guard value should be left out and the sparse tensor should be filled
+    # with -1.0's
+    expected_keypoints[expected_keypoints == -2.0] = float('nan')
+    sequence = tf.train.SequenceExample(
+        feature_lists=tf.train.FeatureLists(
+            feature_list={
+                'keypoints/x':
+                    self._SequenceFloatFeature(x, guard_value=-2.0),
+                'keypoints/y':
+                    self._SequenceFloatFeature(y, guard_value=-2.0)
+            }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'keypoints/x': parsing_ops.VarLenFeature(dtype=tf.float32),
+            'keypoints/y': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'keypoints': tfexample_decoder.KeypointsSequence(
+                prefix='keypoints/', default_value=float('nan')),
+        },
+    )
+    decoded_keypoints, = decoder.decode(serialized_sequence)
+    with self.test_session():
+      self.assertAllClose(decoded_keypoints.eval(), expected_keypoints)
+
+  def testDecodeSequenceExample(self):
+    float_array = np.array([[32.0, 21.0], [55.5, 12.0]])
+    sequence = tf.train.SequenceExample(
+        context=tf.train.Features(feature={
+            'string': self._StringFeature('test')
+        }),
+        feature_lists=tf.train.FeatureLists(feature_list={
+            'floats': self._SequenceFloatFeature(float_array)
+        }))
+    serialized_sequence = sequence.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={
+            'string':
+                parsing_ops.FixedLenFeature(
+                    (), tf.string, default_value='')
+        },
+        keys_to_sequence_features={
+            'floats':
+                parsing_ops.FixedLenSequenceFeature([2], dtype=tf.float32),
+        },
+        items_to_handlers={
+            'string': tfexample_decoder.Tensor('string'),
+            'floats': tfexample_decoder.Tensor('floats'),
+        },
+    )
+    decoded_string, decoded_floats = decoder.decode(
+        serialized_sequence, items=['string', 'floats'])
+    with self.test_session():
+      self.assertEqual(decoded_string.eval(), b'test')
+      self.assertAllClose(decoded_floats.eval(), float_array)
+
+  def testDecodeSequenceExampleNoBoxes(self):
+    sequence_example_text_proto = """
+    feature_lists: {
+      feature_list: {
+        key: "bbox/xmin"
+        value: {
+          feature: {
+          }
+          feature: {
+          }
+        }
+      }
+    }"""
+    sequence_example = tf.train.SequenceExample()
+    text_format.Parse(sequence_example_text_proto, sequence_example)
+    serialized_sequence = sequence_example.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'bbox/xmin': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'num_boxes':
+                tfexample_decoder.NumBoxesSequence(
+                    'bbox/xmin', check_consistency=True)
+        },
+    )
+    num_boxes, = decoder.decode(serialized_sequence)
+    with self.test_session() as sess:
+      actual_num_boxes = sess.run(num_boxes)
+      self.assertAllEqual([0, 0], actual_num_boxes)
+
+  def testDecodeSequenceExamplePartialBoxes(self):
+    sequence_example_text_proto = """
+    feature_lists: {
+      feature_list: {
+        key: "bbox/xmin"
+        value: {
+          feature: {
+            float_list: {
+              value: [0.0, 0.1]
+            }
+          }
+          feature: {
+          }
+        }
+      }
+    }"""
+    sequence_example = tf.train.SequenceExample()
+    text_format.Parse(sequence_example_text_proto, sequence_example)
+    serialized_sequence = sequence_example.SerializeToString()
+    decoder = tfexample_decoder.TFSequenceExampleDecoder(
+        keys_to_context_features={},
+        keys_to_sequence_features={
+            'bbox/xmin': parsing_ops.VarLenFeature(dtype=tf.float32),
+        },
+        items_to_handlers={
+            'num_boxes':
+                tfexample_decoder.NumBoxesSequence(
+                    'bbox/xmin', check_consistency=True)
+        },
+    )
+    num_boxes, = decoder.decode(serialized_sequence)
+    with self.test_session() as sess:
+      actual_num_boxes = sess.run(num_boxes)
+      self.assertAllEqual([2, 0], actual_num_boxes)
 
 
 if __name__ == '__main__':
