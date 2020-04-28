@@ -19,8 +19,8 @@ import tf_slim as slim
 TF-Slim is a library that makes defining, training and evaluating neural
 networks simple:
 
-*   Allows the user to define models much more compactly by eliminating
-    boilerplate code. This is accomplished through the use of
+*   Allows the user to define models compactly by eliminating boilerplate code.
+    This is accomplished through the use of
     [argument scoping](https://github.com/google-research/tf-slim/tree/master/tf_slim/ops/arg_scope.py)
     and numerous high level
     [layers](https://github.com/google-research/tf-slim/tree/master/tf_slim/layers/layers.py)
