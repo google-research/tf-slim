@@ -4,9 +4,13 @@ TF-Slim is a lightweight library for defining, training and evaluating complex
 models in TensorFlow. Components of tf-slim can be freely mixed with native
 tensorflow, as well as other frameworks..
 
+Note: Latest version of TF-Slim, 1.1.0, was tested with TF 1.15.2 py2,
+      TF 2.0.1, TF 2.1 and TF 2.2.
+
+
 ## Install
 ```bash
-pip install tf_slim
+pip install --upgrade tf_slim
 ```
 
 ## Usage
@@ -904,6 +908,29 @@ slim.evaluation.evaluation_loop(
     eval_op=names_to_updates.values(),
     summary_op=tf.summary.merge(summary_ops),
     eval_interval_secs=eval_interval_secs)
+```
+
+## Releases
+
+TF-Slim is not in active development. After TF Slim 1.0.0, support for Python2
+was dropped; but 1.1.0 was tested against TensorFlow 1.15.2 + Python2 and the
+unit tests passed.
+
+
+| Release  | Branch / Tag      | TensorFlow Version |
+| -------- | ----------- | ------------------ |
+| 1.1.0   | [v1.1.0](https://github.com/google-research/tf-slim/tree/v1.1.0) | 1.15.2 (py2), 2.0.1, 2.1.0 and 2.2.0 |
+| 1.0    | n/a | 1.15.2   |
+
+Examples of installing most recent stable and a specific version of TF-Slim:
+
+```bash
+# Stable
+pip install tf_slim
+
+# Specific version
+pip install tf_slim==1.0
+
 ```
 
 ## Authors

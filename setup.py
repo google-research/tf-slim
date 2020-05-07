@@ -36,7 +36,7 @@ tf_slim_description = (
 
 setup(
     name='tf_slim',
-    version='1.1',
+    version='1.2.0',
     include_package_data=True,
     packages=find_packages(exclude=['docs']),  # Required
     install_requires=install_requires,

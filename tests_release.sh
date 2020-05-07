@@ -14,8 +14,24 @@
 
 #!/usr/bin/env bash
 
-# Test nightly release: ./test_release.sh nightly
-# Test stable release: ./test_release.sh stable
+# Creates a pip package for tf-slim after executing unit tests.
+#
+# Script is assumed to run from within a docker where the version of tensorflow
+# to test against is already installed.
+#
+# bash tests_release.sh
+#
+# Example usage with docker:
+#   # Test and build with latest
+#   docker run --rm -v $(pwd):/workspace \
+#     --workdir /workspace tensorflow/tensorflow:latest  \
+#     bash tests_release.sh
+#
+#   # Test and build with nightly
+#   docker run --rm -v $(pwd):/workspace \
+#     --workdir /workspace tensorflow/tensorflow:nightly  \
+#     bash tests_release.sh
+
 
 # Exit if any process returns non-zero status.
 set -e
@@ -24,20 +40,8 @@ set -x
 
 
 run_tests() {
-  echo "run_tests $1"
+  echo "run_tests"
   TMP=$(mktemp -d)
-  # Create and activate a virtualenv to specify python version and test in
-  # isolated environment. Note that we don't actually have to cd'ed into a
-  # virtualenv directory to use it; we just need to source bin/activate into the
-  # current shell.
-  VENV_PATH=${TMP}/virtualenv/$1
-  virtualenv -p "$1" "${VENV_PATH}"
-  source ${VENV_PATH}/bin/activate
-
-
-  # TensorFlow isn't a regular dependency because there are many different pip
-  # packages a user might have installed.
-  pip install tensorflow
 
   # Run the tests
   python setup.py test
@@ -52,12 +56,13 @@ run_tests() {
   # installed wheel and not to the local fs.
   (cd $(mktemp -d) && python -c 'import tf_slim')
 
-  # Deactivate virtualenv
-  deactivate
+  # Copies wheel out of tmp to root of repo so it can be more easily uploaded
+  # to pypi as part of the stable release process.
+  cp ${WHEEL_PATH}/tf_slim*.whl ./
+
 }
 
-# Test on Python2.7
-run_tests "python2.7"
-# Test on Python3.6
-run_tests "python3.6"
+# Build and run tests.
+run_tests
+
 
