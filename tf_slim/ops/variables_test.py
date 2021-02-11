@@ -480,7 +480,8 @@ class VariablesTest(test.TestCase):
       self.assertDeviceEqual(e.initial_value.device, 'cpu:99')
 
   def testVariableWithReplicaDeviceSetter(self):
-    with self.cached_session():
+    # Explicitly disable GPU usage because we check for the CPU device below.
+    with self.cached_session(use_gpu=False):
       with ops.device(device_setter.replica_device_setter(ps_tasks=2)):
         a = variables_lib2.variable('a', [])
         b = variables_lib2.variable('b', [])
