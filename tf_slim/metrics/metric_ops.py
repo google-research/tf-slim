@@ -3242,7 +3242,7 @@ def streaming_covariance(predictions,
     delta_comoment = (
         batch_comoment + (prev_mean_prediction - batch_mean_prediction) *
         (prev_mean_label - batch_mean_label) *
-        (prev_count * batch_count / update_count))
+        (math_ops.div_no_nan(prev_count * batch_count, update_count)))
     update_comoment = state_ops.assign_add(comoment, delta_comoment)
 
     covariance = array_ops.where(
