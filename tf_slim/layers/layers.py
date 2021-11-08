@@ -36,12 +36,6 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import tensor_shape
-from tensorflow.python.keras.engine import input_spec
-from tensorflow.python.layers import base
-from tensorflow.python.layers import convolutional as convolutional_layers
-from tensorflow.python.layers import core as core_layers
-from tensorflow.python.layers import normalization as normalization_layers
-from tensorflow.python.layers import pooling as pooling_layers
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import check_ops
 from tensorflow.python.ops import custom_gradient
@@ -115,7 +109,7 @@ def avg_pool2d(inputs,
     inputs = ops.convert_to_tensor(inputs)
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = pooling_layers.AveragePooling2D(
+    layer = tf.layers.AveragePooling2D(
         pool_size=kernel_size,
         strides=stride,
         padding=padding,
@@ -164,7 +158,7 @@ def avg_pool3d(inputs,
     inputs = ops.convert_to_tensor(inputs)
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = pooling_layers.AveragePooling3D(
+    layer = tf.layers.AveragePooling3D(
         pool_size=kernel_size,
         strides=stride,
         padding=padding,
@@ -660,7 +654,7 @@ def batch_norm(inputs,
         param_regularizers = {}
       beta_regularizer = param_regularizers.get('beta')
       gamma_regularizer = param_regularizers.get('gamma')
-      layer = normalization_layers.BatchNormalization(
+      layer = tf.layers.BatchNormalization(
           axis=axis,
           momentum=decay,
           epsilon=epsilon,
@@ -1056,11 +1050,11 @@ def convolution(inputs,
       raise ValueError('Convolution expects input with rank %d, got %d' %
                        (conv_dims + 2, input_rank))
     if input_rank == 3:
-      layer_class = convolutional_layers.Convolution1D
+      layer_class = tf.layers.Conv1D
     elif input_rank == 4:
-      layer_class = convolutional_layers.Convolution2D
+      layer_class = tf.layers.Conv2D
     elif input_rank == 5:
-      layer_class = convolutional_layers.Convolution3D
+      layer_class = tf.layers.Conv3D
     else:
       raise ValueError('Convolution not supported for input with rank',
                        input_rank)
@@ -1428,7 +1422,7 @@ def convolution2d_transpose(
 
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = convolutional_layers.Convolution2DTranspose(
+    layer = tf.layers.Conv2DTranspose(
         filters=num_outputs,
         kernel_size=kernel_size,
         strides=stride,
@@ -1542,7 +1536,7 @@ def convolution3d_transpose(
 
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = convolutional_layers.Convolution3DTranspose(
+    layer = tf.layers.Conv3DTranspose(
         filters=num_outputs,
         kernel_size=kernel_size,
         strides=stride,
@@ -1635,7 +1629,7 @@ def dropout(inputs,
   with variable_scope.variable_scope(
       scope, 'Dropout', [inputs], custom_getter=_model_variable_getter) as sc:
     inputs = ops.convert_to_tensor(inputs)
-    layer = core_layers.Dropout(
+    layer = tf.layers.Dropout(
         rate=1 - keep_prob,
         noise_shape=noise_shape,
         seed=seed,
@@ -1663,7 +1657,7 @@ def flatten(inputs, outputs_collections=None, scope=None):
   """
   with ops.name_scope(scope, 'Flatten', [inputs]) as sc:
     inputs = ops.convert_to_tensor(inputs)
-    outputs = core_layers.flatten(inputs)
+    outputs = tf.layers.flatten(inputs)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
 
@@ -1881,7 +1875,7 @@ def fully_connected(inputs,
       reuse=reuse,
       custom_getter=layer_variable_getter) as sc:
     inputs = ops.convert_to_tensor(inputs)
-    layer = core_layers.Dense(
+    layer = tf.layers.Dense(
         units=num_outputs,
         activation=None,
         use_bias=not normalizer_fn and biases_initializer,
@@ -1914,7 +1908,8 @@ def fully_connected(inputs,
     return utils.collect_named_outputs(outputs_collections, sc.name, outputs)
 
 
-class GDN(base.Layer):
+# pylint: disable=g-classes-have-attributes
+class GDN(tf.layers.Layer):
   """Generalized divisive normalization layer.
 
   Based on the papers:
@@ -2000,7 +1995,7 @@ class GDN(base.Layer):
     self._reparam_offset = reparam_offset
     self.data_format = data_format
     self._channel_axis()  # trigger ValueError early
-    self.input_spec = input_spec.InputSpec(min_ndim=3, max_ndim=5)
+    self.input_spec = tf.layers.InputSpec(min_ndim=3, max_ndim=5)
 
   def _channel_axis(self):
     try:
@@ -2056,7 +2051,7 @@ class GDN(base.Layer):
       raise ValueError('The channel dimension of the inputs to `GDN` '
                        'must be defined.')
     self._input_rank = input_shape.ndims
-    self.input_spec = input_spec.InputSpec(
+    self.input_spec = tf.layers.InputSpec(
         ndim=input_shape.ndims, axes={channel_axis: num_channels})
 
     pedestal = array_ops.constant(self._reparam_offset**2, dtype=self.dtype)
@@ -2437,7 +2432,7 @@ def max_pool2d(inputs,
     inputs = ops.convert_to_tensor(inputs)
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = pooling_layers.MaxPooling2D(
+    layer = tf.layers.MaxPooling2D(
         pool_size=kernel_size,
         strides=stride,
         padding=padding,
@@ -2487,7 +2482,7 @@ def max_pool3d(inputs,
     inputs = ops.convert_to_tensor(inputs)
     df = ('channels_first'
           if data_format and data_format.startswith('NC') else 'channels_last')
-    layer = pooling_layers.MaxPooling3D(
+    layer = tf.layers.MaxPooling3D(
         pool_size=kernel_size,
         strides=stride,
         padding=padding,
@@ -2777,7 +2772,7 @@ def separable_convolution2d(
           if data_format and data_format.startswith('NC') else 'channels_last')
     if num_outputs is not None:
       # Apply separable conv using the SeparableConvolution2D layer.
-      layer = convolutional_layers.SeparableConvolution2D(
+      layer = tf.layers.SeparableConv2D(
           filters=num_outputs,
           kernel_size=kernel_size,
           strides=stride,

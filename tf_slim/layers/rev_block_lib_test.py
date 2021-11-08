@@ -26,9 +26,6 @@ from tf_slim.layers import rev_block_lib
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import random_seed
-from tensorflow.python.layers import convolutional
-from tensorflow.python.layers import core as core_layers
-from tensorflow.python.layers import normalization as normalization_layers
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import gradients_impl
 from tensorflow.python.ops import init_ops
@@ -52,10 +49,10 @@ class RevBlockTest(test.TestCase):
   def testForwardBackward(self):
 
     def f(x):
-      return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+      return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     def g(x):
-      return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+      return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     x = random_ops.random_uniform(
         [self.BATCH_SIZE, self.CHANNELS], dtype=dtypes.float32)
@@ -75,10 +72,10 @@ class RevBlockTest(test.TestCase):
   def testBackwardForward(self):
 
     def f(x):
-      return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+      return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     def g(x):
-      return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+      return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     y = random_ops.random_uniform(
         [self.BATCH_SIZE, self.CHANNELS], dtype=dtypes.float32)
@@ -106,12 +103,12 @@ class RevBlockTest(test.TestCase):
     if f is None:
 
       def f(x):  # pylint: disable=function-redefined
-        return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+        return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     if g is None:
 
       def g(x):  # pylint: disable=function-redefined
-        return core_layers.dense(x, self.CHANNELS // 2, use_bias=True)
+        return tf.layers.dense(x, self.CHANNELS // 2, use_bias=True)
 
     if f_side_input is None:
       f_side_input = []
@@ -173,7 +170,7 @@ class RevBlockTest(test.TestCase):
         [self.BATCH_SIZE, self.CHANNELS // 2])
 
     def f(x, side_input):
-      return core_layers.dense(
+      return tf.layers.dense(
           x, self.CHANNELS // 2, use_bias=True) + side_input[0]
 
     self._testRevBlock(f=f, f_side_input=[f_side_input])
@@ -181,10 +178,10 @@ class RevBlockTest(test.TestCase):
   def testMultipleFns(self):
 
     def f1(x):
-      return core_layers.dense(x, self.CHANNELS // 2)
+      return tf.layers.dense(x, self.CHANNELS // 2)
 
     def f2(x):
-      return core_layers.dense(x, self.CHANNELS // 2, activation=nn_ops.relu)
+      return tf.layers.dense(x, self.CHANNELS // 2, activation=nn_ops.relu)
 
     self._testRevBlock(f=[f1, f2, f1, f2])
 
@@ -194,9 +191,9 @@ class RevBlockTest(test.TestCase):
         [self.BATCH_SIZE, 10, self.CHANNELS], dtype=dtypes.float32)
 
     def f(x):
-      x = convolutional.conv1d(x, self.CHANNELS // 2, 3, padding="same")
+      x = tf.layers.conv1d(x, self.CHANNELS // 2, 3, padding="same")
       x = layers.batch_norm(x, is_training=False)
-      x = convolutional.conv1d(x, self.CHANNELS // 2, 3, padding="same")
+      x = tf.layers.conv1d(x, self.CHANNELS // 2, 3, padding="same")
       x = layers.batch_norm(x, is_training=False)
       return x
 
@@ -205,10 +202,10 @@ class RevBlockTest(test.TestCase):
   def testReuse(self):
 
     def f(x):
-      return core_layers.dense(x, self.CHANNELS // 2)
+      return tf.layers.dense(x, self.CHANNELS // 2)
 
     def g(x):
-      return core_layers.dense(x, self.CHANNELS // 2)
+      return tf.layers.dense(x, self.CHANNELS // 2)
 
     x = random_ops.random_uniform(
         [self.BATCH_SIZE, self.CHANNELS], dtype=dtypes.float32)
@@ -243,7 +240,7 @@ class RecomputeTest(test.TestCase):
     def layer(x, name=None):
       with variable_scope.variable_scope(name, default_name="layer"):
         x = layers.layer_norm(x)
-        x = convolutional.conv1d(
+        x = tf.layers.conv1d(
             x,
             10,
             1,
@@ -315,7 +312,7 @@ class RecomputeTest(test.TestCase):
 
     @rev_block_lib.recompute_grad
     def layer_with_recompute(inputs):
-      return core_layers.dense(inputs, 2)
+      return tf.layers.dense(inputs, 2)
 
     with variable_scope.variable_scope("layer", use_resource=True):
       inputs = array_ops.ones((2, 4), dtypes.float32)
@@ -334,7 +331,7 @@ class RecomputeTest(test.TestCase):
     @rev_block_lib.recompute_grad
     def layer_with_recompute(inputs):
       with variable_scope.variable_scope("inner", use_resource=True):
-        return core_layers.dense(inputs, 2)
+        return tf.layers.dense(inputs, 2)
 
     with variable_scope.variable_scope("layer", use_resource=True):
       inputs = array_ops.ones((2, 4), dtypes.float32)
@@ -358,8 +355,8 @@ class RecomputeTest(test.TestCase):
     @rev_block_lib.recompute_grad
     def layer_with_recompute(inputs, is_recomputing=False):
       kwarg_values.append(is_recomputing)
-      out = core_layers.dense(inputs, 2)
-      out = normalization_layers.batch_normalization(out, training=True)
+      out = tf.layers.dense(inputs, 2)
+      out = tf.layers.batch_normalization(out, training=True)
       if is_recomputing:
         # Ensure that the updates are not duplicated by popping off the latest
         # 2 additions.

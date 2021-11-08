@@ -33,13 +33,14 @@ import re
 import numpy as np
 import six
 from six.moves import xrange  # pylint: disable=redefined-builtin
+import tensorflow.compat.v1 as tf
+
 # pylint: disable=g-direct-tensorflow-import
 from tf_slim.ops import arg_scope as arg_scope_lib
 from tensorflow.python import tf2
 from tensorflow.python.eager import backprop
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops as framework_ops
-from tensorflow.python.layers import base
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import control_flow_util
@@ -180,7 +181,7 @@ def _scope_wrap(fn, scope):
   return wrap
 
 
-class RevBlock(base.Layer):
+class RevBlock(tf.layers.Layer):
   """Block of reversible layers. See rev_block."""
 
   def __init__(self,
