@@ -29,6 +29,7 @@ from tf_slim.layers import layers
 from tf_slim.ops import variables as variables_lib
 from tf_slim.training import training
 # pylint: disable=g-direct-tensorflow-import
+from tensorflow.python.checkpoint import checkpoint_management
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
@@ -40,7 +41,6 @@ from tensorflow.python.ops import variables as variables_lib2
 from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import basic_session_run_hooks
-from tensorflow.python.training import checkpoint_management
 from tensorflow.python.training import gradient_descent
 from tensorflow.python.training import monitored_session
 from tensorflow.python.training import saver as saver_lib

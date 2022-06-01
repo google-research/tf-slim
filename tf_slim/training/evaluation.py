@@ -140,10 +140,10 @@ from __future__ import print_function
 import time
 import tensorflow.compat.v1 as tf
 # pylint: disable=g-direct-tensorflow-import
+from tensorflow.python.checkpoint import checkpoint_management
 from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import basic_session_run_hooks
-from tensorflow.python.training import checkpoint_management
 from tensorflow.python.training import evaluation
 from tensorflow.python.training import monitored_session
 from tensorflow.python.training import session_run_hook
