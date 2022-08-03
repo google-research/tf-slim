@@ -665,7 +665,7 @@ def assign_from_checkpoint(model_path, var_list, ignore_missing_vars=False):
         slice_dims = zip(var._save_slice_info.var_offset,
                          var._save_slice_info.var_shape)
         slice_dims = [(start, start + size) for (start, size) in slice_dims]
-        slice_dims = [slice(*x) for x in slice_dims]
+        slice_dims = tuple(slice(*x) for x in slice_dims)
         slice_value = ckpt_value[slice_dims]
         slice_value = slice_value.reshape(var._save_slice_info.var_shape)
         feed_dict[placeholder_tensor] = slice_value
