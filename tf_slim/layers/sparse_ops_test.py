@@ -75,7 +75,7 @@ class DenseToSparseTensorTest(test.TestCase):
       st = sparse_ops.dense_to_sparse_tensor([True, False, True, False])
       result = sess.run(st)
     self.assertEqual(result.indices.dtype, np.int64)
-    self.assertEqual(result.values.dtype, np.bool)
+    self.assertEqual(result.values.dtype, bool)
     self.assertEqual(result.dense_shape.dtype, np.int64)
     self.assertAllEqual([[0], [2]], result.indices)
     self.assertAllEqual([True, True], result.values)
