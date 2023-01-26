@@ -31,6 +31,7 @@ from tf_slim.layers import layers
 from tf_slim.ops import variables as variables_lib2
 
 # pylint:disable=g-direct-tensorflow-import
+from tensorflow.python.framework import indexed_slices
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import random_seed
 from tensorflow.python.ops import math_ops
@@ -99,7 +100,7 @@ class ClipGradientNormsTest(test.TestCase):
     indices = tf.constant(sparse_grad_indices, dtype=tf.int32)
     dense_shape = tf.constant(sparse_grad_dense_shape, dtype=tf.int32)
 
-    gradient = ops.IndexedSlices(values, indices, dense_shape)
+    gradient = indexed_slices.IndexedSlices(values, indices, dense_shape)
     variable = variables_lib.Variable(self._zero_vec, dtype=tf.float32)
 
     gradients_to_variables = (gradient, variable)
@@ -177,7 +178,7 @@ class MultiplyGradientsTest(test.TestCase):
     indices = tf.constant([0, 1, 2], dtype=tf.int32)
     dense_shape = tf.constant([self._grad_vec.size], dtype=tf.int32)
 
-    gradient = ops.IndexedSlices(values, indices, dense_shape)
+    gradient = indexed_slices.IndexedSlices(values, indices, dense_shape)
     variable = variables_lib.Variable(tf.zeros((1, 3)))
     grad_to_var = (gradient, variable)
     gradient_multipliers = {variable: self._multiplier}

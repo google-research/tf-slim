@@ -261,6 +261,7 @@ from tensorflow.core.protobuf import config_pb2
 from tensorflow.python.client import timeline
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import errors
+from tensorflow.python.framework import indexed_slices
 from tensorflow.python.framework import ops
 from tensorflow.python.lib.io import file_io
 from tensorflow.python.ops import array_ops
@@ -297,9 +298,9 @@ def clip_gradient_norms(gradients_to_variables, max_norm):
   clipped_grads_and_vars = []
   for grad, var in gradients_to_variables:
     if grad is not None:
-      if isinstance(grad, ops.IndexedSlices):
+      if isinstance(grad, indexed_slices.IndexedSlices):
         tmp = clip_ops.clip_by_norm(grad.values, max_norm)
-        grad = ops.IndexedSlices(tmp, grad.indices, grad.dense_shape)
+        grad = indexed_slices.IndexedSlices(tmp, grad.indices, grad.dense_shape)
       else:
         grad = clip_ops.clip_by_norm(grad, max_norm)
     clipped_grads_and_vars.append((grad, var))
@@ -339,9 +340,9 @@ def multiply_gradients(grads_and_vars, gradient_multipliers):
       if not isinstance(multiplier, ops.Tensor):
         multiplier = constant_op.constant(multiplier, dtype=grad.dtype)
 
-      if isinstance(grad, ops.IndexedSlices):
+      if isinstance(grad, indexed_slices.IndexedSlices):
         tmp = grad.values * multiplier
-        grad = ops.IndexedSlices(tmp, grad.indices, grad.dense_shape)
+        grad = indexed_slices.IndexedSlices(tmp, grad.indices, grad.dense_shape)
       else:
         grad *= multiplier
     multiplied_grads_and_vars.append((grad, var))
@@ -360,7 +361,7 @@ def add_gradients_summaries(grads_and_vars):
   summaries = []
   for grad, var in grads_and_vars:
     if grad is not None:
-      if isinstance(grad, ops.IndexedSlices):
+      if isinstance(grad, indexed_slices.IndexedSlices):
         grad_values = grad.values
       else:
         grad_values = grad
