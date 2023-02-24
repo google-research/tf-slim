@@ -26,6 +26,7 @@ import tensorflow.compat.v1 as tf
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import array_ops_stack  # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.ops import check_ops
 from tensorflow.python.ops import confusion_matrix
 from tensorflow.python.ops import control_flow_ops
@@ -748,7 +749,7 @@ def _streaming_confusion_matrix_at_thresholds(predictions,
     num_predictions = array_ops.shape(predictions_2d)[0]
   thresh_tiled = array_ops.tile(
       array_ops.expand_dims(array_ops.constant(thresholds), [1]),
-      array_ops.stack([1, num_predictions]))
+      array_ops_stack.stack([1, num_predictions]))
 
   # Tile the predictions after thresholding them across different thresholds.
   pred_is_pos = math_ops.greater(
@@ -947,7 +948,7 @@ def streaming_curve_points(labels=None,
 
     xs, ys = compute_points(values['tp'], values['fn'], values['tn'],
                             values['fp'])
-    points = array_ops.stack([xs, ys], axis=1)
+    points = array_ops_stack.stack([xs, ys], axis=1)
     update_op = control_flow_ops.group(*update_ops.values())
 
     if metrics_collections:
@@ -3629,7 +3630,7 @@ def streaming_concat(values,
     def reallocate():
       """Reallocates the varible to the next size."""
       next_size = _next_array_size(new_size)
-      next_shape = array_ops.stack([next_size] + fixed_shape)
+      next_shape = array_ops_stack.stack([next_size] + fixed_shape)
       new_value = array_ops.zeros(next_shape, dtype=values.dtype)
       old_value = array.value()
       with ops.control_dependencies([old_value]):

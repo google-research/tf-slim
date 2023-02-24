@@ -37,6 +37,7 @@ from tensorflow.python.framework import ops
 from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.ops import array_ops
+from tensorflow.python.ops import array_ops_stack  # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.ops import check_ops
 from tensorflow.python.ops import custom_gradient
 from tensorflow.python.ops import init_ops
@@ -3317,10 +3318,10 @@ def legacy_fully_connected(x,
       y = nn.bias_add(y, b)
 
     if len(dims) > 2:
-      out_shape = array_ops.unstack(array_ops.shape(x))
+      out_shape = array_ops_stack.unstack(array_ops.shape(x))
       out_shape[-1] = num_output_units
 
-      y = array_ops.reshape(y, array_ops.stack(out_shape))
+      y = array_ops.reshape(y, array_ops_stack.stack(out_shape))
 
       static_shape = x.get_shape().as_list()
       static_shape[-1] = num_output_units
