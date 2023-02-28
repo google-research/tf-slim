@@ -27,7 +27,7 @@ from tf_slim.data import tfexample_decoder
 from google.protobuf import text_format
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import array_ops
-from tensorflow.python.ops import control_flow_ops
+from tensorflow.python.ops import control_flow_case
 from tensorflow.python.ops import image_ops
 from tensorflow.python.ops import lookup_ops
 from tensorflow.python.ops import math_ops
@@ -723,7 +723,7 @@ class TFExampleDecoderTest(test.TestCase):
           def DecodeJpg():
             return image_ops.decode_jpeg(image_buffer, 3)
 
-          image = control_flow_ops.case(
+          image = control_flow_case.case(
               {
                   math_ops.equal(image_format, 'png'): DecodePng,
               },

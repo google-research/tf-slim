@@ -36,6 +36,7 @@ from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import array_ops_stack
 from tensorflow.python.ops import check_ops
+from tensorflow.python.ops import control_flow_case
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import image_ops
 from tensorflow.python.ops import map_fn
@@ -451,7 +452,7 @@ class Image(ItemHandler):
         math_ops.equal(image_format, 'raw'),
         math_ops.equal(image_format, 'RAW')), decode_raw)]
 
-    image = control_flow_ops.case(
+    image = control_flow_case.case(
         pred_fn_pairs, default=check_jpeg, exclusive=True)
 
     image.set_shape([None, None, self._channels])
