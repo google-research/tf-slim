@@ -25,6 +25,7 @@ from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import confusion_matrix as cm
+from tensorflow.python.ops import control_flow_assert
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import histogram_ops
 from tensorflow.python.ops import init_ops
@@ -104,15 +105,18 @@ def _check_labels_and_scores(boolean_labels, scores, check_shape):
           boolean_labels.dtype)
 
     if check_shape:
-      labels_rank_1 = control_flow_ops.Assert(
-          math_ops.equal(1, array_ops.rank(boolean_labels)),
-          ['Argument boolean_labels should have rank 1.  Found: ',
-           boolean_labels.name, array_ops.shape(boolean_labels)])
+      labels_rank_1 = control_flow_assert.Assert(
+          math_ops.equal(1, array_ops.rank(boolean_labels)), [
+              'Argument boolean_labels should have rank 1.  Found: ',
+              boolean_labels.name,
+              array_ops.shape(boolean_labels)
+          ])
 
-      scores_rank_1 = control_flow_ops.Assert(
-          math_ops.equal(1, array_ops.rank(scores)),
-          ['Argument scores should have rank 1.  Found: ', scores.name,
-           array_ops.shape(scores)])
+      scores_rank_1 = control_flow_assert.Assert(
+          math_ops.equal(1, array_ops.rank(scores)), [
+              'Argument scores should have rank 1.  Found: ', scores.name,
+              array_ops.shape(scores)
+          ])
 
       with ops.control_dependencies([labels_rank_1, scores_rank_1]):
         return boolean_labels, scores
