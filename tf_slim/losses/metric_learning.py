@@ -26,12 +26,12 @@ from tensorflow.python.framework import ops
 from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.ops import array_ops
-from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import logging_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
 from tensorflow.python.ops import script_ops
 from tensorflow.python.ops import sparse_ops
+from tensorflow.python.ops import while_loop
 from tensorflow.python.summary import summary
 try:
   # pylint: disable=g-import-not-at-top
@@ -718,8 +718,8 @@ def _find_loss_augmented_facility_idx(pairwise_distances, labels, chosen_ids,
     return iteration + 1, nmi_scores + array_ops.concat(
         [pad_before, [1.0 - nmi_score_i], pad_after], 0)
 
-  _, nmi_scores = control_flow_ops.while_loop(
-      func_cond, func_body, [iteration, nmi_scores])
+  _, nmi_scores = while_loop.while_loop(func_cond, func_body,
+                                        [iteration, nmi_scores])
 
   candidate_scores = math_ops.add(
       candidate_scores, margin_multiplier * nmi_scores)
@@ -767,11 +767,13 @@ def compute_augmented_facility_locations(pairwise_distances, labels, all_ids,
   # num_classes get determined at run time based on the sampled batch.
   iteration = array_ops.constant(0)
 
-  _, chosen_ids = control_flow_ops.while_loop(
+  _, chosen_ids = while_loop.while_loop(
       func_cond_augmented,
       func_body_augmented, [iteration, chosen_ids],
-      shape_invariants=[iteration.get_shape(), tensor_shape.TensorShape(
-          [None])])
+      shape_invariants=[
+          iteration.get_shape(),
+          tensor_shape.TensorShape([None])
+      ])
   return chosen_ids
 
 
@@ -820,8 +822,8 @@ def update_medoid_per_cluster(pairwise_distances, pairwise_distances_subset,
   num_candidates = array_ops.size(cluster_member_ids)
   scores_margin = array_ops.zeros([num_candidates])
 
-  _, scores_margin = control_flow_ops.while_loop(func_cond, func_body,
-                                                 [iteration, scores_margin])
+  _, scores_margin = while_loop.while_loop(func_cond, func_body,
+                                           [iteration, scores_margin])
   candidate_scores = math_ops.add(scores_fac, margin_multiplier * scores_margin)
 
   argmax_index = math_ops.cast(
@@ -876,8 +878,9 @@ def update_all_medoids(pairwise_distances, predictions, labels, chosen_ids,
   num_classes = array_ops.size(unique_class_ids)
   iteration = array_ops.constant(0)
 
-  _, chosen_ids = control_flow_ops.while_loop(
-      func_cond_augmented_pam, func_body_augmented_pam, [iteration, chosen_ids])
+  _, chosen_ids = while_loop.while_loop(func_cond_augmented_pam,
+                                        func_body_augmented_pam,
+                                        [iteration, chosen_ids])
   return chosen_ids
 
 
@@ -949,8 +952,8 @@ def compute_gt_cluster_score(pairwise_distances, labels):
             pairwise_distances_subset, axis=0))
     return iteration + 1, gt_cluster_score + this_cluster_score
 
-  _, gt_cluster_score = control_flow_ops.while_loop(
-      func_cond, func_body, [iteration, gt_cluster_score])
+  _, gt_cluster_score = while_loop.while_loop(func_cond, func_body,
+                                              [iteration, gt_cluster_score])
   return gt_cluster_score
 
 
