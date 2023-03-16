@@ -36,8 +36,8 @@ from tensorflow.python.framework import sparse_tensor
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import array_ops_stack
 from tensorflow.python.ops import check_ops
+from tensorflow.python.ops import cond
 from tensorflow.python.ops import control_flow_case
-from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import image_ops
 from tensorflow.python.ops import map_fn
 from tensorflow.python.ops import math_ops
@@ -277,7 +277,7 @@ class BackupHandler(ItemHandler):
 
   def tensors_to_item(self, keys_to_tensors):
     item = self._handler.tensors_to_item(keys_to_tensors)
-    return control_flow_ops.cond(
+    return cond.cond(
         pred=math_ops.equal(math_ops.reduce_prod(array_ops.shape(item)), 0),
         true_fn=lambda: self._backup.tensors_to_item(keys_to_tensors),
         false_fn=lambda: item)
@@ -438,7 +438,7 @@ class Image(ItemHandler):
       """Checks if an image is jpeg."""
       # For jpeg, we directly use image_ops.decode_jpeg rather than decode_image
       # in order to feed the jpeg specify parameter 'dct_method'.
-      return control_flow_ops.cond(
+      return cond.cond(
           image_ops.is_jpeg(image_buffer),
           decode_jpeg,
           decode_image,

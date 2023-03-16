@@ -28,6 +28,7 @@ from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import array_ops_stack  # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.ops import check_ops
+from tensorflow.python.ops import cond
 from tensorflow.python.ops import confusion_matrix
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import math_ops
@@ -1129,7 +1130,7 @@ def _compute_dynamic_auc(labels, predictions, curve='ROC', weights=None):
 
   # If all the labels are the same, AUC isn't well-defined (but raising an
   # exception seems excessive) so we return 0, otherwise we finish computing.
-  return control_flow_ops.cond(
+  return cond.cond(
       math_ops.logical_or(
           math_ops.equal(total_positive, 0),
           math_ops.equal(total_positive, total_weight)),
@@ -1388,7 +1389,7 @@ def _compute_placement_auc(labels, predictions, weights, alpha,
   # exception seems excessive) so we return 0, otherwise we finish computing.
   trivial_value = array_ops.constant(0.0)
 
-  return AucData(*control_flow_ops.cond(
+  return AucData(*cond.cond(
       is_valid, lambda: [auc, lower, upper], lambda: [trivial_value] * 3))
 
 
@@ -1492,7 +1493,7 @@ def auc_with_confidence_intervals(labels,
       is_valid = math_ops.logical_and(all_labels_positive_or_0,
                                       sums_of_weights_at_least_1)
 
-      update_op = control_flow_ops.cond(
+      update_op = cond.cond(
           sums_of_weights_at_least_1, lambda: update_op_for_valid_case,
           control_flow_ops.no_op)
 
@@ -2546,8 +2547,8 @@ def _compute_recall_at_precision(tp, fp, fn, precision, name,
       return math_ops.div(tp[tf_index], tp[tf_index] + fn[tf_index] + _EPSILON,
                           name)
 
-    return control_flow_ops.cond(precisions[tf_index] >= precision,
-                                 _return_good_recall, lambda: .0)
+    return cond.cond(precisions[tf_index] >= precision,
+                     _return_good_recall, lambda: .0)
 
 
 def recall_at_precision(labels,
@@ -3643,9 +3644,9 @@ def streaming_concat(values,
 
     new_size = size + batch_size
     array_size = array_ops.shape_internal(array, optimize=False)[0]
-    maybe_reallocate_op = control_flow_ops.cond(new_size > array_size,
-                                                reallocate,
-                                                control_flow_ops.no_op)
+    maybe_reallocate_op = cond.cond(new_size > array_size,
+                                    reallocate,
+                                    control_flow_ops.no_op)
     with ops.control_dependencies([maybe_reallocate_op]):
       append_values_op = array[size:new_size].assign(batch_values)
     with ops.control_dependencies([append_values_op]):

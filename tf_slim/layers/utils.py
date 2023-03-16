@@ -26,7 +26,7 @@ from collections import OrderedDict
 from tensorflow.python.framework import ops
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.framework import tensor_util
-from tensorflow.python.ops import control_flow_ops
+from tensorflow.python.ops import cond
 from tensorflow.python.ops import variables
 
 __all__ = ['collect_named_outputs',
@@ -217,7 +217,7 @@ def smart_cond(pred, fn1, fn2, name=None):
     return static_cond(pred_value, fn1, fn2)
   else:
     # Use dynamic cond otherwise.
-    return control_flow_ops.cond(pred, fn1, fn2, name)
+    return cond.cond(pred, fn1, fn2, name)
 
 
 def get_variable_collections(variables_collections, name):
