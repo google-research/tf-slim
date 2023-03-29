@@ -40,6 +40,7 @@ from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops
 from tensorflow.python.ops import variable_scope
+from tensorflow.python.ops import variable_v1
 from tensorflow.python.ops import variables
 
 
@@ -2085,11 +2086,11 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
     num_batches = 100
     labels = np.array([])
     predictions = np.array([])
-    tf_labels = variables.VariableV1(
+    tf_labels = variable_v1.VariableV1(
         array_ops.ones(batch_size, dtypes_lib.int32),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.int32)
-    tf_predictions = variables.VariableV1(
+    tf_predictions = variable_v1.VariableV1(
         array_ops.ones(batch_size),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.float32)
@@ -2149,15 +2150,15 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
     labels = np.array([])
     predictions = np.array([])
     weights = np.array([])
-    tf_labels = variables.VariableV1(
+    tf_labels = variable_v1.VariableV1(
         array_ops.ones(batch_size, dtypes_lib.int32),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.int32)
-    tf_predictions = variables.VariableV1(
+    tf_predictions = variable_v1.VariableV1(
         array_ops.ones(batch_size),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.float32)
-    tf_weights = variables.VariableV1(
+    tf_weights = variable_v1.VariableV1(
         array_ops.ones(batch_size),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.float32)
@@ -2328,11 +2329,11 @@ class AucWithConfidenceIntervalsTest(tf1.test.TestCase):
     num_batches = 100
     labels = np.array([])
     predictions = np.array([])
-    tf_labels = variables.VariableV1(
+    tf_labels = variable_v1.VariableV1(
         array_ops.ones(batch_size, dtypes_lib.int32),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.int32)
-    tf_predictions = variables.VariableV1(
+    tf_predictions = variable_v1.VariableV1(
         array_ops.ones(batch_size),
         collections=[ops.GraphKeys.LOCAL_VARIABLES],
         dtype=dtypes_lib.float32)

@@ -41,6 +41,7 @@ from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import partitioned_variables
 from tensorflow.python.ops import resource_variable_ops
 from tensorflow.python.ops import variable_scope
+from tensorflow.python.ops import variable_v1
 from tensorflow.python.ops import variables as variables_lib
 from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
@@ -212,7 +213,7 @@ class GlobalStepTest(test.TestCase):
   def test_invalid_dtype(self):
     with ops.Graph().as_default() as g:
       self.assertEqual(None, variables_lib2.get_global_step())
-      variables_lib.VariableV1(
+      variable_v1.VariableV1(
           0.0,
           trainable=False,
           dtype=dtypes.float32,
@@ -225,14 +226,14 @@ class GlobalStepTest(test.TestCase):
   def test_invalid_shape(self):
     with ops.Graph().as_default() as g:
       self.assertEqual(None, variables_lib2.get_global_step())
-      variables_lib.VariableV1(
-          [0],
-          trainable=False,
-          dtype=dtypes.int32,
-          name=ops.GraphKeys.GLOBAL_STEP,
-          collections=[ops.GraphKeys.GLOBAL_VARIABLES,
-                       ops.GraphKeys.GLOBAL_STEP]
-      )
+      variable_v1.VariableV1([0],
+                             trainable=False,
+                             dtype=dtypes.int32,
+                             name=ops.GraphKeys.GLOBAL_STEP,
+                             collections=[
+                                 ops.GraphKeys.GLOBAL_VARIABLES,
+                                 ops.GraphKeys.GLOBAL_STEP
+                             ])
       self.assertRaisesRegexp(TypeError, 'not scalar',
                               variables_lib2.get_global_step)
     self.assertRaisesRegexp(TypeError, 'not scalar',
@@ -252,14 +253,14 @@ class GlobalStepTest(test.TestCase):
   def test_get_global_step(self):
     with ops.Graph().as_default() as g:
       self.assertEqual(None, variables_lib2.get_global_step())
-      variables_lib.VariableV1(
+      variable_v1.VariableV1(
           0,
           trainable=False,
           dtype=dtypes.int32,
           name=ops.GraphKeys.GLOBAL_STEP,
-          collections=[ops.GraphKeys.GLOBAL_VARIABLES,
-                       ops.GraphKeys.GLOBAL_STEP]
-      )
+          collections=[
+              ops.GraphKeys.GLOBAL_VARIABLES, ops.GraphKeys.GLOBAL_STEP
+          ])
       self._assert_global_step(
           variables_lib2.get_global_step(), expected_dtype=dtypes.int32)
     self._assert_global_step(
@@ -635,10 +636,10 @@ class ModelVariablesTest(test.TestCase):
     with self.cached_session():
       with variable_scope.variable_scope('A'):
         variables_lib2.local_variable([5])
-        a = variables_lib.VariableV1([5])
+        a = variable_v1.VariableV1([5])
       with variable_scope.variable_scope('B'):
         variables_lib2.local_variable([5])
-        b = variables_lib.VariableV1([5])
+        b = variable_v1.VariableV1([5])
       self.assertEqual([a], variables_lib2.get_trainable_variables('A'))
       self.assertEqual([b], variables_lib2.get_trainable_variables('B'))
 
@@ -982,7 +983,7 @@ class AssignFromCheckpointTest(test.TestCase):
       # Create a set of variables to save in the checkpoint.
       for var_name in var_names_to_values:
         var_value = var_names_to_values[var_name]
-        var_list.append(variables_lib.VariableV1(var_value, name=var_name))
+        var_list.append(variable_v1.VariableV1(var_value, name=var_name))
       saver = saver_lib.Saver(var_list)
       init_op = variables_lib.variables_initializer(var_list)
       sess.run(init_op)
@@ -1129,7 +1130,7 @@ class AssignFromCheckpointFnTest(test.TestCase):
       # Create a set of variables to save in the checkpoint.
       for var_name in var_names_to_values:
         var_value = var_names_to_values[var_name]
-        var_list.append(variables_lib.VariableV1(var_value, name=var_name))
+        var_list.append(variable_v1.VariableV1(var_value, name=var_name))
       saver = saver_lib.Saver(var_list)
       init_op = variables_lib.variables_initializer(var_list)
       sess.run(init_op)
@@ -1318,12 +1319,12 @@ class FilterVariablesTest(test.TestCase):
     g = ops.Graph()
     with g.as_default():
       var_list = []
-      var_list.append(variables_lib.VariableV1(0, name='conv1/weights'))
-      var_list.append(variables_lib.VariableV1(0, name='conv1/biases'))
-      var_list.append(variables_lib.VariableV1(0, name='conv2/weights'))
-      var_list.append(variables_lib.VariableV1(0, name='conv2/biases'))
-      var_list.append(variables_lib.VariableV1(0, name='clfs/weights'))
-      var_list.append(variables_lib.VariableV1(0, name='clfs/biases'))
+      var_list.append(variable_v1.VariableV1(0, name='conv1/weights'))
+      var_list.append(variable_v1.VariableV1(0, name='conv1/biases'))
+      var_list.append(variable_v1.VariableV1(0, name='conv2/weights'))
+      var_list.append(variable_v1.VariableV1(0, name='conv2/biases'))
+      var_list.append(variable_v1.VariableV1(0, name='clfs/weights'))
+      var_list.append(variable_v1.VariableV1(0, name='clfs/biases'))
       self._var_list = var_list
 
   def _test_filter_variables(self,
