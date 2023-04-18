@@ -141,7 +141,6 @@ import time
 import tensorflow.compat.v1 as tf
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.checkpoint import checkpoint_management
-from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import basic_session_run_hooks
 from tensorflow.python.training import evaluation
@@ -187,7 +186,7 @@ def wait_for_new_checkpoint(checkpoint_dir,
   Returns:
     a new checkpoint path, or None if the timeout was reached.
   """
-  logging.info('Waiting for new checkpoint at %s', checkpoint_dir)
+  tf.logging.info('Waiting for new checkpoint at %s', checkpoint_dir)
   stop_time = time.time() + timeout if timeout is not None else None
   while True:
     checkpoint_path = checkpoint_management.latest_checkpoint(checkpoint_dir)
@@ -196,7 +195,7 @@ def wait_for_new_checkpoint(checkpoint_dir,
         return None
       time.sleep(seconds_to_sleep)
     else:
-      logging.info('Found new checkpoint at %s', checkpoint_path)
+      tf.logging.info('Found new checkpoint at %s', checkpoint_path)
       return checkpoint_path
 
 
@@ -249,7 +248,7 @@ def checkpoints_iterator(checkpoint_dir,
     if new_checkpoint_path is None:
       if not timeout_fn:
         # timed out
-        logging.info('Timed-out waiting for a checkpoint.')
+        tf.logging.info('Timed-out waiting for a checkpoint.')
         return
       if timeout_fn():
         # The timeout_fn indicated that we are truly done.
@@ -447,14 +446,18 @@ def evaluate_repeatedly(checkpoint_dir,
 
     with monitored_session.MonitoredSession(
         session_creator=session_creator, hooks=hooks) as session:
-      logging.info('Starting evaluation at ' +
-                   time.strftime('%Y-%m-%d-%H:%M:%S', time.gmtime()))
+      tf.logging.info(
+          'Starting evaluation at '
+          + time.strftime('%Y-%m-%d-%H:%M:%S', time.gmtime())
+      )
       if eval_ops is not None:
         while not session.should_stop():
           session.run(eval_ops, feed_dict)
 
-      logging.info('Finished evaluation at ' +
-                   time.strftime('%Y-%m-%d-%H:%M:%S', time.gmtime()))
+      tf.logging.info(
+          'Finished evaluation at '
+          + time.strftime('%Y-%m-%d-%H:%M:%S', time.gmtime())
+      )
     num_evaluations += 1
 
     if (max_number_of_evaluations is not None and

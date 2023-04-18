@@ -38,7 +38,6 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import image_ops
 from tensorflow.python.ops import io_ops
 from tensorflow.python.ops import parsing_ops
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 # pylint:enable=g-direct-tensorflow-import
 
@@ -54,8 +53,8 @@ def _resize_image(image, height, width):
 
 
 def _create_tfrecord_dataset(tmpdir):
-  if not gfile.Exists(tmpdir):
-    gfile.MakeDirs(tmpdir)
+  if not tf.gfile.Exists(tmpdir):
+    tf.gfile.MakeDirs(tmpdir)
 
   data_sources = test_utils.create_tfrecord_files(tmpdir, num_files=1)
 

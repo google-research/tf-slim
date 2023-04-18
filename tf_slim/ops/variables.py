@@ -31,7 +31,6 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
-from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.training import saver as tf_saver
 from tensorflow.python.training import training_util
 from tensorflow.python.util.deprecation import deprecated
@@ -640,7 +639,7 @@ def assign_from_checkpoint(model_path, var_list, ignore_missing_vars=False):
     if not reader.has_tensor(ckpt_name):
       log_str = 'Checkpoint is missing variable [%s]' % ckpt_name
       if ignore_missing_vars:
-        logging.warning(log_str)
+        tf.logging.warning(log_str)
         continue
       else:
         raise ValueError(log_str)
@@ -720,7 +719,9 @@ def assign_from_checkpoint_fn(model_path,
       if reader.has_tensor(var):
         available_vars[var] = var_dict[var]
       else:
-        logging.warning('Variable %s missing in checkpoint %s', var, model_path)
+        tf.logging.warning(
+            'Variable %s missing in checkpoint %s', var, model_path
+        )
     var_list = available_vars
   if var_list:
     saver = tf_saver.Saver(
@@ -733,7 +734,7 @@ def assign_from_checkpoint_fn(model_path,
 
     return callback
   else:
-    logging.warning('No Variables to restore')
+    tf.logging.warning('No Variables to restore')
     return None
 
 

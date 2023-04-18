@@ -45,7 +45,6 @@ from tensorflow.python.ops import metrics
 from tensorflow.python.ops import state_ops
 from tensorflow.python.ops import variables as variables_lib
 
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.summary import summary as summary_lib
 from tensorflow.python.summary import summary_iterator
@@ -70,8 +69,8 @@ class CheckpointIteratorTest(test.TestCase):
 
   def testReturnsSingleCheckpointIfOneCheckpointFound(self):
     checkpoint_dir = tempfile.mkdtemp('one_checkpoint_found')
-    if not gfile.Exists(checkpoint_dir):
-      gfile.MakeDirs(checkpoint_dir)
+    if not tf.gfile.Exists(checkpoint_dir):
+      tf.gfile.MakeDirs(checkpoint_dir)
 
     global_step = variables.get_or_create_global_step()
     saver = saver_lib.Saver()  # Saves the global step.
@@ -88,8 +87,8 @@ class CheckpointIteratorTest(test.TestCase):
 
   def testReturnsSingleCheckpointIfOneShardedCheckpoint(self):
     checkpoint_dir = tempfile.mkdtemp('one_checkpoint_found_sharded')
-    if not gfile.Exists(checkpoint_dir):
-      gfile.MakeDirs(checkpoint_dir)
+    if not tf.gfile.Exists(checkpoint_dir):
+      tf.gfile.MakeDirs(checkpoint_dir)
 
     global_step = variables.get_or_create_global_step()
 
@@ -333,8 +332,8 @@ class EvaluateRepeatedlyTest(test.TestCase):
 
   def testEvaluationLoopTimeout(self):
     checkpoint_dir = tempfile.mkdtemp('evaluation_loop_timeout')
-    if not gfile.Exists(checkpoint_dir):
-      gfile.MakeDirs(checkpoint_dir)
+    if not tf.gfile.Exists(checkpoint_dir):
+      tf.gfile.MakeDirs(checkpoint_dir)
 
     # We need a variable that the saver will try to restore.
     variables.get_or_create_global_step()
@@ -464,8 +463,8 @@ class EvaluateRepeatedlyTest(test.TestCase):
   def testSummariesAreFlushedToDisk(self):
     checkpoint_dir = tempfile.mkdtemp('summaries_are_flushed')
     logdir = tempfile.mkdtemp('summaries_are_flushed_eval')
-    if gfile.Exists(logdir):
-      gfile.DeleteRecursively(logdir)
+    if tf.gfile.Exists(logdir):
+      tf.gfile.DeleteRecursively(logdir)
 
     # Train a Model to completion:
     self._train_model(checkpoint_dir, num_steps=300)
@@ -491,8 +490,8 @@ class EvaluateRepeatedlyTest(test.TestCase):
 
   def testSummaryAtEndHookWithoutSummaries(self):
     logdir = tempfile.mkdtemp('summary_at_end_hook_without_summaires')
-    if gfile.Exists(logdir):
-      gfile.DeleteRecursively(logdir)
+    if tf.gfile.Exists(logdir):
+      tf.gfile.DeleteRecursively(logdir)
 
     with ops.Graph().as_default():
       # Purposefully don't add any summaries. The hook will just dump the

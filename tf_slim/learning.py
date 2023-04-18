@@ -255,6 +255,8 @@ import os
 import sys
 import time
 
+import tensorflow as tf
+
 from tf_slim.training import training
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.core.protobuf import config_pb2
@@ -270,7 +272,6 @@ from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import lookup_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import variables
-from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import optimizer as tf_optimizer
 from tensorflow.python.training import saver as tf_saver
@@ -371,7 +372,7 @@ def add_gradients_summaries(grads_and_vars):
           summary.scalar(var.op.name + '/gradient_norm',
                          clip_ops.global_norm([grad_values])))
     else:
-      logging.info('Var %s has no gradient', var.op.name)
+      tf.compat.v1.logging.info('Var %s has no gradient', var.op.name)
 
   return summaries
 
@@ -501,7 +502,7 @@ def train_step(sess, train_op, global_step, train_step_kwargs):
     trace = tl.generate_chrome_trace_format()
     trace_filename = os.path.join(train_step_kwargs['logdir'],
                                   'tf_trace-%d.json' % np_global_step)
-    logging.info('Writing trace to %s', trace_filename)
+    tf.compat.v1.logging.info('Writing trace to %s', trace_filename)
     file_io.write_string_to_file(trace_filename, trace)
     if 'summary_writer' in train_step_kwargs:
       train_step_kwargs['summary_writer'].add_run_metadata(
@@ -509,8 +510,12 @@ def train_step(sess, train_op, global_step, train_step_kwargs):
 
   if 'should_log' in train_step_kwargs:
     if sess.run(train_step_kwargs['should_log']):
-      logging.info('global step %d: loss = %.4f (%.3f sec/step)',
-                   np_global_step, total_loss, time_elapsed)
+      tf.compat.v1.logging.info(
+          'global step %d: loss = %.4f (%.3f sec/step)',
+          np_global_step,
+          total_loss,
+          time_elapsed,
+      )
 
   if 'should_stop' in train_step_kwargs:
     should_stop = sess.run(train_step_kwargs['should_stop'])
@@ -744,10 +749,11 @@ def train(train_op,
       should_retry = False
       with sv.managed_session(
           master, start_standard_services=False, config=session_config) as sess:
-        logging.info('Starting Session.')
+        tf.compat.v1.logging.info('Starting Session.')
         if session_wrapper is not None:
-          logging.info('Wrapping session with wrapper function: %s',
-                       session_wrapper)
+          tf.compat.v1.logging.info(
+              'Wrapping session with wrapper function: %s', session_wrapper
+          )
           sess = session_wrapper(sess)
         if is_chief:
           if logdir:
@@ -758,7 +764,7 @@ def train(train_op,
               sess, global_step,
               min(startup_delay_steps, number_of_steps or sys.maxsize))
         threads = sv.start_queue_runners(sess)
-        logging.info('Starting Queues.')
+        tf.compat.v1.logging.info('Starting Queues.')
         if is_chief and sync_optimizer is not None:
           sv.start_queue_runners(sess, chief_queue_runner)
           sess.run(init_tokens_op)
@@ -767,25 +773,28 @@ def train(train_op,
             total_loss, should_stop = train_step_fn(sess, train_op, global_step,
                                                     train_step_kwargs)
             if should_stop:
-              logging.info('Stopping Training.')
+              tf.compat.v1.logging.info('Stopping Training.')
               sv.request_stop()
               break
         except errors.OutOfRangeError as e:
           # OutOfRangeError is thrown when epoch limit per
           # tf.compat.v1.train.limit_epochs is reached.
-          logging.info('Caught OutOfRangeError. Stopping Training. %s', e)
+          tf.compat.v1.logging.info(
+              'Caught OutOfRangeError. Stopping Training. %s', e
+          )
         if logdir and sv.is_chief:
-          logging.info('Finished training! Saving model to disk.')
+          tf.compat.v1.logging.info('Finished training! Saving model to disk.')
           sv.saver.save(sess, sv.save_path, global_step=sv.global_step)
           sv.stop(
               threads,
               close_summary_writer=True,
-              ignore_live_threads=ignore_live_threads)
+              ignore_live_threads=ignore_live_threads,
+          )
 
     except errors.AbortedError:
       # Always re-run on AbortedError as it indicates a restart of one of the
       # distributed tensorflow servers.
-      logging.info('Retrying training!')
+      tf.compat.v1.logging.info('Retrying training!')
       should_retry = True
 
   return total_loss

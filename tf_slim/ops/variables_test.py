@@ -43,7 +43,6 @@ from tensorflow.python.ops import resource_variable_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variable_v1
 from tensorflow.python.ops import variables as variables_lib
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import device_setter
 from tensorflow.python.training import saver as saver_lib
@@ -1139,8 +1138,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   def testLoadExistingVariables(self):
     model_dir = tempfile.mkdtemp('load_existing_variables')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = 10.0
     init_value1 = 20.0
@@ -1169,8 +1168,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
   @unittest.skip('sess.run functionality difference in v2.0')
   def testLoadExistingVariablesDifferentShapeDefaultDoesNotAllowReshape(self):
     model_dir = tempfile.mkdtemp('load_existing_vars_no_reshape')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = [[10.0, 11.0]]
     init_value1 = 20.0
@@ -1196,8 +1195,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
   def testLoadExistingVariablesDifferentShapeAllowReshape(self):
     model_dir = tempfile.mkdtemp(
         'load_existing_variables_different_shape_allow_reshape')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = [[10.0, 11.0]]
     init_value1 = 20.0
@@ -1225,8 +1224,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   def testNotFoundError(self):
     model_dir = tempfile.mkdtemp('not_found_error')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = 10.0
     init_value1 = 20.0
@@ -1252,8 +1251,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   def testMissingVariablesList(self):
     model_dir = tempfile.mkdtemp('missing_variables_list')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = 10.0
     init_value1 = 20.0
@@ -1282,8 +1281,8 @@ class AssignFromCheckpointFnTest(test.TestCase):
 
   def testMissingVariablesDict(self):
     model_dir = tempfile.mkdtemp('missing_variables_dict')
-    if gfile.Exists(model_dir):
-      gfile.DeleteRecursively(model_dir)
+    if tf.gfile.Exists(model_dir):
+      tf.gfile.DeleteRecursively(model_dir)
 
     init_value0 = 10.0
     init_value1 = 20.0

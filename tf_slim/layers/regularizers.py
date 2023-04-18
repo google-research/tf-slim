@@ -20,13 +20,13 @@ from __future__ import division
 from __future__ import print_function
 
 import numbers
+import tensorflow as tf
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
 from tensorflow.python.ops import standard_ops
-from tensorflow.python.platform import tf_logging as logging
 
 __all__ = ['l1_regularizer',
            'l2_regularizer',
@@ -57,7 +57,7 @@ def l1_regularizer(scale, scope=None):
       raise ValueError('Setting a scale less than 0 on a regularizer: %g' %
                        scale)
     if scale == 0.:
-      logging.info('Scale of 0 disables regularizer.')
+      tf.compat.v1.logging.info('Scale of 0 disables regularizer.')
       return lambda _: None
 
   def l1(weights, name=None):
@@ -96,7 +96,7 @@ def l2_regularizer(scale, scope=None):
       raise ValueError('Setting a scale less than 0 on a regularizer: %g.' %
                        scale)
     if scale == 0.:
-      logging.info('Scale of 0 disables regularizer.')
+      tf.compat.v1.logging.info('Scale of 0 disables regularizer.')
       return lambda _: None
 
   def l2(weights):

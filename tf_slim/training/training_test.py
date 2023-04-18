@@ -38,7 +38,6 @@ from tensorflow.python.ops import gradients_impl
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import variables as variables_lib2
 
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.training import basic_session_run_hooks
 from tensorflow.python.training import gradient_descent
@@ -386,10 +385,10 @@ class TrainTest(test.TestCase):
     logdir1 = tempfile.mkdtemp('tmp_logs1/')
     logdir2 = tempfile.mkdtemp('tmp_logs2/')
 
-    if gfile.Exists(logdir1):  # For running on jenkins.
-      gfile.DeleteRecursively(logdir1)
-    if gfile.Exists(logdir2):  # For running on jenkins.
-      gfile.DeleteRecursively(logdir2)
+    if tf.gfile.Exists(logdir1):  # For running on jenkins.
+      tf.gfile.DeleteRecursively(logdir1)
+    if tf.gfile.Exists(logdir2):  # For running on jenkins.
+      tf.gfile.DeleteRecursively(logdir2)
 
     # First, train the model one step (make sure the error is high).
     with ops.Graph().as_default():
@@ -462,8 +461,8 @@ class TrainTest(test.TestCase):
 
   def testTrainAllVarsHasLowerLossThanTrainSubsetOfVars(self):
     logdir = tempfile.mkdtemp('tmp_logs3/')
-    if gfile.Exists(logdir):  # For running on jenkins.
-      gfile.DeleteRecursively(logdir)
+    if tf.gfile.Exists(logdir):  # For running on jenkins.
+      tf.gfile.DeleteRecursively(logdir)
 
     # First, train only the weights of the model.
     with ops.Graph().as_default():
