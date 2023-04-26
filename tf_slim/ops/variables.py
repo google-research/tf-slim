@@ -145,7 +145,7 @@ def local_variable(initial_value,
   Returns:
     New variable.
   """
-  return variable_scope.variable(
+  return tf.Variable(
       initial_value,
       trainable=False,
       collections=[ops.GraphKeys.LOCAL_VARIABLES],
@@ -169,7 +169,7 @@ def global_variable(initial_value,
   Returns:
     New variable.
   """
-  return variable_scope.variable(
+  return tf.Variable(
       initial_value,
       trainable=False,
       collections=[ops.GraphKeys.GLOBAL_VARIABLES],
