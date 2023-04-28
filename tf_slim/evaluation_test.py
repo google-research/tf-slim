@@ -43,7 +43,6 @@ from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import metrics
 from tensorflow.python.ops import variables
 from tensorflow.python.platform import flags
-from tensorflow.python.platform import gfile
 from tensorflow.python.platform import test
 from tensorflow.python.summary import summary_iterator
 from tensorflow.python.training import input  # pylint: disable=redefined-builtin
@@ -214,9 +213,9 @@ class EvaluationTest(test.TestCase):
                                      variables.local_variables_initializer())
     # Create checkpoint and log directories:
     chkpt_dir = tempfile.mkdtemp('tmp_logs')
-    gfile.MakeDirs(chkpt_dir)
+    tf.gfile.MakeDirs(chkpt_dir)
     logdir = tempfile.mkdtemp('tmp_logs2')
-    gfile.MakeDirs(logdir)
+    tf.gfile.MakeDirs(logdir)
 
     # Save initialized variables to a checkpoint directory:
     saver = saver_lib.Saver()

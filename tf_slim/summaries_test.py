@@ -28,7 +28,6 @@ from tf_slim import summaries
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import array_ops
-from tensorflow.python.platform import test
 from tensorflow.python.summary import summary
 from tensorflow.python.summary import summary_iterator
 # pylint:enable=g-direct-tensorflow-import
@@ -38,7 +37,7 @@ def setUpModule():
   tf.disable_eager_execution()
 
 
-class SummariesTest(test.TestCase):
+class SummariesTest(tf.test.TestCase):
 
   def assert_scalar_summary(self, output_dir, names_to_values):
     """Asserts that the given output directory contains written summaries.
@@ -104,4 +103,4 @@ class SummariesTest(test.TestCase):
 
 
 if __name__ == '__main__':
-  test.main()
+  tf.test.main()

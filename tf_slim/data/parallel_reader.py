@@ -19,13 +19,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow as tf
+
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes as tf_dtypes
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.ops import io_ops
 from tensorflow.python.ops import math_ops
-from tensorflow.python.platform import gfile
 from tensorflow.python.summary import summary
 from tensorflow.python.training import input as tf_input
 from tensorflow.python.training import queue_runner
@@ -312,7 +313,7 @@ def get_data_files(data_sources):
       data_files += get_data_files(source)
   else:
     if '*' in data_sources or '?' in data_sources or '[' in data_sources:
-      data_files = gfile.Glob(data_sources)
+      data_files = tf.compat.v1.gfile.Glob(data_sources)
     else:
       data_files = [data_sources]
   if not data_files:

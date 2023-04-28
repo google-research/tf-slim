@@ -246,6 +246,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import tensorflow as tf
+
 # pylint: disable=g-direct-tensorflow-import
 
 from tensorflow.python.framework import indexed_slices
@@ -254,7 +256,6 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import clip_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import variables as tf_variables
-from tensorflow.python.platform import tf_logging as logging
 from tensorflow.python.summary import summary
 from tensorflow.python.training import monitored_session
 from tensorflow.python.training import optimizer as tf_optimizer
@@ -293,7 +294,7 @@ def add_gradients_summaries(grads_and_vars):
           summary.scalar(var.op.name + '_gradient_norm',
                          clip_ops.global_norm([grad_values])))
     else:
-      logging.info('Var %s has no gradient', var.op.name)
+      tf.compat.v1.logging.info('Var %s has no gradient', var.op.name)
 
   return summaries
 
@@ -423,8 +424,10 @@ def create_train_op(total_loss,
   else:
     update_ops = set(update_ops)
   if not global_update_ops.issubset(update_ops):
-    logging.warning('update_ops in create_train_op does not contain all the '
-                    'update_ops in GraphKeys.UPDATE_OPS')
+    tf.compat.v1.logging.warning(
+        'update_ops in create_train_op does not contain all the '
+        'update_ops in GraphKeys.UPDATE_OPS'
+    )
 
   # Make sure update_ops are computed before total_loss.
   if update_ops:
