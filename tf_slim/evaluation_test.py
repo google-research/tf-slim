@@ -288,7 +288,7 @@ class SingleEvaluationTest(test.TestCase):
         labels=self._labels, predictions=self._predictions)
 
     dumping_root = tempfile.mkdtemp('tfdbg_dump_dir')
-    dumping_hook = hooks.DumpingDebugHook(dumping_root, log_usage=False)
+    dumping_hook = hooks.DumpingDebugHook(dumping_root)
     try:
       # Run the evaluation and verify the results:
       accuracy_value = evaluation.evaluate_once(
