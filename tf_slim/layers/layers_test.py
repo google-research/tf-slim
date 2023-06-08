@@ -2703,7 +2703,7 @@ class BatchNormTest(test.TestCase):
   def _runBatchNormalizationWithFormat(self, shape, data_format, is_training):
     channels = shape[-1]
     with self.session(use_gpu=True) as sess:
-      images = np.arange(np.product(shape), dtype=np.float32).reshape(shape)
+      images = np.arange(np.prod(shape), dtype=np.float32).reshape(shape)
       beta = init_ops.constant_initializer(
           np.arange(2, channels + 2, dtype=np.float32))
       gamma = init_ops.constant_initializer(
@@ -2789,7 +2789,7 @@ class BatchNormTest(test.TestCase):
 
   def _runFusedBatchNorm(self, shape, dtype):
     channels = shape[1]
-    images = np.arange(np.product(shape), dtype=dtype).reshape(shape)
+    images = np.arange(np.prod(shape), dtype=dtype).reshape(shape)
     beta = init_ops.constant_initializer(
         np.arange(2, channels + 2, dtype=np.float32))
     gamma = init_ops.constant_initializer(

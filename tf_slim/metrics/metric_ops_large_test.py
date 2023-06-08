@@ -63,7 +63,7 @@ class StreamingPrecisionRecallAtEqualThresholdsLargeTest(test.TestCase):
       # Since we use random values, we won't know the tp/fp/tn/fn values, but
       # tp and fp at threshold 0 should be the total number of positive and
       # negative labels, hence their sum should be total number of pixels.
-      expected_value = 1.0 * np.product(shape) * num_updates
+      expected_value = 1.0 * np.prod(shape) * num_updates
       got_value = prdata.tp[0] + prdata.fp[0]
       # They should be at least within 1.
       self.assertNear(got_value, expected_value, 1.0)
