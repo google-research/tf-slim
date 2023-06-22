@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import contextlib
 import functools
 import re
 import tensorflow.compat.v1 as tf
@@ -239,7 +240,9 @@ def variable(name,
   if custom_getter is not None:
     getter = functools.partial(
         custom_getter, reuse=variable_scope.get_variable_scope().reuse)
-  with ops.device(device or ''):
+  with contextlib.ExitStack() as es:
+    if device is not None:
+      es.enter_context(ops.device(device))
     return getter(
         name,
         shape=shape,
