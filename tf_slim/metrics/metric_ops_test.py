@@ -6756,6 +6756,23 @@ class StreamingConcatTest(tf1.test.TestCase):
       self.assertEqual(next_array_size(5, growth_factor=2).eval(), 8)
       self.assertEqual(next_array_size(6, growth_factor=2).eval(), 8)
 
+  def testNextArraySizeHandlesLargeSizes(self):
+    # Tests that next_array_size() always returns a large-enough array size.
+    # Test around the boundaries where off-by-one errors are most likely.
+    growth_factor = 1.5
+    validity_limit = 2**30
+    exponent_limit = math.ceil(
+        math.log(validity_limit) / math.log(growth_factor)
+    )
+    required_size = array_ops.placeholder(dtypes_lib.int32, [])
+    outputed_size = _next_array_size(required_size, growth_factor)
+    with self.cached_session():
+      for exponent in range(exponent_limit):
+        center = math.ceil(growth_factor**exponent)
+        for x in range(max(1, center - 100), center + 100):
+          self.assertGreaterEqual(
+              outputed_size.eval(feed_dict={required_size: x}), x)
+
   def testStreamingConcat(self):
     with self.cached_session() as sess:
       values = array_ops.placeholder(dtypes_lib.int32, [None])

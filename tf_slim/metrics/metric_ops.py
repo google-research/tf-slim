@@ -3541,9 +3541,10 @@ def _next_array_size(required_size, growth_factor=1.5):
   Returns:
     tf.Tensor with dtype=int32 giving the next array size.
   """
+  required_size = math_ops.cast(required_size, dtypes.float64)
+  growth_factor = math_ops.cast(growth_factor, dtypes.float64)
   exponent = math_ops.ceil(
-      math_ops.log(math_ops.cast(required_size, dtypes.float32)) /
-      math_ops.log(math_ops.cast(growth_factor, dtypes.float32)))
+      math_ops.log(required_size) / math_ops.log(growth_factor))
   return math_ops.cast(math_ops.ceil(growth_factor**exponent), dtypes.int32)
 
 
