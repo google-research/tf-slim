@@ -6940,10 +6940,10 @@ class CountTest(tf1.test.TestCase):
 
   def testReturnType(self):
     c, op = metrics.count(array_ops.ones([4, 3]))
-    self.assertIsInstance(c, ops.Tensor)
+    self.assertIsInstance(c, tf2.Tensor)
     # Note: If resource variables are enabeld the result is a Variable
     # (AssignAdd)
-    self.assertIsInstance(op, (ops.Operation, ops.Tensor, tf2.Variable))
+    self.assertIsInstance(op, (ops.Operation, tf2.Tensor, tf2.Variable))
 
   def testBasic(self):
     with self.cached_session() as sess:

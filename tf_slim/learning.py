@@ -338,7 +338,7 @@ def multiply_gradients(grads_and_vars, gradient_multipliers):
         raise ValueError('Requested multiple of `None` gradient.')
 
       multiplier = gradient_multipliers[key]
-      if not isinstance(multiplier, ops.Tensor):
+      if not isinstance(multiplier, tf.Tensor):
         multiplier = constant_op.constant(multiplier, dtype=grad.dtype)
 
       if isinstance(grad, indexed_slices.IndexedSlices):

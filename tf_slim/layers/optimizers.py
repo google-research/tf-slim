@@ -24,6 +24,7 @@ import six
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import indexed_slices
 from tensorflow.python.framework import ops
+from tensorflow.python.framework import tensor
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import check_ops
 from tensorflow.python.ops import clip_ops
@@ -170,7 +171,7 @@ def optimize_loss(loss,
     # Learning rate variable, with possible decay.
     lr = None
     if learning_rate is not None:
-      if (isinstance(learning_rate, ops.Tensor) and
+      if (isinstance(learning_rate, tensor.Tensor) and
           learning_rate.get_shape().ndims == 0):
         lr = learning_rate
       elif isinstance(learning_rate, float):

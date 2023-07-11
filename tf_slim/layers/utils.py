@@ -24,6 +24,7 @@ from collections import OrderedDict
 
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import ops
+from tensorflow.python.framework import tensor as tensor_lib
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.framework import tensor_util
 from tensorflow.python.ops import cond
@@ -160,7 +161,9 @@ def constant_value(value_or_tensor_or_var, dtype=None):
   if value_or_tensor_or_var is None:
     raise ValueError('value_or_tensor_or_var cannot be None')
   value = value_or_tensor_or_var
-  if isinstance(value_or_tensor_or_var, (ops.Tensor, variables.Variable)):
+  if isinstance(
+      value_or_tensor_or_var, (tensor_lib.Tensor, variables.Variable)
+  ):
     if dtype and value_or_tensor_or_var.dtype != dtype:
       raise ValueError('It has the wrong type %s instead of %s' % (
           value_or_tensor_or_var.dtype, dtype))
