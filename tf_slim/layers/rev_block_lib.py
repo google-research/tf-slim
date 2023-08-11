@@ -41,6 +41,7 @@ from tensorflow.python import tf2
 from tensorflow.python.eager import backprop
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops as framework_ops
+from tensorflow.python.framework import tensor as tensor_lib
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.ops import control_flow_util
@@ -505,7 +506,7 @@ def recompute_grad(fn, use_data_dep=_USE_DEFAULT, tupleize_grads=False):
     closed_over_vars = dict(zip(fn.__code__.co_freevars,
                                 [c.cell_contents for c in fn.__closure__]))
     for var_name, value in six.iteritems(closed_over_vars):
-      if isinstance(value, (framework_ops.Tensor, variables_lib.Variable)):
+      if isinstance(value, (tensor_lib.Tensor, variables_lib.Variable)):
         raise ValueError(
             "fn decorated with @recompute_grad closes over Tensor %s "
             "(local variable name: %s). The decorated fn must not close over "
@@ -597,7 +598,7 @@ def _recompute_grad(fn, args, use_data_dep=_USE_DEFAULT, tupleize_grads=False):
   """See recompute_grad."""
   has_is_recompute_kwarg = "is_recomputing" in tf_inspect.getargspec(fn).args
   for arg in args:
-    if not isinstance(arg, (framework_ops.Tensor, variables_lib.Variable)):
+    if not isinstance(arg, (tensor_lib.Tensor, variables_lib.Variable)):
       raise ValueError("All inputs to function must be Tensors")
   use_data_dep_ = use_data_dep
   if use_data_dep_ == _USE_DEFAULT:
