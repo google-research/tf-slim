@@ -40,6 +40,7 @@ from tensorflow.python.ops import init_ops
 from tensorflow.python.ops import nn_ops
 from tensorflow.python.ops import partitioned_variables
 from tensorflow.python.ops import resource_variable_ops
+from tensorflow.python.ops import resource_variables_toggle
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variable_v1
 from tensorflow.python.ops import variables as variables_lib
@@ -54,13 +55,13 @@ def setUpModule():
 
 @contextlib.contextmanager
 def temporary_disable_resource_variables():
-  enabled = variable_scope.resource_variables_enabled()
+  enabled = resource_variables_toggle.resource_variables_enabled()
   try:
-    variable_scope.disable_resource_variables()
+    resource_variables_toggle.disable_resource_variables()
     yield
   finally:
     if enabled:
-      variable_scope.enable_resource_variables()
+      resource_variables_toggle.enable_resource_variables()
 
 
 class LocalVariableTest(test.TestCase):

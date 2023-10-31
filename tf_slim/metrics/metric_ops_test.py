@@ -39,7 +39,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import data_flow_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import random_ops
-from tensorflow.python.ops import variable_scope
+from tensorflow.python.ops import resource_variables_toggle
 from tensorflow.python.ops import variable_v1
 from tensorflow.python.ops import variables
 
@@ -6726,7 +6726,7 @@ class StreamingConcatTest(tf1.test.TestCase):
 
   def setUp(self):
     super(StreamingConcatTest, self).setUp()
-    variable_scope.enable_resource_variables()
+    resource_variables_toggle.enable_resource_variables()
 
   def testVars(self):
     metrics.streaming_concat(values=array_ops.ones((10,)))

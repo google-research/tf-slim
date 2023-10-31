@@ -32,6 +32,7 @@ from tensorflow.python.framework import random_seed
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import init_ops
 from tensorflow.python.ops import math_ops
+from tensorflow.python.ops import resource_variables_toggle
 from tensorflow.python.ops import state_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables
@@ -45,11 +46,11 @@ def setUpModule():
 
 def disable_resource_variables(f):
   def wrapper(*args, **kwargs):
-    variable_scope.disable_resource_variables()
+    resource_variables_toggle.disable_resource_variables()
     try:
       f(*args, **kwargs)
     finally:
-      variable_scope.enable_resource_variables()
+      resource_variables_toggle.enable_resource_variables()
   return wrapper
 
 
