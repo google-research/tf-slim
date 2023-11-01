@@ -26,7 +26,6 @@ from tensorflow.python.framework import constant_op
 from tensorflow.python.framework import ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
-from tensorflow.python.ops import standard_ops
 
 __all__ = ['l1_regularizer',
            'l2_regularizer',
@@ -66,9 +65,9 @@ def l1_regularizer(scale, scope=None):
       my_scale = ops.convert_to_tensor(scale,
                                        dtype=weights.dtype.base_dtype,
                                        name='scale')
-      return standard_ops.multiply(
+      return math_ops.multiply(
           my_scale,
-          standard_ops.reduce_sum(standard_ops.abs(weights)),
+          math_ops.reduce_sum(math_ops.abs(weights)),
           name=name)
 
   return l1
@@ -105,7 +104,7 @@ def l2_regularizer(scale, scope=None):
       my_scale = ops.convert_to_tensor(scale,
                                        dtype=weights.dtype.base_dtype,
                                        name='scale')
-      return standard_ops.multiply(my_scale, nn.l2_loss(weights), name=name)
+      return math_ops.multiply(my_scale, nn.l2_loss(weights), name=name)
 
   return l2
 

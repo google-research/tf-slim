@@ -24,7 +24,7 @@ import re
 # pylint: disable=g-direct-tensorflow-import
 from tensorflow.python.framework import dtypes
 from tensorflow.python.framework import ops
-from tensorflow.python.ops import standard_ops
+from tensorflow.python.ops import math_ops
 from tensorflow.python.summary import summary
 
 __all__ = [
@@ -88,17 +88,17 @@ def summarize_activation(op):
   if op.op.type in ('Relu', 'Softplus', 'Relu6'):
     # Using inputs to avoid floating point equality and/or epsilons.
     _add_scalar_summary(
-        standard_ops.reduce_mean(
-            standard_ops.to_float(
-                standard_ops.less(op.op.inputs[
-                    0], standard_ops.cast(0.0, op.op.inputs[0].dtype)))),
+        math_ops.reduce_mean(
+            math_ops.to_float(
+                math_ops.less(op.op.inputs[
+                    0], math_ops.cast(0.0, op.op.inputs[0].dtype)))),
         '%s/zeros' % op.op.name)
   if op.op.type == 'Relu6':
     _add_scalar_summary(
-        standard_ops.reduce_mean(
-            standard_ops.to_float(
-                standard_ops.greater(op.op.inputs[
-                    0], standard_ops.cast(6.0, op.op.inputs[0].dtype)))),
+        math_ops.reduce_mean(
+            math_ops.to_float(
+                math_ops.greater(op.op.inputs[
+                    0], math_ops.cast(6.0, op.op.inputs[0].dtype)))),
         '%s/sixes' % op.op.name)
   return _add_histogram_summary(op, '%s/activation' % op.op.name)
 

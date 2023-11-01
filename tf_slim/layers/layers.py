@@ -45,7 +45,6 @@ from tensorflow.python.ops import linalg_ops
 from tensorflow.python.ops import math_ops
 from tensorflow.python.ops import nn
 from tensorflow.python.ops import sparse_ops
-from tensorflow.python.ops import standard_ops
 from tensorflow.python.ops import variable_scope
 from tensorflow.python.ops import variables as tf_variables
 from tensorflow.python.training import moving_averages
@@ -2585,8 +2584,8 @@ def one_hot_encoding(labels,
   with ops.name_scope(scope, 'OneHotEncoding', [labels, num_classes]) as sc:
     labels = ops.convert_to_tensor(labels)
     if labels.dtype == dtypes.int32:
-      labels = standard_ops.to_int64(labels)
-    outputs = standard_ops.one_hot(
+      labels = math_ops.to_int64(labels)
+    outputs = array_ops.one_hot(
         labels, num_classes, on_value=on_value, off_value=off_value)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
@@ -3301,7 +3300,7 @@ def legacy_fully_connected(x,
         trainable=trainable)
     x_2_dim = x if len(dims) <= 2 else array_ops.reshape(
         x, [-1, num_input_units])
-    y = standard_ops.matmul(x_2_dim, w)
+    y = math_ops.matmul(x_2_dim, w)
 
     if bias_init is not None:
       bias_collections = set(
