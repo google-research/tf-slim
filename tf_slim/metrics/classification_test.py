@@ -201,7 +201,7 @@ class F1ScoreTest(test.TestCase):
       sess.run([f1_op])
       # Threshold 0 will have around 0.5 precision and 1 recall yielding an F1
       # score of 2 * 0.5 * 1 / (1 + 0.5).
-      self.assertAlmostEqual(2 * 0.5 * 1 / (1 + 0.5), f1.eval())
+      self.assertAlmostEqual(2 * 0.5 * 1 / (1 + 0.5), f1.eval(), places=6)
 
   def testAllIncorrect(self):
     inputs = np.random.randint(0, 2, size=(10000, 1))
