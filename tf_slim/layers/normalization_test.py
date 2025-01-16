@@ -42,23 +42,23 @@ class InstanceNormTest(test.TestCase):
 
   def testUnknownShape(self):
     inputs = array_ops.placeholder(dtypes.float32)
-    with self.assertRaisesRegexp(ValueError, 'undefined rank'):
+    with self.assertRaisesRegex(ValueError, 'undefined rank'):
       normalization.instance_norm(inputs)
 
   def testBadDataFormat(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(2, 5, 5))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'data_format has to be either NCHW or NHWC.'):
       normalization.instance_norm(inputs, data_format='NHCW')
 
   def testParamsShapeNotFullyDefinedNCHW(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(3, None, 4))
-    with self.assertRaisesRegexp(ValueError, 'undefined channels dimension'):
+    with self.assertRaisesRegex(ValueError, 'undefined channels dimension'):
       normalization.instance_norm(inputs, data_format='NCHW')
 
   def testParamsShapeNotFullyDefinedNHWC(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(3, 4, None))
-    with self.assertRaisesRegexp(ValueError, 'undefined channels dimension'):
+    with self.assertRaisesRegex(ValueError, 'undefined channels dimension'):
       normalization.instance_norm(inputs, data_format='NHWC')
 
   def testCreateOp(self):
@@ -180,14 +180,14 @@ class GroupNormTest(test.TestCase):
 
   def testInvalidGroupSize(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(5, 2, 10, 10))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'Invalid groups 10 for 2 channels.'):
       normalization.group_norm(inputs, groups=10,
                                reduction_axes=[-2, -1], channels_axis=-3)
 
   def testBadCommensurateGroup(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(5, 4, 10, 10))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  '4 channels is not commensurate with '
                                  '3 groups.'):
       normalization.group_norm(inputs, groups=3,
@@ -195,38 +195,38 @@ class GroupNormTest(test.TestCase):
 
   def testAxisIsBad(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(1, 2, 4, 5))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'Axis is out of bounds.'):
       normalization.group_norm(inputs, channels_axis=5)
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'Axis is out of bounds.'):
       normalization.group_norm(inputs, reduction_axes=[1, 5])
 
   def testNotMutuallyExclusiveAxis(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(10, 32, 32, 32))
     # Specify axis with negative values.
-    with self.assertRaisesRegexp(ValueError, 'mutually exclusive'):
+    with self.assertRaisesRegex(ValueError, 'mutually exclusive'):
       normalization.group_norm(inputs, channels_axis=-2, reduction_axes=[-2])
     # Specify axis with positive values.
-    with self.assertRaisesRegexp(ValueError, 'mutually exclusive'):
+    with self.assertRaisesRegex(ValueError, 'mutually exclusive'):
       normalization.group_norm(inputs, channels_axis=1, reduction_axes=[1, 3])
     # Specify axis with mixed positive and negative values.
-    with self.assertRaisesRegexp(ValueError, 'mutually exclusive'):
+    with self.assertRaisesRegex(ValueError, 'mutually exclusive'):
       normalization.group_norm(inputs, channels_axis=-2, reduction_axes=[2])
 
   def testUnknownShape(self):
     inputs = array_ops.placeholder(dtypes.float32)
-    with self.assertRaisesRegexp(ValueError, 'undefined rank'):
+    with self.assertRaisesRegex(ValueError, 'undefined rank'):
       normalization.group_norm(inputs)
 
   def testParamsShapeNotFullyDefinedReductionAxes(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(1, 32, None, 4))
-    with self.assertRaisesRegexp(ValueError, 'undefined dimensions'):
+    with self.assertRaisesRegex(ValueError, 'undefined dimensions'):
       normalization.group_norm(inputs)
 
   def testParamsShapeNotFullyDefinedChannelsAxis(self):
     inputs = array_ops.placeholder(dtypes.float32, shape=(1, 3, 4, None))
-    with self.assertRaisesRegexp(ValueError, 'undefined channel dimension'):
+    with self.assertRaisesRegex(ValueError, 'undefined channel dimension'):
       normalization.group_norm(inputs, channels_axis=-1,
                                reduction_axes=[-3, -2])
 

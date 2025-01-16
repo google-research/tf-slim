@@ -355,7 +355,7 @@ class OptimizersTest(test.TestCase):
         update_var = variable_scope.get_variable(
             "update", [], initializer=init_ops.constant_initializer(10))
         update_op = state_ops.assign(update_var, 20)
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
             ValueError, "global_step is required for learning_rate_decay_fn"):
           optimizers_lib.optimize_loss(
               loss,

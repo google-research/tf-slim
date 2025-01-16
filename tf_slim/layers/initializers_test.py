@@ -37,7 +37,7 @@ from tensorflow.python.platform import test
 class InitializerTest(test.TestCase):
 
   def test_xavier_wrong_dtype(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError, 'Cannot create initializer for non-floating point type.'):
       initializers.xavier_initializer(dtype=dtypes.int32)
 
@@ -78,11 +78,11 @@ class InitializerTest(test.TestCase):
 class VarianceScalingInitializerTest(test.TestCase):
 
   def test_wrong_dtype(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError, 'Cannot create initializer for non-floating point type.'):
       initializers.variance_scaling_initializer(dtype=dtypes.int32)
     initializer = initializers.variance_scaling_initializer()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         TypeError, 'Cannot create initializer for non-floating point type.'):
       initializer([], dtype=dtypes.int32)
 

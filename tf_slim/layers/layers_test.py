@@ -69,7 +69,7 @@ class AvgPool2DTest(test.TestCase):
   def testInvalidDataFormat(self):
     height, width = 3, 6
     images = np.random.uniform(size=(5, height, width, 3))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'data_format has to be either NCHW or NHWC.'):
       _layers.avg_pool2d(images, [3, 3], data_format='CHWN')
 
@@ -138,7 +138,7 @@ class AvgPool3DTest(test.TestCase):
   def testInvalidDataFormat(self):
     depth, height, width = 3, 6, 9
     images = np.random.uniform(size=(5, depth, height, width, 3))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, 'data_format has to be either NCDHW or NDHWC.'):
       _layers.avg_pool3d(images, [3, 3, 3], data_format='CDHWN')
 
@@ -324,11 +324,11 @@ class ConvolutionTest(test.TestCase):
   def testInvalidShape(self):
     with self.cached_session():
       images_2d = random_ops.random_uniform((5, 7, 9, 3), seed=1)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           ValueError, 'Convolution expects input with rank 5, got 4'):
         layers_lib.convolution3d(images_2d, 32, 3)
       images_3d = random_ops.random_uniform((5, 6, 7, 9, 3), seed=1)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           ValueError, 'Convolution expects input with rank 4, got 5'):
         layers_lib.convolution2d(images_3d, 32, 3)
 
@@ -336,7 +336,7 @@ class ConvolutionTest(test.TestCase):
     height, width = 7, 9
     with self.cached_session():
       images = random_ops.random_uniform((5, height, width, 3), seed=1)
-      with self.assertRaisesRegexp(ValueError, 'data_format'):
+      with self.assertRaisesRegex(ValueError, 'data_format'):
         layers_lib.convolution2d(images, 32, 3, data_format='CHWN')
 
   def testCreateConv(self):
@@ -725,7 +725,7 @@ class Convolution2dTransposeTests(test.TestCase):
     height, width = 7, 9
     with self.cached_session():
       images = random_ops.random_uniform((5, height, width, 3), seed=1)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           ValueError, 'data_format has to be either NCHW or NHWC.'):
         _layers.convolution2d_transpose(images, 32, 3, data_format='CHWN')
 
@@ -1626,7 +1626,7 @@ class PartialFlattenTest(test.TestCase):
     inputs = array_ops.placeholder(dtypes.int32)
     inputs.set_shape(shape)
 
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'inputs has rank less than new_rank'):
       _layers._inner_flatten(inputs, new_rank)
 
@@ -1639,7 +1639,7 @@ class PartialFlattenTest(test.TestCase):
     indices, values, _ = _sparsify(random_)
     inputs = sparse_tensor.SparseTensor(indices, values, shape)
 
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'Inputs has rank less than new_rank'):
       _layers._inner_flatten(inputs, new_rank)
 
@@ -1836,13 +1836,13 @@ class BatchNormTest(test.TestCase):
   def testUnknownShape(self):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
-      with self.assertRaisesRegexp(ValueError, 'undefined rank'):
+      with self.assertRaisesRegex(ValueError, 'undefined rank'):
         _layers.batch_norm(inputs)
 
   def testInvalidDataFormat(self):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           ValueError, 'data_format has to be either NCHW or NHWC.'):
         _layers.batch_norm(inputs, data_format='CHWN')
 
@@ -1850,14 +1850,14 @@ class BatchNormTest(test.TestCase):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
       inputs.set_shape(tensor_shape.TensorShape((5, 3, 3, None)))
-      with self.assertRaisesRegexp(ValueError, 'undefined'):
+      with self.assertRaisesRegex(ValueError, 'undefined'):
         _layers.batch_norm(inputs, data_format='NHWC')
 
   def testUnknownChannelsDimNCHW(self):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
       inputs.set_shape(tensor_shape.TensorShape((5, None, 3, 3)))
-      with self.assertRaisesRegexp(ValueError, 'undefined'):
+      with self.assertRaisesRegex(ValueError, 'undefined'):
         _layers.batch_norm(inputs, data_format='NCHW')
 
   def _testCreateOp(self, fused, dtype=None):
@@ -2847,14 +2847,14 @@ class LayerNormTest(test.TestCase):
   def testUnknownShape(self):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
-      with self.assertRaisesRegexp(ValueError, 'undefined rank'):
+      with self.assertRaisesRegex(ValueError, 'undefined rank'):
         _layers.layer_norm(inputs)
 
   def testParamsDimsNotFullyDefined(self):
     with ops.Graph().as_default() as g, self.session(g):
       inputs = array_ops.placeholder(dtype=dtypes.float32)
       inputs.set_shape(tensor_shape.TensorShape((5, 3, 3, None)))
-      with self.assertRaisesRegexp(ValueError, 'is not fully defined'):
+      with self.assertRaisesRegex(ValueError, 'is not fully defined'):
         _layers.layer_norm(inputs)
 
   def testCreateOp(self):
@@ -2959,7 +2959,7 @@ class LayerNormTest(test.TestCase):
     self.doOutputTest((10, 300))
 
   def testOutput2DInputDegenerateNormAxis(self):
-    with self.assertRaisesRegexp(ValueError, r'must be < rank\(inputs\)'):
+    with self.assertRaisesRegex(ValueError, r'must be < rank\(inputs\)'):
       self.doOutputTest((10, 300), begin_norm_axis=2)
 
   def testOutput4DInput(self):
@@ -3042,7 +3042,7 @@ class ImagesToSequenceTest(test.TestCase):
   def testInvalidDataFormat(self):
     height, width = 7, 11
     images = np.random.uniform(size=(5, height, width, 2))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'data_format has to be either NCHW or NHWC.'):
       _layers.images_to_sequence(images, data_format='CHWN')
 
@@ -3064,7 +3064,7 @@ class MaxPool2DTest(test.TestCase):
   def testInvalidDataFormat(self):
     height, width = 3, 6
     images = np.random.uniform(size=(5, height, width, 3))
-    with self.assertRaisesRegexp(ValueError,
+    with self.assertRaisesRegex(ValueError,
                                  'data_format has to be either NCHW or NHWC.'):
       _layers.max_pool2d(images, [3, 3], data_format='CHWN')
 
@@ -3133,7 +3133,7 @@ class MaxPool3DTest(test.TestCase):
   def testInvalidDataFormat(self):
     depth, height, width = 3, 6, 9
     images = np.random.uniform(size=(5, depth, height, width, 3))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, 'data_format has to be either NCDHW or NDHWC.'):
       _layers.max_pool3d(images, [3, 3, 3], data_format='CDHWN')
 
@@ -3263,7 +3263,7 @@ class SeparableConv2dTest(test.TestCase):
     with self.cached_session():
       images = random_ops.random_uniform(
           (5, height, width, 3), seed=1, dtype=dtypes.int32, maxval=12345)
-      with self.assertRaisesRegexp(TypeError, 'non-floating point type'):
+      with self.assertRaisesRegex(TypeError, 'non-floating point type'):
         layers_lib.separable_conv2d(images, 32, [3, 3], 2)
 
   def testCreateConvFloat32(self):
@@ -4211,13 +4211,13 @@ class LegacyFullyConnectedTest(test.TestCase):
     self._unknown_dim_invalid_input(last_dim=3)
 
   def test_unknown_dim_invalid_input(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, 'last dimension of x must be known but is None'):
       self._unknown_dim_invalid_input(last_dim=None)
 
   def test_1d_invalid_input(self):
     with self.cached_session():
-      with self.assertRaisesRegexp(ValueError,
+      with self.assertRaisesRegex(ValueError,
                                    'rank of x must be at least 2 not: 1'):
         x = constant_op.constant([[]], shape=[0])
         _layers.legacy_fully_connected(x, 2, activation_fn=nn_ops.softmax)
@@ -4245,7 +4245,7 @@ class MaxOutTest(test.TestCase):
   def test_invalid_shape(self):
     inputs = random_ops.random_uniform((10, 100, 100, 3), seed=1)
     graph = _layers.conv2d(inputs, 3, 10)
-    with self.assertRaisesRegexp(ValueError, 'number of features'):
+    with self.assertRaisesRegex(ValueError, 'number of features'):
       graph = _layers.maxout(graph, num_units=2)
 
 

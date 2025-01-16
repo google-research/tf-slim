@@ -1746,7 +1746,7 @@ class StreamingAUCTest(tf1.test.TestCase):
       predictions = constant_op.constant(
           [1, -1, 1, -1], shape=(1, 4), dtype=dtypes_lib.float32)
       labels = constant_op.constant([0, 1, 1, 0], shape=(1, 4))
-      with self.assertRaisesRegexp(errors_impl.InvalidArgumentError,
+      with self.assertRaisesRegex(errors_impl.InvalidArgumentError,
                                    r'predictions must be in \[0, 1\]'):
         _, update_op = metrics.streaming_auc(predictions, labels)
         # In later versions of tensorflow error are detected statically;
@@ -1946,7 +1946,7 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
     ops.reset_default_graph()
 
   def testUnknownCurve(self):
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegex(
         ValueError, 'curve must be either ROC or PR, TEST_CURVE unknown'):
       metrics.streaming_dynamic_auc(
           labels=array_ops.ones((10, 1)),
@@ -2054,7 +2054,7 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
     with self.cached_session() as sess:
       predictions = array_ops.ones([5])
       labels = array_ops.zeros([6])
-      with self.assertRaisesRegexp(ValueError, 'Shapes .* are incompatible'):
+      with self.assertRaisesRegex(ValueError, 'Shapes .* are incompatible'):
         _, update_op = metrics.streaming_dynamic_auc(labels, predictions)
         sess.run(variables.local_variables_initializer())
         sess.run(update_op)
@@ -2065,7 +2065,7 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
       labels = constant_op.constant([2, 1, 0])
       _, update_op = metrics.streaming_dynamic_auc(labels, predictions)
       sess.run(variables.local_variables_initializer())
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           errors_impl.InvalidArgumentError,
           '.*labels must be 0 or 1, at least one is >1.*'):
         sess.run(update_op)
@@ -2076,7 +2076,7 @@ class StreamingDynamicAUCTest(tf1.test.TestCase):
       labels = constant_op.constant([1, 0, -1])
       _, update_op = metrics.streaming_dynamic_auc(labels, predictions)
       sess.run(variables.local_variables_initializer())
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           errors_impl.InvalidArgumentError,
           '.*labels must be 0 or 1, at least one is <0.*'):
         sess.run(update_op)
@@ -2367,7 +2367,7 @@ class AucWithConfidenceIntervalsTest(tf1.test.TestCase):
       labels = constant_op.constant([2, 1, 0, 1, 0])
       _, update_op = metrics.auc_with_confidence_intervals(labels, predictions)
       sess.run(variables.local_variables_initializer())
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           errors_impl.InvalidArgumentError,
           '.*labels must be 0 or 1, at least one is >1.*'):
         sess.run(update_op)
@@ -2378,7 +2378,7 @@ class AucWithConfidenceIntervalsTest(tf1.test.TestCase):
       labels = constant_op.constant([1, 0, -1, 1, 0])
       _, update_op = metrics.auc_with_confidence_intervals(labels, predictions)
       sess.run(variables.local_variables_initializer())
-      with self.assertRaisesRegexp(
+      with self.assertRaisesRegex(
           errors_impl.InvalidArgumentError,
           '.*labels must be 0 or 1, at least one is <0.*'):
         sess.run(update_op)
@@ -7271,7 +7271,7 @@ class CohenKappaTest(tf1.test.TestCase):
   def testInvalidNumClasses(self):
     predictions = array_ops.placeholder(dtypes_lib.float32, shape=(4, 1))
     labels = array_ops.placeholder(dtypes_lib.int32, shape=(4, 1))
-    with self.assertRaisesRegexp(ValueError, 'num_classes'):
+    with self.assertRaisesRegex(ValueError, 'num_classes'):
       metrics.cohen_kappa(labels, predictions, 1)
 
   def testInvalidDimension(self):

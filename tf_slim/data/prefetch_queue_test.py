@@ -165,7 +165,7 @@ class PrefetchQueueTest(test.TestCase):
   def testDynamicPad_failure(self):
     with ops.Graph().as_default():
       variable_tensor = array_ops.placeholder(dtypes.int32, shape=[None, 3])
-      with self.assertRaisesRegexp(ValueError, 'shapes must be fully defined'):
+      with self.assertRaisesRegex(ValueError, 'shapes must be fully defined'):
         prefetch_queue.prefetch_queue([variable_tensor])
 
   def testDynamicPad(self):

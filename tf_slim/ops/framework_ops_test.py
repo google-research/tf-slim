@@ -53,15 +53,15 @@ class OpsTest(test.TestCase):
     with g0.as_default():
       values = [constant_op.constant(0.0), constant_op.constant(1.0)]
     g1 = ops.Graph()
-    with self.assertRaisesRegexp(ValueError, "not from the passed-in graph"):
+    with self.assertRaisesRegex(ValueError, "not from the passed-in graph"):
       ops_lib.get_graph_from_inputs(values, g1)
     with g1.as_default():
       values.append(constant_op.constant(2.0))
-    with self.assertRaisesRegexp(ValueError, "must be from the same graph"):
+    with self.assertRaisesRegex(ValueError, "must be from the same graph"):
       ops_lib.get_graph_from_inputs(values)
-    with self.assertRaisesRegexp(ValueError, "not from the passed-in graph"):
+    with self.assertRaisesRegex(ValueError, "not from the passed-in graph"):
       ops_lib.get_graph_from_inputs(values, g0)
-    with self.assertRaisesRegexp(ValueError, "not from the passed-in graph"):
+    with self.assertRaisesRegex(ValueError, "not from the passed-in graph"):
       ops_lib.get_graph_from_inputs(values, g1)
 
   def testGetNameScope(self):

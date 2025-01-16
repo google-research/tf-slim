@@ -218,9 +218,9 @@ class GlobalStepTest(test.TestCase):
           trainable=False,
           dtype=dtypes.float32,
           name=ops.GraphKeys.GLOBAL_STEP)
-      self.assertRaisesRegexp(TypeError, 'does not have integer type',
+      self.assertRaisesRegex(TypeError, 'does not have integer type',
                               variables_lib2.get_global_step)
-    self.assertRaisesRegexp(TypeError, 'does not have integer type',
+    self.assertRaisesRegex(TypeError, 'does not have integer type',
                             variables_lib2.get_global_step, g)
 
   def test_invalid_shape(self):
@@ -234,9 +234,9 @@ class GlobalStepTest(test.TestCase):
                                  ops.GraphKeys.GLOBAL_VARIABLES,
                                  ops.GraphKeys.GLOBAL_STEP
                              ])
-      self.assertRaisesRegexp(TypeError, 'not scalar',
+      self.assertRaisesRegex(TypeError, 'not scalar',
                               variables_lib2.get_global_step)
-    self.assertRaisesRegexp(TypeError, 'not scalar',
+    self.assertRaisesRegex(TypeError, 'not scalar',
                             variables_lib2.get_global_step, g)
 
   def test_create_global_step(self):
@@ -244,9 +244,9 @@ class GlobalStepTest(test.TestCase):
     with ops.Graph().as_default() as g:
       global_step = variables_lib2.create_global_step()
       self._assert_global_step(global_step)
-      self.assertRaisesRegexp(ValueError, 'already exists',
+      self.assertRaisesRegex(ValueError, 'already exists',
                               variables_lib2.create_global_step)
-      self.assertRaisesRegexp(ValueError, 'already exists',
+      self.assertRaisesRegex(ValueError, 'already exists',
                               variables_lib2.create_global_step, g)
       self._assert_global_step(variables_lib2.create_global_step(ops.Graph()))
 
