@@ -89,7 +89,7 @@ class ClipGradientNormsTest(test.TestCase):
     [gradients_to_variables
     ] = learning.clip_gradient_norms([gradients_to_variables], self._max_norm)
 
-    self.assertEqual(gradients_to_variables[0], None)
+    self.assertIsNone(gradients_to_variables[0])
     self.assertEqual(gradients_to_variables[1], variable)
 
   def testIndexedSlicesGradIsClippedCorrectly(self):
@@ -237,7 +237,7 @@ class TrainBNClassifierTest(test.TestCase):
     self._labels = np.random.randint(0, 2, size=(16, 1)).astype(np.float32)
 
     for i in range(16):
-      j = int(2 * self._labels[i] + np.random.randint(0, 2))
+      j = int(2 * np.squeeze(self._labels[i]) + np.random.randint(0, 2))
       self._inputs[i, j] = 1
 
   def testTrainWithNoInitAssignCanAchieveZeroLoss(self):
