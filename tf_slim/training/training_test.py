@@ -239,7 +239,7 @@ class TrainBatchNormClassifierTest(test.TestCase):
     self._labels = np.random.randint(0, 2, size=(16, 1)).astype(np.float32)
 
     for i in range(16):
-      j = int(2 * self._labels[i] + np.random.randint(0, 2))
+      j = int(2 * self._labels[i].item() + np.random.randint(0, 2))
       self._inputs[i, j] = 1
 
   def testTrainWithNoInitAssignCanAchieveZeroLoss(self):
@@ -276,7 +276,7 @@ class TrainTest(test.TestCase):
     self._labels = np.random.randint(0, 2, size=(16, 1)).astype(np.float32)
 
     for i in range(16):
-      j = int(2 * self._labels[i] + np.random.randint(0, 2))
+      j = int(2 * self._labels[i].item() + np.random.randint(0, 2))
       self._inputs[i, j] = 1
 
   def testCanAchieveZeroLoss(self):
