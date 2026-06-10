@@ -20,11 +20,11 @@ from __future__ import division
 from __future__ import print_function
 import sys
 
+from google.protobuf import text_format
 import numpy as np
 import tensorflow.compat.v1 as tf
 
 from tf_slim.data import tfexample_decoder
-from google.protobuf import text_format
 # pylint:disable=g-direct-tensorflow-import
 from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_case
