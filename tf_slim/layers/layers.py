@@ -115,7 +115,7 @@ def avg_pool2d(inputs,
         padding=padding,
         data_format=df,
         _scope=sc)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
 
@@ -164,7 +164,7 @@ def avg_pool3d(inputs,
         padding=padding,
         data_format=df,
         _scope=sc)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
 
@@ -675,7 +675,7 @@ def batch_norm(inputs,
           _scope=sc,
           _reuse=reuse,
           fused=fused)
-      outputs = layer.apply(inputs, training=is_training)
+      outputs = layer(inputs, training=is_training)
 
       # Add variables to collections.
       _add_variable_to_collections(layer.moving_mean, variables_collections,
@@ -1080,7 +1080,7 @@ def convolution(inputs,
         dtype=inputs.dtype.base_dtype,
         _scope=sc,
         _reuse=reuse)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
 
     # Add variables to collections.
     _add_variable_to_collections(layer.kernel, variables_collections, 'weights')
@@ -1440,7 +1440,7 @@ def convolution2d_transpose(
         dtype=inputs.dtype.base_dtype,
         _scope=sc,
         _reuse=reuse)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
 
     # Add variables to collections.
     _add_variable_to_collections(layer.kernel, variables_collections, 'weights')
@@ -1554,7 +1554,7 @@ def convolution3d_transpose(
         dtype=inputs.dtype.base_dtype,
         _scope=sc,
         _reuse=reuse)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
 
     # Add variables to collections.
     _add_variable_to_collections(layer.kernel, variables_collections, 'weights')
@@ -1635,7 +1635,7 @@ def dropout(inputs,
         seed=seed,
         name=sc.name,
         _scope=sc)
-    outputs = layer.apply(inputs, training=is_training)
+    outputs = layer(inputs, training=is_training)
     return utils.collect_named_outputs(outputs_collections, sc.name, outputs)
 
 
@@ -1889,7 +1889,7 @@ def fully_connected(inputs,
         dtype=inputs.dtype.base_dtype,
         _scope=sc,
         _reuse=reuse)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
 
     # Add variables to collections.
     _add_variable_to_collections(layer.kernel, variables_collections, 'weights')
@@ -2221,7 +2221,7 @@ def gdn(inputs,
       dtype=inputs.dtype.base_dtype,
       _scope=name,
       _reuse=reuse)
-  return layer.apply(inputs)
+  return layer(inputs)
 
 
 @add_arg_scope
@@ -2438,7 +2438,7 @@ def max_pool2d(inputs,
         padding=padding,
         data_format=df,
         _scope=sc)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
 
@@ -2488,7 +2488,7 @@ def max_pool3d(inputs,
         padding=padding,
         data_format=df,
         _scope=sc)
-    outputs = layer.apply(inputs)
+    outputs = layer(inputs)
     return utils.collect_named_outputs(outputs_collections, sc, outputs)
 
 
@@ -2794,7 +2794,7 @@ def separable_convolution2d(
           dtype=inputs.dtype.base_dtype,
           _scope=sc,
           _reuse=reuse)
-      outputs = layer.apply(inputs)
+      outputs = layer(inputs)
 
       # Add variables to collections.
       _add_variable_to_collections(layer.depthwise_kernel,
