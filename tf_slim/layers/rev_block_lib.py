@@ -32,7 +32,7 @@ import re
 
 import numpy as np
 import six
-from six.moves import xrange  # pylint: disable=redefined-builtin
+from six.moves import xrange  # pylint: disable=redefined-builtin  # pyrefly: ignore[missing-source-for-stubs]
 import tensorflow.compat.v1 as tf
 
 # pylint: disable=g-direct-tensorflow-import
@@ -265,9 +265,9 @@ class RevBlock(tf.layers.Layer):
 
       for i, t in enumerate(side_inputs):
         if t in self.f_side_input:
-          f_side_idxs[self.f_side_input.index(t)] = i
+          f_side_idxs[self.f_side_input.index(t)] = i  # pyrefly: ignore[unsupported-operation]
         elif t in self.g_side_input:
-          g_side_idxs[self.g_side_input.index(t)] = i
+          g_side_idxs[self.g_side_input.index(t)] = i  # pyrefly: ignore[unsupported-operation]
         else:
           assert False
 
@@ -279,8 +279,8 @@ class RevBlock(tf.layers.Layer):
       for i, ref in enumerate(variables):
         # Use the name to identify the layer number and function (f or g)
         regex = LAYER_RE.match(ref.name)
-        layer_no = int(regex.group(1))
-        fn_name = regex.group(2)
+        layer_no = int(regex.group(1))  # pyrefly: ignore[missing-attribute]
+        fn_name = regex.group(2)  # pyrefly: ignore[missing-attribute]
         if fn_name == "f":
           f_vars[layer_no].append(ref)
           f_vars_idxs[layer_no].append(i)
@@ -333,9 +333,9 @@ class RevBlock(tf.layers.Layer):
           variable_grads[i] = grad
 
       for i, grad in zip(f_side_idxs, acc_f_side_grads):
-        side_input_grads[i] = grad
+        side_input_grads[i] = grad  # pyrefly: ignore[unsupported-operation]
       for i, grad in zip(g_side_idxs, acc_g_side_grads):
-        side_input_grads[i] = grad
+        side_input_grads[i] = grad  # pyrefly: ignore[unsupported-operation]
 
       grad_x1, grad_x2 = grad_ys
       return [grad_x1, grad_x2] + side_input_grads, variable_grads
@@ -386,7 +386,7 @@ class RevBlock(tf.layers.Layer):
 
       y1, y2 = x1, x2
 
-    return x1, x2
+    return x1, x2  # pyrefly: ignore[unbound-name]
 
 
 def rev_block(x1,

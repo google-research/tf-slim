@@ -172,7 +172,7 @@ def _num_present(losses, weights, per_batch=False):
   num_to_broadcast = math_ops.cast(math_ops.reduce_prod(broadcast_dims),
                                    dtypes.float32)
 
-  num_per_batch = math_ops.multiply(num_nonzero_per_batch, num_to_broadcast)
+  num_per_batch = math_ops.multiply(num_nonzero_per_batch, num_to_broadcast)  # pyrefly: ignore[unbound-name]
   return num_per_batch if per_batch else math_ops.reduce_sum(num_per_batch)
 
 
@@ -267,7 +267,7 @@ def absolute_difference(predictions, labels=None, weights=1.0, scope=None):
   """
   with ops.name_scope(scope, "absolute_difference",
                       [predictions, labels, weights]) as scope:
-    predictions.get_shape().assert_is_compatible_with(labels.get_shape())
+    predictions.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
     predictions = math_ops.cast(predictions, dtypes.float32)
     labels = math_ops.cast(labels, dtypes.float32)
     losses = math_ops.abs(math_ops.subtract(predictions, labels))
@@ -443,7 +443,7 @@ def log_loss(predictions, labels=None, weights=1.0, epsilon=1e-7, scope=None):
   """
   with ops.name_scope(scope, "log_loss",
                       [predictions, labels, weights]) as scope:
-    predictions.get_shape().assert_is_compatible_with(labels.get_shape())
+    predictions.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
     predictions = math_ops.cast(predictions, dtypes.float32)
     labels = math_ops.cast(labels, dtypes.float32)
     losses = -math_ops.multiply(
@@ -477,7 +477,7 @@ def hinge_loss(logits, labels=None, scope=None):
     ValueError: If the shapes of `logits` and `labels` don't match.
   """
   with ops.name_scope(scope, "hinge_loss", [logits, labels]) as scope:
-    logits.get_shape().assert_is_compatible_with(labels.get_shape())
+    logits.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
     # We first need to convert binary labels to -1/1 labels (as floats).
     labels = math_ops.cast(labels, dtypes.float32)
     all_ones = array_ops.ones_like(labels)
@@ -514,7 +514,7 @@ def mean_squared_error(predictions, labels=None, weights=1.0, scope=None):
   """
   with ops.name_scope(scope, "mean_squared_error",
                       [predictions, labels, weights]) as scope:
-    predictions.get_shape().assert_is_compatible_with(labels.get_shape())
+    predictions.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
     predictions = math_ops.cast(predictions, dtypes.float32)
     labels = math_ops.cast(labels, dtypes.float32)
     losses = math_ops.squared_difference(predictions, labels)
@@ -568,7 +568,7 @@ def mean_pairwise_squared_error(predictions,
   """
   with ops.name_scope(scope, "mean_pairwise_squared_error",
                       [predictions, labels, weights]) as scope:
-    predictions.get_shape().assert_is_compatible_with(labels.get_shape())
+    predictions.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
     predictions = math_ops.cast(predictions, dtypes.float32)
     labels = math_ops.cast(labels, dtypes.float32)
     weights = math_ops.cast(ops.convert_to_tensor(weights), dtypes.float32)
@@ -642,7 +642,7 @@ def cosine_distance(predictions,
     raise ValueError("You must specify 'axis'.")
   with ops.name_scope(scope, "cosine_distance_loss",
                       [predictions, labels, weights]) as scope:
-    predictions.get_shape().assert_is_compatible_with(labels.get_shape())
+    predictions.get_shape().assert_is_compatible_with(labels.get_shape())  # pyrefly: ignore[missing-attribute]
 
     predictions = math_ops.cast(predictions, dtypes.float32)
     labels = math_ops.cast(labels, dtypes.float32)

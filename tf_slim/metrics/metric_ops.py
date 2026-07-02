@@ -794,7 +794,7 @@ def _streaming_confusion_matrix_at_thresholds(predictions,
                                                    dtypes.float32,
                                                    name='false_negatives')
     is_false_negative = math_ops.cast(
-        math_ops.logical_and(label_is_pos, pred_is_neg), dtypes.float32)
+        math_ops.logical_and(label_is_pos, pred_is_neg), dtypes.float32)  # pyrefly: ignore[unbound-name]
     if weights_tiled is not None:
       is_false_negative *= weights_tiled
     update_ops['fn'] = state_ops.assign_add(
@@ -806,7 +806,7 @@ def _streaming_confusion_matrix_at_thresholds(predictions,
                                                   dtypes.float32,
                                                   name='true_negatives')
     is_true_negative = math_ops.cast(
-        math_ops.logical_and(label_is_neg, pred_is_neg), dtypes.float32)
+        math_ops.logical_and(label_is_neg, pred_is_neg), dtypes.float32)  # pyrefly: ignore[unbound-name]
     if weights_tiled is not None:
       is_true_negative *= weights_tiled
     update_ops['tn'] = state_ops.assign_add(
@@ -1123,9 +1123,9 @@ def _compute_dynamic_auc(labels, predictions, curve='ROC', weights=None):
           array_ops.ones_like(true_positives, dtype=dtypes.float64))
 
     # Calculate trapezoid areas.
-    heights = math_ops.add(y_axis_values[1:], y_axis_values[:-1]) / 2.0
+    heights = math_ops.add(y_axis_values[1:], y_axis_values[:-1]) / 2.0  # pyrefly: ignore[unbound-name]
     widths = math_ops.abs(
-        math_ops.subtract(x_axis_values[1:], x_axis_values[:-1]))
+        math_ops.subtract(x_axis_values[1:], x_axis_values[:-1]))  # pyrefly: ignore[unbound-name]
     return math_ops.reduce_sum(math_ops.multiply(heights, widths))
 
   # If all the labels are the same, AUC isn't well-defined (but raising an

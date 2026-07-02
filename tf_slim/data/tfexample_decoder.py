@@ -494,7 +494,7 @@ class BoundingBoxSequence(ItemHandler):
           len(keys)))
     self._prefix = prefix
     self._keys = keys
-    self._full_keys = [prefix + k for k in keys]
+    self._full_keys = [prefix + k for k in keys]  # pyrefly: ignore[unsupported-operation]
     self._return_dense = return_dense
     self._default_value = default_value
     super(BoundingBoxSequence, self).__init__(self._full_keys)
@@ -627,7 +627,7 @@ class KeypointsSequence(ItemHandler):
           len(keys)))
     self._prefix = prefix
     self._keys = keys
-    self._full_keys = [prefix + k for k in keys]
+    self._full_keys = [prefix + k for k in keys]  # pyrefly: ignore[unsupported-operation]
     self._return_dense = return_dense
     self._default_value = default_value
     super(KeypointsSequence, self).__init__(self._full_keys)
