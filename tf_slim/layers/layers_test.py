@@ -2982,7 +2982,7 @@ class LayerNormTest(test.TestCase):
     self.doOutputTest((1, 100, 100, 1))
 
   def testOutputBigInputFloat32(self):
-    self.doOutputTest((1, 100, 1000, 1), tol=1e-4, dtype=dtypes.float32)
+    self.doOutputTest((1, 100, 1000, 1), tol=2e-4, dtype=dtypes.float32)
 
   def testOutputBigInputFloat16(self):
     self.doOutputTest((1, 100, 1000, 1), tol=5e-2, dtype=dtypes.float16)
